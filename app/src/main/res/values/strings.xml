@@ -2,4 +2,8 @@
     <string name="app_name">StopWatch</string>
     <string name="action_settings">Settings</string>
     <string name="section_format">Hello World from section: %1$d</string>
+
+    <string name="btn1_text">LAP</string>
+    <string name="btn2_text">LAP RECORD</string>
+    <string name="btn3_text">RESET</string>
 </resources>
