@@ -26,7 +26,7 @@
         android:layout_alignParentBottom="true">
 
         <Button
-            android:text="Button"
+            android:text="@string/btn1_text"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/button4"
@@ -35,7 +35,7 @@
             android:textColor="@color/white"/>
 
         <Button
-            android:text="Button"
+            android:text="@string/btn2_text"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/button3"
@@ -44,7 +44,7 @@
             android:textColor="@color/white" />
 
         <Button
-            android:text="Button"
+            android:text="@string/btn3_text"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/button2"
