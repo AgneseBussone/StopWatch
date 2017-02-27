@@ -1,9 +1,78 @@
 <?xml version="1.0" encoding="utf-8"?>
-<shape xmlns:android="http://schemas.android.com/apk/res/android"
-    android:shape="oval">
-    <size android:width="@dimen/white"
-        android:height="@dimen/white"/>
-    <stroke android:color="@color/white"
-        android:width="10dp"/>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
 
-</shape>
+    <!--Shadow -->
+    <item>
+        <shape android:shape="oval">
+            <padding
+                android:bottom="@dimen/big_shadow"
+                android:top="@dimen/big_shadow"
+                android:left="@dimen/big_shadow"
+                android:right="@dimen/big_shadow"/>
+
+            <solid android:color="#00595959" />
+
+        </shape>
+    </item>
+    <item>
+        <shape android:shape="oval">
+            <padding
+                android:bottom="@dimen/big_shadow"
+                android:top="@dimen/big_shadow"
+                android:left="@dimen/big_shadow"
+                android:right="@dimen/big_shadow"/>
+
+            <solid android:color="#10595959" />
+
+        </shape>
+    </item>
+    <item>
+        <shape android:shape="oval">
+            <padding
+                android:bottom="@dimen/big_shadow"
+                android:top="@dimen/big_shadow"
+                android:left="@dimen/big_shadow"
+                android:right="@dimen/big_shadow"/>
+
+            <solid android:color="#20595959" />
+
+        </shape>
+    </item>
+    <item>
+        <shape android:shape="oval">
+            <padding
+                android:bottom="@dimen/big_shadow"
+                android:top="@dimen/big_shadow"
+                android:left="@dimen/big_shadow"
+                android:right="@dimen/big_shadow"/>
+
+            <solid android:color="#30595959" />
+
+        </shape>
+    </item>
+    <item>
+        <shape android:shape="oval">
+            <padding
+                android:bottom="@dimen/big_shadow"
+                android:top="@dimen/big_shadow"
+                android:left="@dimen/big_shadow"
+                android:right="@dimen/big_shadow"/>
+
+            <solid android:color="#50595959" />
+
+        </shape>
+    </item>
+
+
+    <item>
+        <shape
+            android:shape="oval">
+            <size android:width="@dimen/white"
+                android:height="@dimen/white"/>
+            <solid android:color="@color/background_color"/>
+            <stroke android:color="@color/white"
+                android:width="10dp"/>
+
+        </shape>
+    </item>
+</layer-list>

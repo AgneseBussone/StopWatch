@@ -15,4 +15,5 @@
     <dimen name="bg_dimension">320dp</dimen>
     <dimen name="needleH">65dp</dimen>
     <dimen name="needleW">35dp</dimen>
+    <dimen name="big_shadow">4dp</dimen>
 </resources>
