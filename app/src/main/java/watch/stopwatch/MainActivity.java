@@ -6,6 +6,7 @@ import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Button;
 import android.widget.RadioGroup;
 
 public class MainActivity extends AppCompatActivity {
@@ -25,6 +26,8 @@ public class MainActivity extends AppCompatActivity {
      */
     private ViewPager mViewPager;
     ViewPager.OnPageChangeListener pageListener;
+    private Button btn1;
+    private Button btn2;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,6 +41,9 @@ public class MainActivity extends AppCompatActivity {
         // Set up the ViewPager with the sections adapter.
         mViewPager = (ViewPager) findViewById(R.id.container);
         mViewPager.setAdapter(mSectionsPagerAdapter);
+
+        btn1 = (Button)findViewById(R.id.button1);
+        btn2 = (Button)findViewById(R.id.button2);
 
 
         // Page indicator RadioGroup
@@ -60,10 +66,21 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onPageSelected(int position) {
                 // when swipe to the next page, update the radiobutton
+                // and button text
                 switch(position){
-                    case 0: page_selector.check(R.id.page1);break;
-                    case 1: page_selector.check(R.id.page2);break;
-                    case 2: page_selector.check(R.id.page3);break;
+                    case 0:
+                        page_selector.check(R.id.page1);
+                        btn1.setText(R.string.btn1_page1_text);
+                        btn2.setText(R.string.btn2_page1_text);
+                        break;
+                    case 1:
+                        page_selector.check(R.id.page2);
+                        btn1.setText(R.string.btn1_page2_text);
+                        btn2.setText(R.string.btn2_page2_text);
+                        break;
+                    case 2:
+                        page_selector.check(R.id.page3);
+                        break;
                 }
             }
 

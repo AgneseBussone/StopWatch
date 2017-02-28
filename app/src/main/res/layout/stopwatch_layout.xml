@@ -1,37 +1,46 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="@color/background_color">
+                android:orientation="vertical" android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@color/background_color"
+    >
 
-    <ImageView
-        android:layout_width="@dimen/numbers_dimension"
-        android:layout_height="@dimen/numbers_dimension"
-        android:background="@drawable/numbers"
-        android:layout_centerVertical="true"
-        android:layout_centerHorizontal="true"
-        android:layout_gravity="center"
-        android:id="@+id/numbers"/>
 
-    <ImageView
+    <RelativeLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:background="@drawable/clock_list"
-        android:layout_gravity="center"
-        android:layout_centerVertical="true"
+        android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
-        android:id="@+id/clock_list"
-        />
+        android:id="@+id/relL">
 
+        <ImageView
+            android:layout_width="@dimen/numbers_dimension"
+            android:layout_height="@dimen/numbers_dimension"
+            android:background="@drawable/numbers"
+            android:layout_centerVertical="true"
+            android:layout_centerHorizontal="true"
+            android:layout_gravity="center"
+            android:id="@+id/numbers"/>
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/clock_list"
+            android:layout_gravity="center"
+            android:layout_centerVertical="true"
+            android:layout_centerHorizontal="true"
+            android:id="@+id/clock_list"
+            />
+    </RelativeLayout>
 
     <TextView
         android:text="00:000"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_above="@+id/numbers"
-        android:layout_centerHorizontal="true"
         android:id="@+id/time_text"
         android:textAppearance="@style/TextAppearance.AppCompat.Display1"
-        android:textColor="@color/colorPrimary" />
+        android:textColor="@color/colorPrimary"
+        android:layout_above="@+id/relL"
+        android:layout_centerHorizontal="true"/>
 
 </RelativeLayout>
