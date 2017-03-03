@@ -8,4 +8,7 @@
     <string name="btn3_text">RESET</string>
     <string name="btn1_page2_text">SET</string>
     <string name="btn2_page2_text">TIMER PRESET</string>
+
+    <string name="central_btn_start_tap">TAP\nto start</string>
+    <string name="central_btn_start_shake">SHAKE\nto start</string>
 </resources>

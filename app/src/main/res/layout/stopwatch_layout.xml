@@ -31,6 +31,19 @@
             android:layout_centerHorizontal="true"
             android:id="@+id/clock_list"
             />
+
+        <TextView
+            android:text="@string/central_btn_start_shake"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_centerHorizontal="true"
+            android:id="@+id/textView"
+            android:textAppearance="@style/TextAppearance.AppCompat"
+            android:singleLine="false"
+            android:textSize="24sp"
+            android:textColor="@color/white"
+            android:textAlignment="center"/>
     </RelativeLayout>
 
     <TextView

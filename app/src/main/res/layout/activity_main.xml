@@ -31,7 +31,8 @@
         android:layout_weight="1"
         android:layout_alignBottom="@id/container"
         android:layout_alignEnd="@id/container"
-        android:layout_marginBottom="360dp"/>
+        android:layout_marginBottom="360dp"
+        android:onClick="onCreateOptionMenu"/>
 
     <LinearLayout
         android:id="@+id/buttons"
@@ -48,7 +49,10 @@
             android:layout_weight="1"
             android:textColor="@color/white"
             style="@style/Widget.AppCompat.Button.Borderless.Colored"
-            android:background="@color/colorPrimary" />
+            android:background="@color/colorPrimary"
+            android:foreground="@drawable/button_state_selector"
+            android:onClick="btn1Click"
+            />
 
         <Button
             android:text="@string/btn2_page1_text"
@@ -58,7 +62,9 @@
             android:layout_weight="1"
             android:textColor="@color/white"
             style="@style/Widget.AppCompat.Button.Borderless.Colored"
-            android:background="@color/colorPrimaryLight" />
+            android:background="@color/colorPrimaryLight"
+            android:foreground="@drawable/button_state_selector"
+            android:onClick="btn2Click"/>
 
         <Button
             android:text="@string/btn3_text"
@@ -68,7 +74,9 @@
             android:layout_weight="1"
             android:textColor="@color/white"
             style="@style/Widget.AppCompat.Button.Borderless.Colored"
-            android:background="@color/colorPrimary" />
+            android:background="@color/colorPrimary"
+            android:foreground="@drawable/button_state_selector"
+            android:onClick="btn3Click"/>
 
     </LinearLayout>
 

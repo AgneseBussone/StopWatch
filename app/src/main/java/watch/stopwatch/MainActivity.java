@@ -1,11 +1,14 @@
 package watch.stopwatch;
 
+import android.content.Context;
 import android.os.Bundle;
+import android.os.Vibrator;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.Button;
 import android.widget.RadioGroup;
 
@@ -26,8 +29,10 @@ public class MainActivity extends AppCompatActivity {
      */
     private ViewPager mViewPager;
     ViewPager.OnPageChangeListener pageListener;
+    private RadioGroup page_selector;
     private Button btn1;
     private Button btn2;
+    private Vibrator vibe;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,7 +52,7 @@ public class MainActivity extends AppCompatActivity {
 
 
         // Page indicator RadioGroup
-        final RadioGroup page_selector = (RadioGroup)findViewById(R.id.page_selector);
+        page_selector = (RadioGroup)findViewById(R.id.page_selector);
         page_selector.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(RadioGroup group, int checkedId) {
@@ -90,6 +95,7 @@ public class MainActivity extends AppCompatActivity {
 
         mViewPager.addOnPageChangeListener(pageListener);
 
+        vibe = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE) ;
     }
 
 
@@ -113,5 +119,68 @@ public class MainActivity extends AppCompatActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    /**
+     * Callback for button1 click
+     * @param view
+     */
+    public void btn1Click(View view) {
+        vibe.vibrate(30);
+        int page = page_selector.getCheckedRadioButtonId();
+        switch(page){
+            case 0:
+                // stopwatch
+                break;
+            case 1:
+                // timer
+                break;
+            case 3:
+                // TBD
+                break;
+        }
+
+    }
+
+    /**
+     * Callback for button2 click
+     * @param view
+     */
+    public void btn2Click(View view) {
+        vibe.vibrate(30);
+        int page = page_selector.getCheckedRadioButtonId();
+        switch(page){
+            case 0:
+                // stopwatch
+                break;
+            case 1:
+                // timer
+                break;
+            case 3:
+                // TBD
+                break;
+        }
+
+    }
+
+    /**
+     * Callback for button3 click
+     * @param view
+     */
+    public void btn3Click(View view) {
+        vibe.vibrate(30);
+        int page = page_selector.getCheckedRadioButtonId();
+        switch(page){
+            case 0:
+                // stopwatch
+                break;
+            case 1:
+                // timer
+                break;
+            case 3:
+                // TBD
+                break;
+        }
+
     }
 }
