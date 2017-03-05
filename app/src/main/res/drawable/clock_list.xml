@@ -14,7 +14,4 @@
     <item android:drawable="@drawable/needle"
         android:gravity="top|center"/>
 
-    <item android:drawable="@drawable/center"
-        android:gravity="center"/>
-
 </layer-list>

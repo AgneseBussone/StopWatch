@@ -9,6 +9,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.Button;
 import android.widget.RadioGroup;
 
@@ -182,5 +184,15 @@ public class MainActivity extends AppCompatActivity {
                 break;
         }
 
+    }
+
+    /**
+     * Callback for center button
+     * @param view
+     */
+    public void btnCenter(View view) {
+        vibe.vibrate(50);
+        Animation animation = AnimationUtils.loadAnimation(this, R.anim.center_btn_anim);
+        view.startAnimation(animation);
     }
 }
