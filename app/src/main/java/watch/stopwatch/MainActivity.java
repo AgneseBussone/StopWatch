@@ -35,6 +35,8 @@ public class MainActivity extends AppCompatActivity {
     private Button btn1;
     private Button btn2;
     private Vibrator vibe;
+    private MessageHandler messageHandler;
+    private boolean stopwatch_running = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,6 +53,8 @@ public class MainActivity extends AppCompatActivity {
 
         btn1 = (Button)findViewById(R.id.button1);
         btn2 = (Button)findViewById(R.id.button2);
+
+
 
 
         // Page indicator RadioGroup
@@ -98,6 +102,9 @@ public class MainActivity extends AppCompatActivity {
         mViewPager.addOnPageChangeListener(pageListener);
 
         vibe = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE) ;
+
+        // message handler setup
+        messageHandler = new MessageHandler(mSectionsPagerAdapter, getMainLooper());
     }
 
 
@@ -191,8 +198,20 @@ public class MainActivity extends AppCompatActivity {
      * @param view
      */
     public void btnCenter(View view) {
-        vibe.vibrate(50);
         Animation animation = AnimationUtils.loadAnimation(this, R.anim.center_btn_anim);
         view.startAnimation(animation);
+        startStopwatch();
+    }
+
+    private void startStopwatch(){
+        vibe.vibrate(50);
+        if(stopwatch_running) {
+            messageHandler.sendEmptyMessage(MessageHandler.MSG_STOPWATCH_STOP);
+            stopwatch_running = false;
+        }
+        else{
+            messageHandler.sendEmptyMessage(MessageHandler.MSG_STOPWATCH_START);
+            stopwatch_running = true;
+        }
     }
 }
