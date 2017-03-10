@@ -4,7 +4,6 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -57,21 +56,19 @@ public class SectionsPagerAdapter extends FragmentPagerAdapter {
         return null;
     }
 
-    public void updateStopwatch(String text, float degree){
+    public TextView getStopwatchTV() {
         View view = fragment_list.get(0).getView();
-        ImageView stopwatch_needle = (ImageView) view.findViewById(R.id.needle_list);
-        TextView stopwatch_tv = (TextView)view.findViewById(R.id.time_text);
-        if(stopwatch_needle != null && stopwatch_tv != null){
-            Log.d(TAG, "update stopwatch");
-            stopwatch_needle.setRotation(stopwatch_needle.getRotation() + degree);
-            stopwatch_tv.setText(text);
-        }
+        return (TextView) view.findViewById(R.id.time_text);
     }
 
-    public void updateStopwatchButtonText(int resId){
+    public ImageView getStopwatchNeedle() {
         View view = fragment_list.get(0).getView();
-        TextView text = (TextView)view.findViewById(R.id.btn_text_action);
-        text.setText(resId);
+        return (ImageView) view.findViewById(R.id.needle_list);
+    }
+
+    public TextView getStopwatchButtonText(){
+        View view = fragment_list.get(0).getView();
+        return (TextView)view.findViewById(R.id.btn_text_action);
     }
 
     /**

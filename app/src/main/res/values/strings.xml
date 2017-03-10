@@ -13,4 +13,5 @@
     <string name="central_btn_shake">SHAKE</string>
     <string name="central_btn_start">to start</string>
     <string name="central_btn_stop">to stop</string>
+    <string name="time_default">00:00:00:000</string>
 </resources>

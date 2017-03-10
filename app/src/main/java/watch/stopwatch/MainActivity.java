@@ -14,7 +14,9 @@ import android.view.animation.AnimationUtils;
 import android.widget.Button;
 import android.widget.RadioGroup;
 
+
 public class MainActivity extends AppCompatActivity {
+    private enum StopwatchState {RUNNING, STOPPED, PAUSED}
 
     /**
      * The {@link android.support.v4.view.PagerAdapter} that will provide
@@ -36,7 +38,7 @@ public class MainActivity extends AppCompatActivity {
     private Button btn2;
     private Vibrator vibe;
     private MessageHandler messageHandler;
-    private boolean stopwatch_running = false;
+    StopwatchState stopwatch_state = StopwatchState.STOPPED;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -104,7 +106,7 @@ public class MainActivity extends AppCompatActivity {
         vibe = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE) ;
 
         // message handler setup
-        messageHandler = new MessageHandler(mSectionsPagerAdapter, getMainLooper());
+        messageHandler = new MessageHandler(getMainLooper());
     }
 
 
@@ -138,13 +140,13 @@ public class MainActivity extends AppCompatActivity {
         vibe.vibrate(30);
         int page = page_selector.getCheckedRadioButtonId();
         switch(page){
-            case 0:
+            case R.id.page1:
                 // stopwatch
                 break;
-            case 1:
+            case R.id.page2:
                 // timer
                 break;
-            case 3:
+            case R.id.page3:
                 // TBD
                 break;
         }
@@ -159,13 +161,13 @@ public class MainActivity extends AppCompatActivity {
         vibe.vibrate(30);
         int page = page_selector.getCheckedRadioButtonId();
         switch(page){
-            case 0:
+            case R.id.page1:
                 // stopwatch
                 break;
-            case 1:
+            case R.id.page2:
                 // timer
                 break;
-            case 3:
+            case R.id.page3:
                 // TBD
                 break;
         }
@@ -180,13 +182,15 @@ public class MainActivity extends AppCompatActivity {
         vibe.vibrate(30);
         int page = page_selector.getCheckedRadioButtonId();
         switch(page){
-            case 0:
-                // stopwatch
+            case R.id.page1:
+                // stopwatch - reset
+                messageHandler.sendEmptyMessage(MessageHandler.MSG_STOPWATCH_STOP);
+                stopwatch_state = StopwatchState.STOPPED;
                 break;
-            case 1:
+            case R.id.page2:
                 // timer
                 break;
-            case 3:
+            case R.id.page3:
                 // TBD
                 break;
         }
@@ -205,13 +209,22 @@ public class MainActivity extends AppCompatActivity {
 
     private void startStopwatch(){
         vibe.vibrate(50);
-        if(stopwatch_running) {
-            messageHandler.sendEmptyMessage(MessageHandler.MSG_STOPWATCH_STOP);
-            stopwatch_running = false;
-        }
-        else{
-            messageHandler.sendEmptyMessage(MessageHandler.MSG_STOPWATCH_START);
-            stopwatch_running = true;
+        switch(stopwatch_state){
+            case STOPPED:
+                messageHandler.initStopwatch(mSectionsPagerAdapter.getStopwatchTV(),
+                    mSectionsPagerAdapter.getStopwatchNeedle(),
+                    mSectionsPagerAdapter.getStopwatchButtonText());
+                messageHandler.sendEmptyMessage(MessageHandler.MSG_STOPWATCH_START);
+                stopwatch_state = StopwatchState.RUNNING;
+                break;
+            case RUNNING:
+                messageHandler.sendEmptyMessage(MessageHandler.MSG_STOPWATCH_PAUSE);
+                stopwatch_state = StopwatchState.PAUSED;
+                break;
+            case PAUSED:
+                messageHandler.sendEmptyMessage(MessageHandler.MSG_STOPWATCH_RESUME);
+                stopwatch_state = StopwatchState.RUNNING;
+                break;
         }
     }
 }
