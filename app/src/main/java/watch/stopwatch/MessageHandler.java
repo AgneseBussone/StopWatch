@@ -6,6 +6,8 @@ import android.os.Message;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import java.util.ArrayList;
+
 /**
  * Handler callback for update the UI
  */
@@ -18,6 +20,8 @@ public class MessageHandler extends Handler {
     public static final int MSG_STOPWATCH_UPDATE    = 2;
     public static final int MSG_STOPWATCH_PAUSE     = 3;
     public static final int MSG_STOPWATCH_RESUME    = 4;
+    public static final int MSG_STOPWATCH_LAP       = 5;
+    public static final int MSG_STOPWATCH_SAVE_LAP  = 6;
 
     private Chronometer timer = new Chronometer();
     private final long REFRESH_RATE = 100;
@@ -26,6 +30,10 @@ public class MessageHandler extends Handler {
     private TextView stopwatch_tv = null;
     private ImageView stopwatch_needle = null;
     private TextView stopwatchBtn_tv = null;
+
+    // time info for stopwatch laps
+    private long stopwatch_start;
+    private ArrayList<Long> laps;
 
     public MessageHandler(Looper looper){
         super(looper);
@@ -44,7 +52,7 @@ public class MessageHandler extends Handler {
     public void handleMessage(Message msg) {
         switch (msg.what) {
             case MSG_STOPWATCH_START:
-                timer.start(); //start timer
+                stopwatch_start = timer.start(); //start timer
                 if(stopwatchBtn_tv != null) {
                     stopwatchBtn_tv.setText(R.string.central_btn_stop);
                 }
@@ -83,11 +91,22 @@ public class MessageHandler extends Handler {
                 sendEmptyMessage(MSG_STOPWATCH_UPDATE);
                 break;
 
+            case MSG_STOPWATCH_LAP:
+                // add the time to the list
+                laps.add(timer.getElapsedTime());
+                break;
+
+            case MSG_STOPWATCH_SAVE_LAP:
+                // save the laps into shared preferences
+                //TODO: call proper method of settings activity
+                break;
+
             default:
                 break;
         }
     }
 
+    /* Update graphics elements */
     private void updateStopwatch(){
         if(stopwatch_tv != null && stopwatch_needle != null) {
             Time time = timer.getTime();

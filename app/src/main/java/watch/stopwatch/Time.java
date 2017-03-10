@@ -21,6 +21,17 @@ public class Time {
         ms = milliseconds;
     }
 
+    public Time(long elapsed){
+        h = (int)(elapsed / (3600 * 1000));
+        int remaining = (int)(elapsed % (3600 * 1000));
+
+        m = (remaining / (60 * 1000));
+        remaining = (remaining % (60 * 1000));
+
+        s = (remaining / 1000);
+        ms = (remaining % (1000));
+    }
+
     public String getFormattedTime(){
         String text = "";
         text += df.format(h) + ":";

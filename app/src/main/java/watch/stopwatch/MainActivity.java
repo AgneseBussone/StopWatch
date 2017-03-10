@@ -109,6 +109,12 @@ public class MainActivity extends AppCompatActivity {
         messageHandler = new MessageHandler(getMainLooper());
     }
 
+    @Override
+    protected void onStop() {
+        super.onStop();
+        messageHandler.sendEmptyMessage(MessageHandler.MSG_STOPWATCH_SAVE_LAP);
+    }
+
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -141,7 +147,10 @@ public class MainActivity extends AppCompatActivity {
         int page = page_selector.getCheckedRadioButtonId();
         switch(page){
             case R.id.page1:
-                // stopwatch
+                // stopwatch - lap
+                if(stopwatch_state == StopwatchState.RUNNING){
+                    messageHandler.sendEmptyMessage(MessageHandler.MSG_STOPWATCH_LAP);
+                }
                 break;
             case R.id.page2:
                 // timer

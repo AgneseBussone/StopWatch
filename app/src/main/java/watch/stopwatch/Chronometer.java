@@ -12,9 +12,10 @@ public class Chronometer {
     private boolean running = false;
 
 
-    public void start() {
+    public long start() {
         startTime = System.currentTimeMillis();
         running = true;
+        return startTime;
     }
 
 
@@ -51,18 +52,7 @@ public class Chronometer {
     }
 
     public Time getTime(){
-        long timeElapsed = getElapsedTime();
-
-        int hours = (int)(timeElapsed / (3600 * 1000));
-        int remaining = (int)(timeElapsed % (3600 * 1000));
-
-        int minutes = (remaining / (60 * 1000));
-        remaining = (remaining % (60 * 1000));
-
-        int seconds = (remaining / 1000);
-        remaining = (remaining % (1000));
-
-        return new Time(hours, minutes, seconds, remaining);
+        return new Time(getElapsedTime());
     }
 
 }
