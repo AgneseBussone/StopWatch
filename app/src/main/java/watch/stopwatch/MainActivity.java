@@ -180,9 +180,15 @@ public class MainActivity extends AppCompatActivity {
             case R.id.page1:
                 // stopwatch - lap record
                 RelativeLayout secondary_view = (RelativeLayout)findViewById(R.id.secondary_view);
+                ImageView buttonsLine = (ImageView)findViewById(R.id.buttonsLine);
+                Button btn = (Button)view;
+
                 if(lapRecordView == null){
                     // create and show the view
                     secondary_view.removeAllViews();
+                    buttonsLine.setVisibility(View.VISIBLE);
+                    btn.setText("");
+                    btn.setBackgroundResource(R.drawable.btn_pressed);
                     View laps_view = View.inflate(getApplicationContext(), R.layout.lap_list, secondary_view);
 
                     // set the y position to the height of the father, so the view'll be out of screen (bottom)
@@ -197,6 +203,10 @@ public class MainActivity extends AppCompatActivity {
                 }
                 else{
                     // hide and destroy the view
+                    buttonsLine.setVisibility(View.INVISIBLE);
+                    btn.setText(R.string.btn2_page1_text);
+                    btn.setBackgroundResource(0);
+                    btn.setBackgroundColor(getResources().getColor(R.color.colorPrimaryLight));
                     lapRecordView.animate().translationY(secondary_view.getHeight());
                     lapRecordView.animate().setDuration(500);
                     lapRecordView.animate().start();

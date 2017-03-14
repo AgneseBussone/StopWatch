@@ -101,48 +101,67 @@
         />
 
     <!-- The real buttons must stay as last element because are on top of the secondary view -->
-    <LinearLayout
-        android:id="@+id/buttons"
+
+
+    <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom"
-        android:orientation="horizontal">
+        android:layout_height="match_parent"
+        android:layout_gravity="bottom">
 
-        <Button
-            android:id="@+id/button1"
-            style="@style/Widget.AppCompat.Button.Borderless.Colored"
-            android:layout_width="wrap_content"
+        <ImageView
+            android:id="@+id/buttonsLine"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:background="@color/colorPrimary"
-            android:foreground="@drawable/button_state_selector"
-            android:onClick="btn1Click"
-            android:text="@string/btn1_page1_text"
-            android:textColor="@color/white"
-            />
+            android:src="@drawable/line"
+            android:visibility="invisible"
+            android:layout_above="@+id/buttons"
+            android:layout_alignParentStart="true"/>
 
-        <Button
-            android:id="@+id/button2"
-            style="@style/Widget.AppCompat.Button.Borderless.Colored"
-            android:layout_width="wrap_content"
+        <LinearLayout
+            android:id="@+id/buttons"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:background="@color/colorPrimaryLight"
-            android:foreground="@drawable/button_state_selector"
-            android:onClick="btn2Click"
-            android:text="@string/btn2_page1_text"
-            android:textColor="@color/white"/>
+            android:layout_alignParentBottom="true"
+            android:orientation="horizontal">
 
-        <Button
-            android:id="@+id/button3"
-            style="@style/Widget.AppCompat.Button.Borderless.Colored"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:background="@color/colorPrimary"
-            android:onClick="btn3Click"
-            android:text="@string/btn3_text"
-            android:textColor="@color/white"/>
+            <Button
+                android:id="@+id/button1"
+                style="@style/Widget.AppCompat.Button.Borderless.Colored"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:background="@color/colorPrimary"
+                android:foreground="@drawable/button_state_selector"
+                android:onClick="btn1Click"
+                android:text="@string/btn1_page1_text"
+                android:textColor="@color/white"
+                />
 
-    </LinearLayout>
+            <Button
+                android:id="@+id/button2"
+                style="@style/Widget.AppCompat.Button.Borderless.Colored"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:background="@color/colorPrimaryLight"
+                android:foreground="@drawable/button_state_selector"
+                android:onClick="btn2Click"
+                android:text="@string/btn2_page1_text"
+                android:textColor="@color/white"/>
+
+            <Button
+                android:id="@+id/button3"
+                style="@style/Widget.AppCompat.Button.Borderless.Colored"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:background="@color/colorPrimary"
+                android:onClick="btn3Click"
+                android:text="@string/btn3_text"
+                android:textColor="@color/white"/>
+
+        </LinearLayout>
+
+
+    </RelativeLayout>
 </FrameLayout>
