@@ -179,22 +179,28 @@ public class MainActivity extends AppCompatActivity {
         switch(page){
             case R.id.page1:
                 // stopwatch - lap record
+                RelativeLayout secondary_view = (RelativeLayout)findViewById(R.id.secondary_view);
                 if(lapRecordView == null){
                     // create and show the view
-                    RelativeLayout secondary_view = (RelativeLayout)findViewById(R.id.secondary_view);
+                    secondary_view.removeAllViews();
                     View laps_view = View.inflate(getApplicationContext(), R.layout.lap_list, secondary_view);
-                    float fromY = secondary_view.getY();
-                    float toY = settingsBtn.getY();
-//                    TranslateAnimation anim = new TranslateAnimation(0f, 0f, fromY, toY);
-//                    anim.setDuration(300);
-//                    anim.setInterpolator(new LinearInterpolator());
-//                    laps_view.startAnimation(anim);
+
+                    // set the y position to the height of the father, so the view'll be out of screen (bottom)
+                    laps_view.setY(secondary_view.getHeight());
+                    float toY = settingsBtn.getY() + settingsBtn.getHeight();
+
+                    // use animate() to make the changes permanent
                     laps_view.animate().translationY(toY);
-                    laps_view.animate().setDuration(300);
+                    laps_view.animate().setDuration(500);
                     laps_view.animate().start();
+                    lapRecordView = laps_view;
                 }
                 else{
                     // hide and destroy the view
+                    lapRecordView.animate().translationY(secondary_view.getHeight());
+                    lapRecordView.animate().setDuration(500);
+                    lapRecordView.animate().start();
+                    lapRecordView = null;
                 }
                 break;
             case R.id.page2:
