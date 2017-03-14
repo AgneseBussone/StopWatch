@@ -10,4 +10,6 @@
     <color name="light_blue">#bad2de</color>
     <color name="transparent">#00ffffff</color>
     <color name="black">#000000</color>
+    <color name="greyDark">#4b4b4b</color>
+    <color name="greyLight">#979797</color>
 </resources>

@@ -12,11 +12,15 @@ import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.RadioGroup;
+import android.widget.RelativeLayout;
 
 
 public class MainActivity extends AppCompatActivity {
     private enum StopwatchState {RUNNING, STOPPED, PAUSED}
+
+    private static final String TAG = MainActivity.class.getSimpleName();
 
     /**
      * The {@link android.support.v4.view.PagerAdapter} that will provide
@@ -36,9 +40,12 @@ public class MainActivity extends AppCompatActivity {
     private RadioGroup page_selector;
     private Button btn1;
     private Button btn2;
+    private Button btn3;
+    private ImageView settingsBtn;
     private Vibrator vibe;
     private MessageHandler messageHandler;
     StopwatchState stopwatch_state = StopwatchState.STOPPED;
+    private View lapRecordView = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,8 +62,8 @@ public class MainActivity extends AppCompatActivity {
 
         btn1 = (Button)findViewById(R.id.button1);
         btn2 = (Button)findViewById(R.id.button2);
-
-
+        btn3 = (Button)findViewById(R.id.button3);
+        settingsBtn = (ImageView)findViewById(R.id.button_settings);
 
 
         // Page indicator RadioGroup
@@ -171,7 +178,24 @@ public class MainActivity extends AppCompatActivity {
         int page = page_selector.getCheckedRadioButtonId();
         switch(page){
             case R.id.page1:
-                // stopwatch
+                // stopwatch - lap record
+                if(lapRecordView == null){
+                    // create and show the view
+                    RelativeLayout secondary_view = (RelativeLayout)findViewById(R.id.secondary_view);
+                    View laps_view = View.inflate(getApplicationContext(), R.layout.lap_list, secondary_view);
+                    float fromY = secondary_view.getY();
+                    float toY = settingsBtn.getY();
+//                    TranslateAnimation anim = new TranslateAnimation(0f, 0f, fromY, toY);
+//                    anim.setDuration(300);
+//                    anim.setInterpolator(new LinearInterpolator());
+//                    laps_view.startAnimation(anim);
+                    laps_view.animate().translationY(toY);
+                    laps_view.animate().setDuration(300);
+                    laps_view.animate().start();
+                }
+                else{
+                    // hide and destroy the view
+                }
                 break;
             case R.id.page2:
                 // timer
@@ -195,6 +219,7 @@ public class MainActivity extends AppCompatActivity {
                 // stopwatch - reset
                 messageHandler.sendEmptyMessage(MessageHandler.MSG_STOPWATCH_STOP);
                 stopwatch_state = StopwatchState.STOPPED;
+                //TODO: animate needle from current position to starting position
                 break;
             case R.id.page2:
                 // timer
@@ -224,14 +249,20 @@ public class MainActivity extends AppCompatActivity {
                     mSectionsPagerAdapter.getStopwatchNeedle(),
                     mSectionsPagerAdapter.getStopwatchButtonText());
                 messageHandler.sendEmptyMessage(MessageHandler.MSG_STOPWATCH_START);
+                btn3.setEnabled(false);
+                btn3.setBackgroundColor(getResources().getColor(R.color.greyDark));
                 stopwatch_state = StopwatchState.RUNNING;
                 break;
             case RUNNING:
                 messageHandler.sendEmptyMessage(MessageHandler.MSG_STOPWATCH_PAUSE);
+                btn3.setEnabled(true);
+                btn3.setBackgroundColor(getResources().getColor(R.color.colorPrimary));
                 stopwatch_state = StopwatchState.PAUSED;
                 break;
             case PAUSED:
                 messageHandler.sendEmptyMessage(MessageHandler.MSG_STOPWATCH_RESUME);
+                btn3.setEnabled(true);
+                btn3.setBackgroundColor(getResources().getColor(R.color.colorPrimary));
                 stopwatch_state = StopwatchState.RUNNING;
                 break;
         }
