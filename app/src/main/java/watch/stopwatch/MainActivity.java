@@ -193,7 +193,7 @@ public class MainActivity extends AppCompatActivity {
 
                     // set the y position to the height of the father, so the view'll be out of screen (bottom)
                     laps_view.setY(secondary_view.getHeight());
-                    float toY = settingsBtn.getY() + settingsBtn.getHeight();
+                    float toY = settingsBtn.getY() + settingsBtn.getHeight() + 3;
 
                     // use animate() to make the changes permanent
                     laps_view.animate().translationY(toY);
