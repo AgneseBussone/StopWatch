@@ -101,8 +101,6 @@
         />
 
     <!-- The real buttons must stay as last element because are on top of the secondary view -->
-
-
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -156,6 +154,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:background="@color/colorPrimary"
+                android:foreground="@drawable/button_state_selector"
                 android:onClick="btn3Click"
                 android:text="@string/btn3_text"
                 android:textColor="@color/white"/>
