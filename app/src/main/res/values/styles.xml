@@ -22,4 +22,10 @@
         <item name="android:button">@null</item>
     </style>
 
+    <!-- The listView for laps need this to show the correct color for end-scrolling
+         I don't know why it's not inherited by the AppTheme....-->
+    <style name="MyEdgeOverlayTheme">
+        <item name="android:colorEdgeEffect">@color/colorPrimary</item>
+    </style>
+
 </resources>
