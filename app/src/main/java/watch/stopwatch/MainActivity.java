@@ -39,7 +39,7 @@ public class MainActivity extends AppCompatActivity {
     /**
      * The {@link ViewPager} that will host the section contents.
      */
-    private ViewPager mViewPager;
+    private CustomViewPager mViewPager;
     ViewPager.OnPageChangeListener pageListener;
     private RadioGroup page_selector;
     private Button btn1;
@@ -83,9 +83,14 @@ public class MainActivity extends AppCompatActivity {
         mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
 
         // Set up the ViewPager with the sections adapter.
-        mViewPager = (ViewPager) findViewById(R.id.container);
+        mViewPager = (CustomViewPager) findViewById(R.id.container);
         mViewPager.setAdapter(mSectionsPagerAdapter);
+        // Set the limit of pages kept in memory
+        mViewPager.setOffscreenPageLimit(mSectionsPagerAdapter.getCount());
+        //TODO: if we want to keep the state after the app is closed...
+        // http://stackoverflow.com/questions/13273285/how-do-i-tell-my-custom-fragmentpageradapter-to-stop-destroying-my-fragments/
 
+        // Buttons
         btn1 = (Button)findViewById(R.id.button1);
         btn2 = (Button)findViewById(R.id.button2);
         btn3 = (Button)findViewById(R.id.button3);
@@ -244,6 +249,9 @@ public class MainActivity extends AppCompatActivity {
                     viewBtn.setOnClickListener(secondaryViewBtnListener);
                     viewBtn = (Button)laps_view.findViewById(R.id.lapTotalTimeBtn);
                     viewBtn.setOnClickListener(secondaryViewBtnListener);
+
+                    // disable the pager
+                    mViewPager.setSwipeable(false);
                 }
                 else{
                     // hide and destroy the view
@@ -271,6 +279,7 @@ public class MainActivity extends AppCompatActivity {
                     lapRecordView.animate().translationY(secondary_view.getHeight());
                     lapRecordView.animate().setDuration(500);
                     lapRecordView.animate().start();
+                    mViewPager.setSwipeable(true);
                 }
                 break;
             case R.id.page2:
