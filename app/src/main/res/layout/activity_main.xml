@@ -1,123 +1,167 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<!--Child views are drawn in a stack, with the most recently added child on top -->
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
                 xmlns:app="http://schemas.android.com/apk/res-auto"
                 xmlns:tools="http://schemas.android.com/tools"
-                android:id="@+id/main_content"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:fitsSystemWindows="true"
                 android:background="@color/background_color"
                 tools:context="watch.stopwatch.MainActivity">
 
-    <FrameLayout
-        android:layout_width="match_parent"
-        android:layout_height="70dp"
-        android:id="@+id/adPlaceholder">
-    </FrameLayout>
+        <RelativeLayout
+            android:id="@+id/main_content"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
 
-    <android.support.v4.view.ViewPager
-        android:id="@+id/container"
+            <FrameLayout
+                android:id="@+id/adPlaceholder"
+                android:layout_width="match_parent"
+                android:layout_height="70dp">
+            </FrameLayout>
+
+            <android.support.v4.view.ViewPager
+                android:id="@+id/container"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_above="@+id/page_selector"
+                android:layout_alignParentStart="true"
+                android:layout_below="@+id/adPlaceholder"
+                app:layout_behavior="@string/appbar_scrolling_view_behavior"/>
+
+            <ImageView
+                android:id="@+id/button_settings"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignBottom="@id/container"
+                android:layout_alignEnd="@id/container"
+                android:layout_marginBottom="360dp"
+                android:src="@drawable/ic_settings"/>
+
+
+            <RadioGroup
+                android:id="@+id/page_selector"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_above="@+id/fakeBtn"
+                android:layout_centerHorizontal="true"
+                android:layout_marginBottom="20dp"
+                android:orientation="horizontal"
+                >
+
+                <RadioButton
+                    android:id="@+id/page1"
+                    style="@style/RadioButtonStyle"
+                    android:layout_width="@dimen/dot"
+                    android:layout_height="@dimen/dot"
+                    android:layout_marginEnd="5dp"
+                    android:layout_marginStart="5dp"
+                    android:layout_weight="1"
+                    android:checked="true"/>
+
+                <RadioButton
+                    android:id="@+id/page2"
+                    style="@style/RadioButtonStyle"
+                    android:layout_width="@dimen/dot"
+                    android:layout_height="@dimen/dot"
+                    android:layout_marginEnd="5dp"
+                    android:layout_marginStart="5dp"
+                    android:layout_weight="1"/>
+
+                <RadioButton
+                    android:id="@+id/page3"
+                    style="@style/RadioButtonStyle"
+                    android:layout_width="@dimen/dot"
+                    android:layout_height="@dimen/dot"
+                    android:layout_marginEnd="5dp"
+                    android:layout_marginStart="5dp"
+                    android:layout_weight="1"/>
+
+            </RadioGroup>
+
+            <!-- fake button used just for alignment -->
+            <Button
+                android:id="@+id/fakeBtn"
+                style="@style/Widget.AppCompat.Button.Borderless.Colored"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:enabled="false"
+                android:layout_gravity="bottom"
+                android:visibility="invisible"
+                android:layout_alignParentBottom="true"
+                android:layout_centerHorizontal="true"/>
+
+        </RelativeLayout>
+
+    <!-- secondary layout for popup views -->
+    <RelativeLayout
+        android:id="@+id/secondary_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior"
-        android:layout_alignParentStart="true"
-        android:layout_above="@+id/page_selector"
-        android:layout_below="@+id/adPlaceholder" />
+        />
 
-    <ImageView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:src="@drawable/ic_settings"
-        android:layout_weight="1"
-        android:layout_alignBottom="@id/container"
-        android:layout_alignEnd="@id/container"
-        android:layout_marginBottom="360dp"
-        android:onClick="onCreateOptionMenu"/>
+    <!-- The real buttons must stay as last element because are on top of the secondary view -->
 
-    <LinearLayout
-        android:id="@+id/buttons"
-        android:orientation="horizontal"
+
+    <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true">
+        android:layout_height="match_parent"
+        android:layout_gravity="bottom">
 
-        <Button
-            android:text="@string/btn1_page1_text"
-            android:layout_width="wrap_content"
+        <ImageView
+            android:id="@+id/buttonsLine"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:id="@+id/button1"
-            android:layout_weight="1"
-            android:textColor="@color/white"
-            style="@style/Widget.AppCompat.Button.Borderless.Colored"
-            android:background="@color/colorPrimary"
-            android:foreground="@drawable/button_state_selector"
-            android:onClick="btn1Click"
-            />
+            android:src="@drawable/line"
+            android:visibility="invisible"
+            android:layout_above="@+id/buttons"
+            android:layout_alignParentStart="true"/>
 
-        <Button
-            android:text="@string/btn2_page1_text"
-            android:layout_width="wrap_content"
+        <LinearLayout
+            android:id="@+id/buttons"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:id="@+id/button2"
-            android:layout_weight="1"
-            android:textColor="@color/white"
-            style="@style/Widget.AppCompat.Button.Borderless.Colored"
-            android:background="@color/colorPrimaryLight"
-            android:foreground="@drawable/button_state_selector"
-            android:onClick="btn2Click"/>
+            android:layout_alignParentBottom="true"
+            android:orientation="horizontal">
 
-        <Button
-            android:text="@string/btn3_text"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/button3"
-            android:layout_weight="1"
-            android:textColor="@color/white"
-            style="@style/Widget.AppCompat.Button.Borderless.Colored"
-            android:background="@color/colorPrimary"
-            android:foreground="@drawable/button_state_selector"
-            android:onClick="btn3Click"/>
+            <Button
+                android:id="@+id/button1"
+                style="@style/Widget.AppCompat.Button.Borderless.Colored"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:background="@color/colorPrimary"
+                android:foreground="@drawable/button_state_selector"
+                android:onClick="btn1Click"
+                android:text="@string/btn1_page1_text"
+                android:textColor="@color/white"
+                />
 
-    </LinearLayout>
+            <Button
+                android:id="@+id/button2"
+                style="@style/Widget.AppCompat.Button.Borderless.Colored"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:background="@color/colorPrimaryLight"
+                android:foreground="@drawable/button_state_selector"
+                android:onClick="btn2Click"
+                android:text="@string/btn2_page1_text"
+                android:textColor="@color/white"/>
 
-    <RadioGroup
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:id="@+id/page_selector"
-        android:layout_above="@+id/buttons"
-        android:layout_centerHorizontal="true"
-        android:layout_marginBottom="20dp"
-        >
+            <Button
+                android:id="@+id/button3"
+                style="@style/Widget.AppCompat.Button.Borderless.Colored"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:background="@color/colorPrimary"
+                android:onClick="btn3Click"
+                android:text="@string/btn3_text"
+                android:textColor="@color/white"/>
 
-        <RadioButton
-            android:id="@+id/page1"
-            android:layout_weight="1"
-            android:checked="true"
-            style="@style/RadioButtonStyle"
-            android:layout_marginEnd="5dp"
-            android:layout_marginStart="5dp"
-            android:layout_width="@dimen/dot"
-            android:layout_height="@dimen/dot" />
+        </LinearLayout>
 
-        <RadioButton
-            android:id="@+id/page2"
-            android:layout_weight="1"
-            style="@style/RadioButtonStyle"
-            android:layout_marginEnd="5dp"
-            android:layout_marginStart="5dp"
-            android:layout_height="@dimen/dot"
-            android:layout_width="@dimen/dot"/>
 
-        <RadioButton
-            android:layout_height="@dimen/dot"
-            android:layout_width="@dimen/dot"
-            android:id="@+id/page3"
-            android:layout_weight="1"
-            style="@style/RadioButtonStyle"
-            android:layout_marginEnd="5dp"
-            android:layout_marginStart="5dp" />
-
-    </RadioGroup>
-
-</RelativeLayout>
+    </RelativeLayout>
+</FrameLayout>

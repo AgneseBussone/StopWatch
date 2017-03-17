@@ -7,7 +7,10 @@ import android.support.v4.app.FragmentPagerAdapter;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
+
+import java.util.ArrayList;
 
 /**
  * A {@link FragmentPagerAdapter} that returns a fragment corresponding to
@@ -15,21 +18,29 @@ import android.widget.TextView;
  */
 public class SectionsPagerAdapter extends FragmentPagerAdapter {
 
+    private static final String TAG = SectionsPagerAdapter.class.getSimpleName();
+    private final int PAGES = 3;
+
+    private ArrayList<WatchFragment> fragment_list;
+
     public SectionsPagerAdapter(FragmentManager fm) {
         super(fm);
+        fragment_list = new ArrayList<>(PAGES);
     }
 
     @Override
     public Fragment getItem(int position) {
         // getItem is called to instantiate the fragment for the given page.
         // Return a WatchFragment (defined as a static inner class below).
-        return WatchFragment.newInstance(position + 1);
+        WatchFragment fragment = WatchFragment.newInstance(position + 1);
+        fragment_list.add(position, fragment);
+        return fragment;
     }
 
     @Override
     public int getCount() {
         // Show 3 total pages.
-        return 3;
+        return PAGES;
     }
 
     @Override
@@ -43,6 +54,21 @@ public class SectionsPagerAdapter extends FragmentPagerAdapter {
                 return "SECTION 3";
         }
         return null;
+    }
+
+    public TextView getStopwatchTV() {
+        View view = fragment_list.get(0).getView();
+        return (TextView) view.findViewById(R.id.time_text);
+    }
+
+    public ImageView getStopwatchNeedle() {
+        View view = fragment_list.get(0).getView();
+        return (ImageView) view.findViewById(R.id.needle_list);
+    }
+
+    public TextView getStopwatchButtonText(){
+        View view = fragment_list.get(0).getView();
+        return (TextView)view.findViewById(R.id.btn_text_action);
     }
 
     /**

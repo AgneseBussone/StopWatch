@@ -19,41 +19,79 @@
             android:background="@drawable/numbers"
             android:layout_centerVertical="true"
             android:layout_centerHorizontal="true"
-            android:layout_gravity="center"
-            android:id="@+id/numbers"/>
+            android:layout_gravity="center"/>
 
         <ImageView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:background="@drawable/clock_list"
             android:layout_gravity="center"
             android:layout_centerVertical="true"
             android:layout_centerHorizontal="true"
-            android:id="@+id/clock_list"
-            />
+            android:background="@drawable/tick_list"/>
 
-        <TextView
-            android:text="@string/central_btn_start_shake"
+        <ImageView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:background="@drawable/needle_list"
+            android:layout_gravity="center"
             android:layout_centerVertical="true"
             android:layout_centerHorizontal="true"
-            android:id="@+id/textView"
-            android:textAppearance="@style/TextAppearance.AppCompat"
-            android:singleLine="false"
-            android:textSize="24sp"
-            android:textColor="@color/white"
-            android:textAlignment="center"/>
+            android:id="@+id/needle_list"
+            />
+
+        <ImageView
+            android:id="@+id/stopwatchBtn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_centerVertical="true"
+            android:background="@drawable/center"
+            android:onClick="btnCenter" />
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_centerVertical="true"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/btn_text_mode"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:layout_weight="1"
+                android:text="@string/central_btn_tap"
+                android:textAlignment="center"
+                android:textAppearance="@style/TextAppearance.AppCompat"
+                android:textColor="@color/white"
+                android:textSize="24sp" />
+
+            <TextView
+                android:id="@+id/btn_text_action"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+
+                android:layout_gravity="center_horizontal"
+                android:layout_weight="1"
+                android:text="@string/central_btn_start"
+                android:textAlignment="center"
+                android:textAppearance="@style/TextAppearance.AppCompat"
+                android:textColor="@color/white"
+                android:textSize="24sp" />
+
+        </LinearLayout>
+
     </RelativeLayout>
 
     <TextView
-        android:text="00:000"
+        android:id="@+id/time_text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/time_text"
-        android:textAppearance="@style/TextAppearance.AppCompat.Display1"
-        android:textColor="@color/colorPrimary"
         android:layout_above="@+id/relL"
-        android:layout_centerHorizontal="true"/>
+        android:layout_centerHorizontal="true"
+        android:text="@string/time_default"
+        android:textAppearance="@style/TextAppearance.AppCompat.Display1"
+        android:textColor="@color/colorPrimary"/>
 
 </RelativeLayout>

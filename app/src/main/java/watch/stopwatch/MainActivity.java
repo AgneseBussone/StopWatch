@@ -9,10 +9,18 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.RadioGroup;
+import android.widget.RelativeLayout;
+
 
 public class MainActivity extends AppCompatActivity {
+    private enum StopwatchState {RUNNING, STOPPED, PAUSED}
+
+    private static final String TAG = MainActivity.class.getSimpleName();
 
     /**
      * The {@link android.support.v4.view.PagerAdapter} that will provide
@@ -32,7 +40,12 @@ public class MainActivity extends AppCompatActivity {
     private RadioGroup page_selector;
     private Button btn1;
     private Button btn2;
+    private Button btn3;
+    private ImageView settingsBtn;
     private Vibrator vibe;
+    private MessageHandler messageHandler;
+    StopwatchState stopwatch_state = StopwatchState.STOPPED;
+    private View lapRecordView = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,6 +62,8 @@ public class MainActivity extends AppCompatActivity {
 
         btn1 = (Button)findViewById(R.id.button1);
         btn2 = (Button)findViewById(R.id.button2);
+        btn3 = (Button)findViewById(R.id.button3);
+        settingsBtn = (ImageView)findViewById(R.id.button_settings);
 
 
         // Page indicator RadioGroup
@@ -96,6 +111,15 @@ public class MainActivity extends AppCompatActivity {
         mViewPager.addOnPageChangeListener(pageListener);
 
         vibe = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE) ;
+
+        // message handler setup
+        messageHandler = new MessageHandler(getMainLooper());
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        messageHandler.sendEmptyMessage(MessageHandler.MSG_STOPWATCH_SAVE_LAP);
     }
 
 
@@ -129,13 +153,16 @@ public class MainActivity extends AppCompatActivity {
         vibe.vibrate(30);
         int page = page_selector.getCheckedRadioButtonId();
         switch(page){
-            case 0:
-                // stopwatch
+            case R.id.page1:
+                // stopwatch - lap
+                if(stopwatch_state == StopwatchState.RUNNING){
+                    messageHandler.sendEmptyMessage(MessageHandler.MSG_STOPWATCH_LAP);
+                }
                 break;
-            case 1:
+            case R.id.page2:
                 // timer
                 break;
-            case 3:
+            case R.id.page3:
                 // TBD
                 break;
         }
@@ -150,13 +177,46 @@ public class MainActivity extends AppCompatActivity {
         vibe.vibrate(30);
         int page = page_selector.getCheckedRadioButtonId();
         switch(page){
-            case 0:
-                // stopwatch
+            case R.id.page1:
+                // stopwatch - lap record
+                RelativeLayout secondary_view = (RelativeLayout)findViewById(R.id.secondary_view);
+                ImageView buttonsLine = (ImageView)findViewById(R.id.buttonsLine);
+                Button btn = (Button)view;
+
+                if(lapRecordView == null){
+                    // create and show the view
+                    secondary_view.removeAllViews();
+                    buttonsLine.setVisibility(View.VISIBLE);
+                    btn.setText("");
+                    btn.setBackgroundResource(R.drawable.btn_pressed);
+                    View laps_view = View.inflate(getApplicationContext(), R.layout.lap_list, secondary_view);
+
+                    // set the y position to the height of the father, so the view'll be out of screen (bottom)
+                    laps_view.setY(secondary_view.getHeight());
+                    float toY = settingsBtn.getY() + settingsBtn.getHeight() + 3;
+
+                    // use animate() to make the changes permanent
+                    laps_view.animate().translationY(toY);
+                    laps_view.animate().setDuration(500);
+                    laps_view.animate().start();
+                    lapRecordView = laps_view;
+                }
+                else{
+                    // hide and destroy the view
+                    buttonsLine.setVisibility(View.INVISIBLE);
+                    btn.setText(R.string.btn2_page1_text);
+                    btn.setBackgroundResource(0);
+                    btn.setBackgroundColor(getResources().getColor(R.color.colorPrimaryLight));
+                    lapRecordView.animate().translationY(secondary_view.getHeight());
+                    lapRecordView.animate().setDuration(500);
+                    lapRecordView.animate().start();
+                    lapRecordView = null;
+                }
                 break;
-            case 1:
+            case R.id.page2:
                 // timer
                 break;
-            case 3:
+            case R.id.page3:
                 // TBD
                 break;
         }
@@ -171,16 +231,56 @@ public class MainActivity extends AppCompatActivity {
         vibe.vibrate(30);
         int page = page_selector.getCheckedRadioButtonId();
         switch(page){
-            case 0:
-                // stopwatch
+            case R.id.page1:
+                // stopwatch - reset
+                messageHandler.sendEmptyMessage(MessageHandler.MSG_STOPWATCH_STOP);
+                stopwatch_state = StopwatchState.STOPPED;
+                //TODO: animate needle from current position to starting position
                 break;
-            case 1:
+            case R.id.page2:
                 // timer
                 break;
-            case 3:
+            case R.id.page3:
                 // TBD
                 break;
         }
 
+    }
+
+    /**
+     * Callback for center button
+     * @param view
+     */
+    public void btnCenter(View view) {
+        Animation animation = AnimationUtils.loadAnimation(this, R.anim.center_btn_anim);
+        view.startAnimation(animation);
+        startStopwatch();
+    }
+
+    private void startStopwatch(){
+        vibe.vibrate(50);
+        switch(stopwatch_state){
+            case STOPPED:
+                messageHandler.initStopwatch(mSectionsPagerAdapter.getStopwatchTV(),
+                    mSectionsPagerAdapter.getStopwatchNeedle(),
+                    mSectionsPagerAdapter.getStopwatchButtonText());
+                messageHandler.sendEmptyMessage(MessageHandler.MSG_STOPWATCH_START);
+                btn3.setEnabled(false);
+                btn3.setBackgroundColor(getResources().getColor(R.color.greyDark));
+                stopwatch_state = StopwatchState.RUNNING;
+                break;
+            case RUNNING:
+                messageHandler.sendEmptyMessage(MessageHandler.MSG_STOPWATCH_PAUSE);
+                btn3.setEnabled(true);
+                btn3.setBackgroundColor(getResources().getColor(R.color.colorPrimary));
+                stopwatch_state = StopwatchState.PAUSED;
+                break;
+            case PAUSED:
+                messageHandler.sendEmptyMessage(MessageHandler.MSG_STOPWATCH_RESUME);
+                btn3.setEnabled(true);
+                btn3.setBackgroundColor(getResources().getColor(R.color.colorPrimary));
+                stopwatch_state = StopwatchState.RUNNING;
+                break;
+        }
     }
 }

@@ -9,6 +9,12 @@
     <string name="btn1_page2_text">SET</string>
     <string name="btn2_page2_text">TIMER PRESET</string>
 
-    <string name="central_btn_start_tap">TAP\nto start</string>
-    <string name="central_btn_start_shake">SHAKE\nto start</string>
+    <string name="central_btn_tap">TAP</string>
+    <string name="central_btn_shake">SHAKE</string>
+    <string name="central_btn_start">to start</string>
+    <string name="central_btn_stop">to stop</string>
+    <string name="time_default">00:00:00:000</string>
+
+    <string name="totalTimeBtn">TOTAL TIME</string>
+    <string name="lapTimeBtn">LAP TIME</string>
 </resources>
