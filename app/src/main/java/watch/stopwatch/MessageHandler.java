@@ -75,7 +75,7 @@ public class MessageHandler extends Handler {
                 removeMessages(MSG_STOPWATCH_UPDATE); // no more updates.
                 timer.stop();//stop timer
                 if(stopwatch_needle != null & stopwatchBtn_tv != null) {
-                    stopwatch_tv.setText(R.string.time_default);
+                    stopwatch_tv.setText(R.string.time_default_stopwatch);
                     stopwatch_needle.animate().rotation(0f);
                     stopwatchBtn_tv.setText(R.string.central_btn_start);
                 }

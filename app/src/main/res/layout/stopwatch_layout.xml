@@ -52,7 +52,7 @@
             />
 
         <ImageView
-            android:id="@+id/stopwatchBtn"
+            android:id="@+id/bigBtn"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerHorizontal="true"
@@ -103,7 +103,7 @@
         android:layout_height="wrap_content"
         android:layout_above="@+id/relL"
         android:layout_centerHorizontal="true"
-        android:text="@string/time_default"
+        android:text="@string/time_default_stopwatch"
         android:textAppearance="@style/TextAppearance.AppCompat.Display1"
         android:textColor="@color/colorPrimary"/>
 
