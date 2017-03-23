@@ -14,15 +14,20 @@ import java.util.List;
  * Each element contains two string: the absolute format and the relative format
  */
 
-public class MyArrayAdapter extends BaseAdapter {
+public class LapsListAdapter extends BaseAdapter {
+
+    public enum LapsFormat {ABSOLUTE, RELATIVE}
 
     private List<String[]> data;
     private Context context;
+    private LapsFormat format = LapsFormat.ABSOLUTE;
 
-    MyArrayAdapter(Context context, List<String[]> list){
+    LapsListAdapter(Context context, List<String[]> list){
         data = list;
         this.context = context;
     }
+
+    public void setLapsFormat(LapsFormat format){ this.format = format; }
 
     @Override
     public int getCount() {
@@ -48,7 +53,9 @@ public class MyArrayAdapter extends BaseAdapter {
         TextView number = (TextView) convertView.findViewById(R.id.lapItem_number);
         TextView value = (TextView)convertView.findViewById(R.id.lapItem_value);
         number.setText(String.valueOf(position + 1));
-        value.setText(data.get(position)[0]);
+
+        // Show the chosen laps format
+        value.setText(data.get(position)[format.ordinal()]);
 
         // make the item not clickable
         convertView.setEnabled(false);

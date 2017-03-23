@@ -17,14 +17,15 @@ import java.util.ArrayList;
 public class MessageHandler extends Handler {
 
     // Messages available
-    public static final int MSG_STOPWATCH_START     = 0;
-    public static final int MSG_STOPWATCH_RESET     = 1;
-    public static final int MSG_STOPWATCH_UPDATE    = 2;
-    public static final int MSG_STOPWATCH_PAUSE     = 3;
-    public static final int MSG_STOPWATCH_RESUME    = 4;
-    public static final int MSG_STOPWATCH_LAP       = 5;
-    public static final int MSG_STOPWATCH_SAVE_LAP  = 6;
-    public static final int MSG_STOPWATCH_SHOW_LAP  = 7;
+    public static final int MSG_STOPWATCH_START      = 0;
+    public static final int MSG_STOPWATCH_RESET      = 1;
+    public static final int MSG_STOPWATCH_UPDATE     = 2;
+    public static final int MSG_STOPWATCH_PAUSE      = 3;
+    public static final int MSG_STOPWATCH_RESUME     = 4;
+    public static final int MSG_STOPWATCH_LAP        = 5;
+    public static final int MSG_STOPWATCH_SAVE_LAP   = 6;
+    public static final int MSG_STOPWATCH_SHOW_LAP   = 7;
+    public static final int MSG_STOPWATCH_LAP_FORMAT = 8;
 
     private Chronometer timer = new Chronometer();
     private final long REFRESH_RATE = 100;
@@ -36,10 +37,9 @@ public class MessageHandler extends Handler {
     private TextView stopwatchBtn_tv = null;
 
     // time info for stopwatch laps
-    private long stopwatch_start;
     private long last_lap;
     private ArrayList<String[]> laps = new ArrayList<>();
-    private MyArrayAdapter lapsListAdapter;
+    private LapsListAdapter lapsListAdapter;
 
     public MessageHandler(Looper looper, Context context){
         super(looper);
@@ -59,7 +59,7 @@ public class MessageHandler extends Handler {
     public void handleMessage(Message msg) {
         switch (msg.what) {
             case MSG_STOPWATCH_START:
-                stopwatch_start = timer.start(); //start timer
+                timer.start(); //start timer
                 if(stopwatchBtn_tv != null) {
                     stopwatchBtn_tv.setText(R.string.central_btn_stop);
                 }
@@ -112,7 +112,8 @@ public class MessageHandler extends Handler {
                     laps.add(new String[]{absolute.getFormattedTime(), absolute.getFormattedTime()});
                 }
                 else{
-                    laps.add(new String[]{absolute.getFormattedTime(), "relative - TBC"});
+                    Time relative = new Time(time - last_lap);
+                    laps.add(new String[]{absolute.getFormattedTime(), relative.getFormattedTime()});
                 }
                 last_lap = time;
                 if(lapsListAdapter!= null)
@@ -122,8 +123,17 @@ public class MessageHandler extends Handler {
             case MSG_STOPWATCH_SHOW_LAP:
                 if(msg.obj != null) {
                     ListView list = (ListView)msg.obj;
-                    lapsListAdapter = new MyArrayAdapter(context, laps);
+                    lapsListAdapter = new LapsListAdapter(context, laps);
                     list.setAdapter(lapsListAdapter);
+                }
+                break;
+
+            case MSG_STOPWATCH_LAP_FORMAT:
+                // get the format information out of the message
+                if(lapsListAdapter!= null) {
+                    lapsListAdapter.setLapsFormat(LapsListAdapter.LapsFormat.values()[msg.arg1]);
+                    // notify the adapter so that it can rebuild the list with the updated format
+                    lapsListAdapter.notifyDataSetChanged();
                 }
                 break;
 

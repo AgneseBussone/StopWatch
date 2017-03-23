@@ -61,12 +61,20 @@ public class MainActivity extends AppCompatActivity {
                     v.setBackgroundColor(getResources().getColor(R.color.colorPrimaryLight));
                     Button btn = (Button) findViewById(R.id.lapTimeBtn);
                     btn.setBackgroundColor(getResources().getColor(R.color.greyLight));
+                    Message message = new Message();
+                    message.arg1 = LapsListAdapter.LapsFormat.ABSOLUTE.ordinal(); // set the correct format
+                    message.what = MessageHandler.MSG_STOPWATCH_LAP_FORMAT;
+                    messageHandler.sendMessage(message);
                     }
                     break;
                 case R.id.lapTimeBtn: {
                     v.setBackgroundColor(getResources().getColor(R.color.colorPrimaryLight));
                     Button btn = (Button) findViewById(R.id.lapTotalTimeBtn);
                     btn.setBackgroundColor(getResources().getColor(R.color.greyLight));
+                    Message message = new Message();
+                    message.arg1 = LapsListAdapter.LapsFormat.RELATIVE.ordinal(); // set the correct format
+                    message.what = MessageHandler.MSG_STOPWATCH_LAP_FORMAT;
+                    messageHandler.sendMessage(message);
                     }
                     break;
             }
