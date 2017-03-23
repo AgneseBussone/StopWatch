@@ -12,10 +12,9 @@ public class Chronometer {
     private boolean running = false;
 
 
-    public long start() {
+    public void start() {
         startTime = System.currentTimeMillis();
         running = true;
-        return startTime;
     }
 
 

@@ -1,7 +1,9 @@
 package watch.stopwatch;
 
+import android.animation.Animator;
 import android.content.Context;
 import android.os.Bundle;
+import android.os.Message;
 import android.os.Vibrator;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
@@ -9,6 +11,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.Button;
@@ -18,6 +21,7 @@ import android.widget.RelativeLayout;
 
 
 public class MainActivity extends AppCompatActivity {
+
     private enum StopwatchState {RUNNING, STOPPED, PAUSED}
 
     private static final String TAG = MainActivity.class.getSimpleName();
@@ -35,7 +39,7 @@ public class MainActivity extends AppCompatActivity {
     /**
      * The {@link ViewPager} that will host the section contents.
      */
-    private ViewPager mViewPager;
+    private CustomViewPager mViewPager;
     ViewPager.OnPageChangeListener pageListener;
     private RadioGroup page_selector;
     private Button btn1;
@@ -47,6 +51,36 @@ public class MainActivity extends AppCompatActivity {
     StopwatchState stopwatch_state = StopwatchState.STOPPED;
     private View lapRecordView = null;
 
+    // Listener for buttons in secondary views
+    private View.OnClickListener secondaryViewBtnListener = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            int id = v.getId();
+            switch(id){
+                case R.id.lapTotalTimeBtn: {
+                    v.setBackgroundColor(getResources().getColor(R.color.colorPrimaryLight));
+                    Button btn = (Button) findViewById(R.id.lapTimeBtn);
+                    btn.setBackgroundColor(getResources().getColor(R.color.greyLight));
+                    Message message = new Message();
+                    message.arg1 = LapsListAdapter.LapsFormat.ABSOLUTE.ordinal(); // set the correct format
+                    message.what = MessageHandler.MSG_STOPWATCH_LAP_FORMAT;
+                    messageHandler.sendMessage(message);
+                    }
+                    break;
+                case R.id.lapTimeBtn: {
+                    v.setBackgroundColor(getResources().getColor(R.color.colorPrimaryLight));
+                    Button btn = (Button) findViewById(R.id.lapTotalTimeBtn);
+                    btn.setBackgroundColor(getResources().getColor(R.color.greyLight));
+                    Message message = new Message();
+                    message.arg1 = LapsListAdapter.LapsFormat.RELATIVE.ordinal(); // set the correct format
+                    message.what = MessageHandler.MSG_STOPWATCH_LAP_FORMAT;
+                    messageHandler.sendMessage(message);
+                    }
+                    break;
+            }
+        }
+    };
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -57,9 +91,14 @@ public class MainActivity extends AppCompatActivity {
         mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
 
         // Set up the ViewPager with the sections adapter.
-        mViewPager = (ViewPager) findViewById(R.id.container);
+        mViewPager = (CustomViewPager) findViewById(R.id.container);
         mViewPager.setAdapter(mSectionsPagerAdapter);
+        // Set the limit of pages kept in memory
+        mViewPager.setOffscreenPageLimit(mSectionsPagerAdapter.getCount());
+        //TODO: if we want to keep the state after the app is closed...
+        // http://stackoverflow.com/questions/13273285/how-do-i-tell-my-custom-fragmentpageradapter-to-stop-destroying-my-fragments/
 
+        // Buttons
         btn1 = (Button)findViewById(R.id.button1);
         btn2 = (Button)findViewById(R.id.button2);
         btn3 = (Button)findViewById(R.id.button3);
@@ -113,7 +152,7 @@ public class MainActivity extends AppCompatActivity {
         vibe = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE) ;
 
         // message handler setup
-        messageHandler = new MessageHandler(getMainLooper());
+        messageHandler = new MessageHandler(getMainLooper(), getApplicationContext());
     }
 
     @Override
@@ -179,13 +218,12 @@ public class MainActivity extends AppCompatActivity {
         switch(page){
             case R.id.page1:
                 // stopwatch - lap record
-                RelativeLayout secondary_view = (RelativeLayout)findViewById(R.id.secondary_view);
+                final RelativeLayout secondary_view = (RelativeLayout)findViewById(R.id.secondary_view);
                 ImageView buttonsLine = (ImageView)findViewById(R.id.buttonsLine);
                 Button btn = (Button)view;
 
                 if(lapRecordView == null){
                     // create and show the view
-                    secondary_view.removeAllViews();
                     buttonsLine.setVisibility(View.VISIBLE);
                     btn.setText("");
                     btn.setBackgroundResource(R.drawable.btn_pressed);
@@ -195,11 +233,33 @@ public class MainActivity extends AppCompatActivity {
                     laps_view.setY(secondary_view.getHeight());
                     float toY = settingsBtn.getY() + settingsBtn.getHeight() + 3;
 
+                    // set the height of the internal layout = parent's height - y offset - line height - button height
+                    // I tried to apply these value to laps_view, but that view IS secondary_view + inflated layout
+                    RelativeLayout lap_list_layout = (RelativeLayout) laps_view.findViewById(R.id.lapListLayout);
+                    ViewGroup.LayoutParams params = lap_list_layout.getLayoutParams();
+                    params.height = (secondary_view.getHeight() - (int)toY - buttonsLine.getHeight() - btn.getHeight());
+                    lap_list_layout.setLayoutParams(params);
+
                     // use animate() to make the changes permanent
                     laps_view.animate().translationY(toY);
                     laps_view.animate().setDuration(500);
                     laps_view.animate().start();
                     lapRecordView = laps_view;
+
+                    // give to the handler the list
+                    Message msg = new Message();
+                    msg.obj = findViewById(R.id.lapsList);
+                    msg.what = MessageHandler.MSG_STOPWATCH_SHOW_LAP;
+                    messageHandler.sendMessage(msg);
+
+                    // set the clickListener for view's buttons
+                    Button viewBtn = (Button)laps_view.findViewById(R.id.lapTimeBtn);
+                    viewBtn.setOnClickListener(secondaryViewBtnListener);
+                    viewBtn = (Button)laps_view.findViewById(R.id.lapTotalTimeBtn);
+                    viewBtn.setOnClickListener(secondaryViewBtnListener);
+
+                    // disable the pager
+                    mViewPager.setSwipeable(false);
                 }
                 else{
                     // hide and destroy the view
@@ -207,10 +267,27 @@ public class MainActivity extends AppCompatActivity {
                     btn.setText(R.string.btn2_page1_text);
                     btn.setBackgroundResource(0);
                     btn.setBackgroundColor(getResources().getColor(R.color.colorPrimaryLight));
+                    lapRecordView.animate().setListener(new Animator.AnimatorListener() {
+                        @Override
+                        public void onAnimationStart(Animator animation) {}
+
+                        @Override
+                        public void onAnimationEnd(Animator animation) {
+                            secondary_view.removeAllViews();
+                            lapRecordView.animate().setListener(null);
+                            lapRecordView = null;
+                        }
+
+                        @Override
+                        public void onAnimationCancel(Animator animation) {}
+
+                        @Override
+                        public void onAnimationRepeat(Animator animation) {}
+                    });
                     lapRecordView.animate().translationY(secondary_view.getHeight());
                     lapRecordView.animate().setDuration(500);
                     lapRecordView.animate().start();
-                    lapRecordView = null;
+                    mViewPager.setSwipeable(true);
                 }
                 break;
             case R.id.page2:
@@ -233,9 +310,8 @@ public class MainActivity extends AppCompatActivity {
         switch(page){
             case R.id.page1:
                 // stopwatch - reset
-                messageHandler.sendEmptyMessage(MessageHandler.MSG_STOPWATCH_STOP);
+                messageHandler.sendEmptyMessage(MessageHandler.MSG_STOPWATCH_RESET);
                 stopwatch_state = StopwatchState.STOPPED;
-                //TODO: animate needle from current position to starting position
                 break;
             case R.id.page2:
                 // timer
@@ -265,18 +341,21 @@ public class MainActivity extends AppCompatActivity {
                     mSectionsPagerAdapter.getStopwatchNeedle(),
                     mSectionsPagerAdapter.getStopwatchButtonText());
                 messageHandler.sendEmptyMessage(MessageHandler.MSG_STOPWATCH_START);
+                // disable reset btn
                 btn3.setEnabled(false);
                 btn3.setBackgroundColor(getResources().getColor(R.color.greyDark));
                 stopwatch_state = StopwatchState.RUNNING;
                 break;
             case RUNNING:
                 messageHandler.sendEmptyMessage(MessageHandler.MSG_STOPWATCH_PAUSE);
+                // enable reset btn
                 btn3.setEnabled(true);
                 btn3.setBackgroundColor(getResources().getColor(R.color.colorPrimary));
                 stopwatch_state = StopwatchState.PAUSED;
                 break;
             case PAUSED:
                 messageHandler.sendEmptyMessage(MessageHandler.MSG_STOPWATCH_RESUME);
+                // enable reset btn
                 btn3.setEnabled(true);
                 btn3.setBackgroundColor(getResources().getColor(R.color.colorPrimary));
                 stopwatch_state = StopwatchState.RUNNING;

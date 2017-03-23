@@ -16,4 +16,5 @@
     <dimen name="needleH">65dp</dimen>
     <dimen name="needleW">35dp</dimen>
     <dimen name="big_shadow">4dp</dimen>
+    <dimen name="lap_item_start_alignment">18dp</dimen>
 </resources>
