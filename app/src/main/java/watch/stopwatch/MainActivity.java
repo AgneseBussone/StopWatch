@@ -22,7 +22,7 @@ import android.widget.RelativeLayout;
 
 public class MainActivity extends AppCompatActivity {
 
-    private enum StopwatchState {RUNNING, STOPPED, PAUSED}
+    private enum WatchState {RUNNING, STOPPED, PAUSED}
 
     private static final String TAG = MainActivity.class.getSimpleName();
 
@@ -48,7 +48,8 @@ public class MainActivity extends AppCompatActivity {
     private ImageView settingsBtn;
     private Vibrator vibe;
     private MessageHandler messageHandler;
-    StopwatchState stopwatch_state = StopwatchState.STOPPED;
+    WatchState stopwatch_state = WatchState.STOPPED;
+    WatchState timer_state = WatchState.STOPPED;
     private View lapRecordView = null;
 
     // Listener for buttons in secondary views
@@ -124,20 +125,43 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onPageSelected(int position) {
-                // when swipe to the next page, update the radiobutton
-                // and button text
+                // when swipe to the next page, update the radiobutton,
+                // the buttons text and the state of reset button
                 switch(position){
                     case 0:
+                        // stopwatch
                         page_selector.check(R.id.page1);
                         btn1.setText(R.string.btn1_page1_text);
                         btn2.setText(R.string.btn2_page1_text);
+                        if(stopwatch_state == WatchState.RUNNING){
+                            // disable reset btn
+                            btn3.setEnabled(false);
+                            btn3.setBackgroundColor(getResources().getColor(R.color.greyDark));
+                        }
+                        else{
+                            // enable reset btn
+                            btn3.setEnabled(true);
+                            btn3.setBackgroundColor(getResources().getColor(R.color.colorPrimary));
+                        }
                         break;
                     case 1:
+                        // timer
                         page_selector.check(R.id.page2);
                         btn1.setText(R.string.btn1_page2_text);
                         btn2.setText(R.string.btn2_page2_text);
+                        if(timer_state == WatchState.RUNNING){
+                            // disable reset btn
+                            btn3.setEnabled(false);
+                            btn3.setBackgroundColor(getResources().getColor(R.color.greyDark));
+                        }
+                        else{
+                            // enable reset btn
+                            btn3.setEnabled(true);
+                            btn3.setBackgroundColor(getResources().getColor(R.color.colorPrimary));
+                        }
                         break;
                     case 2:
+                        // TBD
                         page_selector.check(R.id.page3);
                         break;
                 }
@@ -194,7 +218,7 @@ public class MainActivity extends AppCompatActivity {
         switch(page){
             case R.id.page1:
                 // stopwatch - lap
-                if(stopwatch_state == StopwatchState.RUNNING){
+                if(stopwatch_state == WatchState.RUNNING){
                     messageHandler.sendEmptyMessage(MessageHandler.MSG_STOPWATCH_LAP);
                 }
                 break;
@@ -311,7 +335,7 @@ public class MainActivity extends AppCompatActivity {
             case R.id.page1:
                 // stopwatch - reset
                 messageHandler.sendEmptyMessage(MessageHandler.MSG_STOPWATCH_RESET);
-                stopwatch_state = StopwatchState.STOPPED;
+                stopwatch_state = WatchState.STOPPED;
                 break;
             case R.id.page2:
                 // timer
@@ -330,11 +354,24 @@ public class MainActivity extends AppCompatActivity {
     public void btnCenter(View view) {
         Animation animation = AnimationUtils.loadAnimation(this, R.anim.center_btn_anim);
         view.startAnimation(animation);
-        startStopwatch();
+        vibe.vibrate(50);
+        int page = page_selector.getCheckedRadioButtonId();
+        switch(page){
+            case R.id.page1:
+                // stopwatch
+                startStopwatch();
+                break;
+            case R.id.page2:
+                // timer
+                break;
+            case R.id.page3:
+                // TBD
+                break;
+        }
     }
 
     private void startStopwatch(){
-        vibe.vibrate(50);
+
         switch(stopwatch_state){
             case STOPPED:
                 messageHandler.initStopwatch(mSectionsPagerAdapter.getStopwatchTV(),
@@ -344,21 +381,21 @@ public class MainActivity extends AppCompatActivity {
                 // disable reset btn
                 btn3.setEnabled(false);
                 btn3.setBackgroundColor(getResources().getColor(R.color.greyDark));
-                stopwatch_state = StopwatchState.RUNNING;
+                stopwatch_state = WatchState.RUNNING;
                 break;
             case RUNNING:
                 messageHandler.sendEmptyMessage(MessageHandler.MSG_STOPWATCH_PAUSE);
                 // enable reset btn
                 btn3.setEnabled(true);
                 btn3.setBackgroundColor(getResources().getColor(R.color.colorPrimary));
-                stopwatch_state = StopwatchState.PAUSED;
+                stopwatch_state = WatchState.PAUSED;
                 break;
             case PAUSED:
                 messageHandler.sendEmptyMessage(MessageHandler.MSG_STOPWATCH_RESUME);
-                // enable reset btn
-                btn3.setEnabled(true);
-                btn3.setBackgroundColor(getResources().getColor(R.color.colorPrimary));
-                stopwatch_state = StopwatchState.RUNNING;
+                // disable reset btn
+                btn3.setEnabled(false);
+                btn3.setBackgroundColor(getResources().getColor(R.color.greyDark));
+                stopwatch_state = WatchState.RUNNING;
                 break;
         }
     }

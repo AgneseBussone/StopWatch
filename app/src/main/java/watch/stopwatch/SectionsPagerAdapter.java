@@ -99,12 +99,17 @@ public class SectionsPagerAdapter extends FragmentPagerAdapter {
         @Override
         public View onCreateView(LayoutInflater inflater, ViewGroup container,
                                  Bundle savedInstanceState) {
-            View rootView;
-            // choose the layout basing on the section number
+            View rootView = inflater.inflate(R.layout.watch_layout, container, false);
+            TextView text = (TextView)rootView.findViewById(R.id.time_text);
+
+            // adjust the layout basing on the section number
             int section =  getArguments().getInt(ARG_SECTION_NUMBER);
             switch(section){
                 case 1:
-                    rootView = inflater.inflate(R.layout.stopwatch_layout, container, false);
+                    text.setText(R.string.time_default_stopwatch);
+                    break;
+                case 2:
+                    text.setText(R.string.time_default_timer);
                     break;
                 default:
                     rootView = inflater.inflate(R.layout.fragment_main, container, false);

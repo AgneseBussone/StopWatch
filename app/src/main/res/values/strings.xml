@@ -14,6 +14,7 @@
     <string name="central_btn_start">to start</string>
     <string name="central_btn_stop">to stop</string>
     <string name="time_default_stopwatch">00:00:00:000</string>
+    <string name="time_default_timer">00:00:00</string>
 
     <string name="totalTimeBtn">TOTAL TIME</string>
     <string name="lapTimeBtn">LAP TIME</string>
