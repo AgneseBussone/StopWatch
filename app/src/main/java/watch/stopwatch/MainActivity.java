@@ -22,7 +22,8 @@ import android.widget.RelativeLayout;
 
 public class MainActivity extends AppCompatActivity {
 
-    private enum WatchState {RUNNING, STOPPED, PAUSED}
+    private enum StopwatchState {RUNNING, STOPPED, PAUSED}
+    private enum TimerState {RUNNING, STOPPED, PAUSED, SET}
 
     private static final String TAG = MainActivity.class.getSimpleName();
 
@@ -48,8 +49,8 @@ public class MainActivity extends AppCompatActivity {
     private ImageView settingsBtn;
     private Vibrator vibe;
     private MessageHandler messageHandler;
-    WatchState stopwatch_state = WatchState.STOPPED;
-    WatchState timer_state = WatchState.STOPPED;
+    StopwatchState stopwatch_state = StopwatchState.STOPPED;
+    TimerState timer_state = TimerState.STOPPED;
     private View lapRecordView = null;
 
     // Listener for buttons in secondary views
@@ -133,7 +134,7 @@ public class MainActivity extends AppCompatActivity {
                         page_selector.check(R.id.page1);
                         btn1.setText(R.string.btn1_page1_text);
                         btn2.setText(R.string.btn2_page1_text);
-                        if(stopwatch_state == WatchState.RUNNING){
+                        if(stopwatch_state == StopwatchState.RUNNING){
                             // disable reset btn
                             btn3.setEnabled(false);
                             btn3.setBackgroundColor(getResources().getColor(R.color.greyDark));
@@ -149,7 +150,7 @@ public class MainActivity extends AppCompatActivity {
                         page_selector.check(R.id.page2);
                         btn1.setText(R.string.btn1_page2_text);
                         btn2.setText(R.string.btn2_page2_text);
-                        if(timer_state == WatchState.RUNNING){
+                        if(timer_state == TimerState.RUNNING){
                             // disable reset btn
                             btn3.setEnabled(false);
                             btn3.setBackgroundColor(getResources().getColor(R.color.greyDark));
@@ -218,7 +219,7 @@ public class MainActivity extends AppCompatActivity {
         switch(page){
             case R.id.page1:
                 // stopwatch - lap
-                if(stopwatch_state == WatchState.RUNNING){
+                if(stopwatch_state == StopwatchState.RUNNING){
                     messageHandler.sendEmptyMessage(MessageHandler.MSG_STOPWATCH_LAP);
                 }
                 break;
@@ -335,7 +336,7 @@ public class MainActivity extends AppCompatActivity {
             case R.id.page1:
                 // stopwatch - reset
                 messageHandler.sendEmptyMessage(MessageHandler.MSG_STOPWATCH_RESET);
-                stopwatch_state = WatchState.STOPPED;
+                stopwatch_state = StopwatchState.STOPPED;
                 break;
             case R.id.page2:
                 // timer
@@ -359,10 +360,11 @@ public class MainActivity extends AppCompatActivity {
         switch(page){
             case R.id.page1:
                 // stopwatch
-                startStopwatch();
+                manage_stopwatch();
                 break;
             case R.id.page2:
                 // timer
+                manage_timer();
                 break;
             case R.id.page3:
                 // TBD
@@ -370,8 +372,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private void startStopwatch(){
-
+    private void manage_stopwatch(){
         switch(stopwatch_state){
             case STOPPED:
                 messageHandler.initStopwatch(mSectionsPagerAdapter.getStopwatchTV(),
@@ -381,22 +382,29 @@ public class MainActivity extends AppCompatActivity {
                 // disable reset btn
                 btn3.setEnabled(false);
                 btn3.setBackgroundColor(getResources().getColor(R.color.greyDark));
-                stopwatch_state = WatchState.RUNNING;
+                stopwatch_state = StopwatchState.RUNNING;
                 break;
             case RUNNING:
                 messageHandler.sendEmptyMessage(MessageHandler.MSG_STOPWATCH_PAUSE);
                 // enable reset btn
                 btn3.setEnabled(true);
                 btn3.setBackgroundColor(getResources().getColor(R.color.colorPrimary));
-                stopwatch_state = WatchState.PAUSED;
+                stopwatch_state = StopwatchState.PAUSED;
                 break;
             case PAUSED:
                 messageHandler.sendEmptyMessage(MessageHandler.MSG_STOPWATCH_RESUME);
                 // disable reset btn
                 btn3.setEnabled(false);
                 btn3.setBackgroundColor(getResources().getColor(R.color.greyDark));
-                stopwatch_state = WatchState.RUNNING;
+                stopwatch_state = StopwatchState.RUNNING;
                 break;
+        }
+    }
+
+    private void manage_timer(){
+        // start the timer only if it's set
+        if(timer_state == TimerState.SET){
+            //TODO
         }
     }
 }
