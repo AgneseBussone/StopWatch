@@ -2,12 +2,15 @@ package watch.stopwatch;
 
 import android.animation.Animator;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.os.Message;
 import android.os.Vibrator;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -16,8 +19,12 @@ import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.NumberPicker;
 import android.widget.RadioGroup;
 import android.widget.RelativeLayout;
+import android.widget.TextView;
+
+import java.text.DecimalFormat;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -136,13 +143,11 @@ public class MainActivity extends AppCompatActivity {
                         btn2.setText(R.string.btn2_page1_text);
                         if(stopwatch_state == StopwatchState.RUNNING){
                             // disable reset btn
-                            btn3.setEnabled(false);
-                            btn3.setBackgroundColor(getResources().getColor(R.color.greyDark));
+                            setEnableBtnReset(false);
                         }
                         else{
                             // enable reset btn
-                            btn3.setEnabled(true);
-                            btn3.setBackgroundColor(getResources().getColor(R.color.colorPrimary));
+                            setEnableBtnReset(true);
                         }
                         break;
                     case 1:
@@ -152,13 +157,11 @@ public class MainActivity extends AppCompatActivity {
                         btn2.setText(R.string.btn2_page2_text);
                         if(timer_state == TimerState.RUNNING){
                             // disable reset btn
-                            btn3.setEnabled(false);
-                            btn3.setBackgroundColor(getResources().getColor(R.color.greyDark));
+                            setEnableBtnReset(false);
                         }
                         else{
                             // enable reset btn
-                            btn3.setEnabled(true);
-                            btn3.setBackgroundColor(getResources().getColor(R.color.colorPrimary));
+                            setEnableBtnReset(true);
                         }
                         break;
                     case 2:
@@ -225,6 +228,51 @@ public class MainActivity extends AppCompatActivity {
                 break;
             case R.id.page2:
                 // timer
+                AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this);
+                LayoutInflater inflater = this.getLayoutInflater();
+                final View dialogView = inflater.inflate(R.layout.set_timer_layout, null);
+                dialogBuilder.setView(dialogView);
+
+                // set the max and the min value for number picker or won't show the wheel
+                final NumberPicker hours = (NumberPicker) dialogView.findViewById(R.id.numberPicker_hours);
+                final NumberPicker min = (NumberPicker) dialogView.findViewById(R.id.numberPicker_min);
+                final NumberPicker sec = (NumberPicker) dialogView.findViewById(R.id.numberPicker_sec);
+                hours.setMaxValue(99);
+                hours.setMinValue(0);
+                hours.setWrapSelectorWheel(true);
+                min.setMaxValue(59);
+                min.setMinValue(0);
+                min.setWrapSelectorWheel(true);
+                sec.setMaxValue(59);
+                sec.setMinValue(0);
+                sec.setWrapSelectorWheel(true);
+
+                dialogBuilder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int whichButton) {
+                        // get the values from the number pickers
+                        int h = hours.getValue();
+                        int m = min.getValue();
+                        int s = sec.getValue();
+
+                        // set the text
+                        DecimalFormat df = new DecimalFormat("00");
+                        TextView timeTV = mSectionsPagerAdapter.getTimerTV();
+                        timeTV.setText(df.format(h) + ":" + df.format(m) + ":" + df.format(s));
+                        
+                        // mark the timer as set
+                        timer_state = TimerState.SET;
+                        
+                        dialog.dismiss();
+                    }
+                });
+                dialogBuilder.setNegativeButton("CANCEL", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                });
+                AlertDialog b = dialogBuilder.create();
+                b.show();
                 break;
             case R.id.page3:
                 // TBD
@@ -376,26 +424,23 @@ public class MainActivity extends AppCompatActivity {
         switch(stopwatch_state){
             case STOPPED:
                 messageHandler.initStopwatch(mSectionsPagerAdapter.getStopwatchTV(),
-                    mSectionsPagerAdapter.getStopwatchNeedle(),
-                    mSectionsPagerAdapter.getStopwatchButtonText());
+                                                mSectionsPagerAdapter.getStopwatchNeedle(),
+                                                mSectionsPagerAdapter.getStopwatchButtonText());
                 messageHandler.sendEmptyMessage(MessageHandler.MSG_STOPWATCH_START);
                 // disable reset btn
-                btn3.setEnabled(false);
-                btn3.setBackgroundColor(getResources().getColor(R.color.greyDark));
+                setEnableBtnReset(false);
                 stopwatch_state = StopwatchState.RUNNING;
                 break;
             case RUNNING:
                 messageHandler.sendEmptyMessage(MessageHandler.MSG_STOPWATCH_PAUSE);
                 // enable reset btn
-                btn3.setEnabled(true);
-                btn3.setBackgroundColor(getResources().getColor(R.color.colorPrimary));
+                setEnableBtnReset(true);
                 stopwatch_state = StopwatchState.PAUSED;
                 break;
             case PAUSED:
                 messageHandler.sendEmptyMessage(MessageHandler.MSG_STOPWATCH_RESUME);
                 // disable reset btn
-                btn3.setEnabled(false);
-                btn3.setBackgroundColor(getResources().getColor(R.color.greyDark));
+                setEnableBtnReset(false);
                 stopwatch_state = StopwatchState.RUNNING;
                 break;
         }
@@ -403,8 +448,28 @@ public class MainActivity extends AppCompatActivity {
 
     private void manage_timer(){
         // start the timer only if it's set
-        if(timer_state == TimerState.SET){
-            //TODO
+        switch (timer_state){
+            case SET:
+                messageHandler.initTimer(mSectionsPagerAdapter.getTimerTV(),
+                                            mSectionsPagerAdapter.getTimerNeedle(),
+                                            mSectionsPagerAdapter.getTimerButtonText());
+                // send a message with the number of seconds
+
+                // disable reset btn
+                setEnableBtnReset(false);
+                timer_state = TimerState.RUNNING;
+                break;
+        }
+    }
+
+    // Method to enable/disable the reset btn easily
+    private void setEnableBtnReset(boolean enable){
+        btn3.setEnabled(enable);
+        if(enable){
+            btn3.setBackgroundColor(getResources().getColor(R.color.colorPrimary));
+        }
+        else{
+            btn3.setBackgroundColor(getResources().getColor(R.color.greyDark));
         }
     }
 }

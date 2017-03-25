@@ -18,4 +18,10 @@
 
     <string name="totalTimeBtn">TOTAL TIME</string>
     <string name="lapTimeBtn">LAP TIME</string>
+
+    <string name="setTimerDialog">Set Timer</string>
+    <string name="setTimer_hours">Hours</string>
+    <string name="setTimer_min">Minutes</string>
+    <string name="setTimer_sec">Seconds</string>
+
 </resources>

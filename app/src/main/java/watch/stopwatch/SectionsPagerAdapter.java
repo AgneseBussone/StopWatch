@@ -71,6 +71,21 @@ public class SectionsPagerAdapter extends FragmentPagerAdapter {
         return (TextView)view.findViewById(R.id.btn_text_action);
     }
 
+    public TextView getTimerTV() {
+        View view = fragment_list.get(1).getView();
+        return (TextView) view.findViewById(R.id.time_text);
+    }
+
+    public ImageView getTimerNeedle() {
+        View view = fragment_list.get(1).getView();
+        return (ImageView) view.findViewById(R.id.needle_list);
+    }
+
+    public TextView getTimerButtonText(){
+        View view = fragment_list.get(1).getView();
+        return (TextView)view.findViewById(R.id.btn_text_action);
+    }
+
     /**
      * Fragment inner class
      */

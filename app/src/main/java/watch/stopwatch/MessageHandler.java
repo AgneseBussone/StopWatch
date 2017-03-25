@@ -41,6 +41,11 @@ public class MessageHandler extends Handler {
     private ArrayList<String[]> laps = new ArrayList<>();
     private LapsListAdapter lapsListAdapter;
 
+    // timer graphical asset
+    private TextView timer_tv = null;
+    private ImageView timer_needle = null;
+    private TextView timerBtn_tv = null;
+
     public MessageHandler(Looper looper, Context context){
         super(looper);
         this.context = context;
@@ -53,6 +58,15 @@ public class MessageHandler extends Handler {
             stopwatch_needle = img;
         if(stopwatchBtn_tv ==  null)
             stopwatchBtn_tv = btn_tv;
+    }
+
+    void initTimer(TextView time_tv, ImageView img, TextView btn_tv){
+        if(timer_tv == null)
+            timer_tv = time_tv;
+        if(timer_needle == null)
+            timer_needle = img;
+        if(timerBtn_tv ==  null)
+            timerBtn_tv = btn_tv;
     }
 
     @Override
