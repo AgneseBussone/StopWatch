@@ -40,4 +40,20 @@ public class Time {
         text += msf.format(ms);
         return text;
     }
+
+    public String getFormattedShortTime(){
+        String text = "";
+        text += df.format(h) + ":";
+        text += df.format(m) + ":";
+        text += df.format(s);
+        return text;
+    }
+
+    public long getMilliseconds(){
+        long time = ms;
+        time += (s * 1000);
+        time += (m * 60 * 1000);
+        time += (h * 3600 * 1000);
+        return time;
+    }
 }

@@ -34,7 +34,7 @@ public class Chronometer {
 
 
     // elapsed time in milliseconds
-    public long getElapsedTime() {
+    public long getElapsedTimeMs() {
         if (running) {
             return System.currentTimeMillis() - startTime;
         }
@@ -50,8 +50,8 @@ public class Chronometer {
         return ((stopTime - startTime) / 1000);
     }
 
-    public Time getTime(){
-        return new Time(getElapsedTime());
+    public Time getElapsedTime(){
+        return new Time(getElapsedTimeMs());
     }
 
 }

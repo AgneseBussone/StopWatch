@@ -4,6 +4,9 @@ import android.content.Context;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
+import android.view.View;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -26,8 +29,11 @@ public class MessageHandler extends Handler {
     public static final int MSG_STOPWATCH_SAVE_LAP   = 6;
     public static final int MSG_STOPWATCH_SHOW_LAP   = 7;
     public static final int MSG_STOPWATCH_LAP_FORMAT = 8;
+    public static final int MSG_TIMER_START          = 9;
+    public static final int MSG_TIMER_UPDATE         = 10;
+    public static final int MSG_TIMER_STOP           = 11;
 
-    private Chronometer timer = new Chronometer();
+    private Chronometer stopwatch_chronometer = new Chronometer();
     private final long REFRESH_RATE = 100;
     private Context context;
 
@@ -45,6 +51,7 @@ public class MessageHandler extends Handler {
     private TextView timer_tv = null;
     private ImageView timer_needle = null;
     private TextView timerBtn_tv = null;
+    private View timerBtn = null;
 
     public MessageHandler(Looper looper, Context context){
         super(looper);
@@ -60,20 +67,22 @@ public class MessageHandler extends Handler {
             stopwatchBtn_tv = btn_tv;
     }
 
-    void initTimer(TextView time_tv, ImageView img, TextView btn_tv){
+    void initTimer(TextView time_tv, ImageView img, TextView btn_tv, View btn){
         if(timer_tv == null)
             timer_tv = time_tv;
         if(timer_needle == null)
             timer_needle = img;
         if(timerBtn_tv ==  null)
             timerBtn_tv = btn_tv;
+        if(timerBtn == null)
+            timerBtn = btn;
     }
 
     @Override
     public void handleMessage(Message msg) {
         switch (msg.what) {
             case MSG_STOPWATCH_START:
-                timer.start(); //start timer
+                stopwatch_chronometer.start(); //start chronometer
                 if(stopwatchBtn_tv != null) {
                     stopwatchBtn_tv.setText(R.string.central_btn_stop);
                 }
@@ -87,7 +96,7 @@ public class MessageHandler extends Handler {
 
             case MSG_STOPWATCH_RESET:
                 removeMessages(MSG_STOPWATCH_UPDATE); // no more updates.
-                timer.stop();//stop timer
+                stopwatch_chronometer.stop();//stop chronometer
                 if(stopwatch_needle != null & stopwatchBtn_tv != null) {
                     stopwatch_tv.setText(R.string.time_default_stopwatch);
                     stopwatch_needle.animate().rotation(0f);
@@ -102,7 +111,7 @@ public class MessageHandler extends Handler {
 
             case MSG_STOPWATCH_PAUSE:
                 removeMessages(MSG_STOPWATCH_UPDATE);
-                timer.pause();
+                stopwatch_chronometer.pause();
                 updateStopwatch();
                 if(stopwatchBtn_tv != null) {
                     stopwatchBtn_tv.setText(R.string.central_btn_start);
@@ -110,7 +119,7 @@ public class MessageHandler extends Handler {
                 break;
 
             case MSG_STOPWATCH_RESUME:
-                timer.resume(); //start timer
+                stopwatch_chronometer.resume(); //start chronometer
                 if(stopwatchBtn_tv != null) {
                     stopwatchBtn_tv.setText(R.string.central_btn_stop);
                 }
@@ -119,7 +128,7 @@ public class MessageHandler extends Handler {
 
             case MSG_STOPWATCH_LAP:
                 // add the time to the list
-                long time = timer.getElapsedTime();
+                long time = stopwatch_chronometer.getElapsedTimeMs();
                 Time absolute = new Time(time);
                 if(laps.isEmpty()){
                     // first entry: the two format are the same
@@ -156,6 +165,29 @@ public class MessageHandler extends Handler {
                 //TODO: call proper method of settings activity
                 break;
 
+            case MSG_TIMER_START:
+                if(msg.obj != null) {
+                    Time timer_timeout = (Time) msg.obj;
+                    Countdown timer = new Countdown(timer_timeout.getMilliseconds(), REFRESH_RATE, this);
+                    if (timerBtn_tv != null) {
+                        timerBtn_tv.setText(R.string.central_btn_stop);
+                    }
+                    timer.start();
+                }
+                break;
+
+            case MSG_TIMER_STOP:
+                // play animation on the central btn
+                Animation animation = AnimationUtils.loadAnimation(context, R.anim.center_btn_anim_timer_out);
+                timerBtn.startAnimation(animation);
+                // fallthrough
+            case MSG_TIMER_UPDATE:
+                if(msg.obj != null) {
+                    Time timer_timeout = (Time) msg.obj;
+                    updateTimer(timer_timeout);
+                }
+                break;
+
             default:
                 break;
         }
@@ -164,9 +196,16 @@ public class MessageHandler extends Handler {
     /* Update graphics elements */
     private void updateStopwatch(){
         if(stopwatch_tv != null && stopwatch_needle != null) {
-            Time time = timer.getTime();
+            Time time = stopwatch_chronometer.getElapsedTime();
             stopwatch_tv.setText(time.getFormattedTime());
             stopwatch_needle.setRotation(((float) time.s + (time.ms / 1000f)) * 6f);
+        }
+    }
+
+    private void updateTimer(Time timer_timeout){
+        if(timer_tv != null && timer_needle != null){
+            timer_tv.setText(timer_timeout.getFormattedShortTime());
+            timer_needle.setRotation(-(((float) timer_timeout.s + (timer_timeout.ms / 1000f)) * 6f));
         }
     }
 }

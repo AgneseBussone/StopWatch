@@ -24,8 +24,6 @@ import android.widget.RadioGroup;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import java.text.DecimalFormat;
-
 
 public class MainActivity extends AppCompatActivity {
 
@@ -59,6 +57,7 @@ public class MainActivity extends AppCompatActivity {
     StopwatchState stopwatch_state = StopwatchState.STOPPED;
     TimerState timer_state = TimerState.STOPPED;
     private View lapRecordView = null;
+    private Time timer_timeout = new Time(0, 0, 0, 0);
 
     // Listener for buttons in secondary views
     private View.OnClickListener secondaryViewBtnListener = new View.OnClickListener() {
@@ -227,7 +226,7 @@ public class MainActivity extends AppCompatActivity {
                 }
                 break;
             case R.id.page2:
-                // timer
+                // timer - set
                 AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this);
                 LayoutInflater inflater = this.getLayoutInflater();
                 final View dialogView = inflater.inflate(R.layout.set_timer_layout, null);
@@ -250,18 +249,21 @@ public class MainActivity extends AppCompatActivity {
                 dialogBuilder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int whichButton) {
                         // get the values from the number pickers
-                        int h = hours.getValue();
-                        int m = min.getValue();
-                        int s = sec.getValue();
+                        timer_timeout.h = hours.getValue();
+                        timer_timeout.m = min.getValue();
+                        timer_timeout.s = sec.getValue();
 
                         // set the text
-                        DecimalFormat df = new DecimalFormat("00");
                         TextView timeTV = mSectionsPagerAdapter.getTimerTV();
-                        timeTV.setText(df.format(h) + ":" + df.format(m) + ":" + df.format(s));
-                        
+                        timeTV.setText(timer_timeout.getFormattedShortTime());
+
                         // mark the timer as set
                         timer_state = TimerState.SET;
-                        
+
+                        // set the needle in the correct position
+                        ImageView needle = mSectionsPagerAdapter.getTimerNeedle();
+                        needle.setRotation(-((float)timer_timeout.s * 6f));
+
                         dialog.dismiss();
                     }
                 });
@@ -401,18 +403,15 @@ public class MainActivity extends AppCompatActivity {
      * @param view
      */
     public void btnCenter(View view) {
-        Animation animation = AnimationUtils.loadAnimation(this, R.anim.center_btn_anim);
-        view.startAnimation(animation);
-        vibe.vibrate(50);
         int page = page_selector.getCheckedRadioButtonId();
         switch(page){
             case R.id.page1:
                 // stopwatch
-                manage_stopwatch();
+                manage_stopwatch(view);
                 break;
             case R.id.page2:
                 // timer
-                manage_timer();
+                manage_timer(view);
                 break;
             case R.id.page3:
                 // TBD
@@ -420,7 +419,14 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private void manage_stopwatch(){
+    private void animateBtnCenter(View btnView){
+        Animation animation = AnimationUtils.loadAnimation(this, R.anim.center_btn_anim);
+        btnView.startAnimation(animation);
+        vibe.vibrate(50);
+    }
+
+    private void manage_stopwatch(View centralBtn){
+        animateBtnCenter(centralBtn);
         switch(stopwatch_state){
             case STOPPED:
                 messageHandler.initStopwatch(mSectionsPagerAdapter.getStopwatchTV(),
@@ -446,18 +452,40 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private void manage_timer(){
+    private void manage_timer(View centralBtn){
         // start the timer only if it's set
         switch (timer_state){
             case SET:
+                animateBtnCenter(centralBtn);
                 messageHandler.initTimer(mSectionsPagerAdapter.getTimerTV(),
                                             mSectionsPagerAdapter.getTimerNeedle(),
-                                            mSectionsPagerAdapter.getTimerButtonText());
+                                            mSectionsPagerAdapter.getTimerButtonText(),
+                                            centralBtn);
                 // send a message with the number of seconds
+                Message mex = new Message();
+                mex.obj = timer_timeout;
+                mex.what = MessageHandler.MSG_TIMER_START;
+                messageHandler.sendMessage(mex);
 
                 // disable reset btn
                 setEnableBtnReset(false);
                 timer_state = TimerState.RUNNING;
+                break;
+            case RUNNING:
+                // check if the timer is expired
+                Animation anim = centralBtn.getAnimation();
+                if(anim == null){
+                    // no animation running = timer not expired
+                    //TODO
+                }
+                else{
+                    // stop animation
+                    centralBtn.clearAnimation();
+
+                    mSectionsPagerAdapter.getTimerButtonText().setText(R.string.central_btn_start);
+                    setEnableBtnReset(true);
+                    timer_state = TimerState.STOPPED;
+                }
                 break;
         }
     }
