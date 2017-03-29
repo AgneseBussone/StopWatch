@@ -476,7 +476,10 @@ public class MainActivity extends AppCompatActivity {
                 Animation anim = centralBtn.getAnimation();
                 if(anim == null){
                     // no animation running = timer not expired
-                    //TODO
+                    messageHandler.sendEmptyMessage(MessageHandler.MSG_TIMER_PAUSE);
+                    // enable reset btn
+                    setEnableBtnReset(true);
+                    timer_state = TimerState.PAUSED;
                 }
                 else{
                     // stop animation
@@ -486,6 +489,13 @@ public class MainActivity extends AppCompatActivity {
                     setEnableBtnReset(true);
                     timer_state = TimerState.STOPPED;
                 }
+                break;
+            case PAUSED:
+                animateBtnCenter(centralBtn);
+                messageHandler.sendEmptyMessage(MessageHandler.MSG_TIMER_RESUME);
+                // disable reset btn
+                setEnableBtnReset(false);
+                timer_state = TimerState.RUNNING;
                 break;
         }
     }

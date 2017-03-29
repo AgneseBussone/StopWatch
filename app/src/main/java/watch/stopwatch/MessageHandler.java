@@ -32,6 +32,8 @@ public class MessageHandler extends Handler {
     public static final int MSG_TIMER_START          = 9;
     public static final int MSG_TIMER_UPDATE         = 10;
     public static final int MSG_TIMER_STOP           = 11;
+    public static final int MSG_TIMER_PAUSE          = 12;
+    public static final int MSG_TIMER_RESUME         = 13;
 
     private Chronometer stopwatch_chronometer = new Chronometer();
     private final long REFRESH_RATE = 100;
@@ -52,6 +54,8 @@ public class MessageHandler extends Handler {
     private ImageView timer_needle = null;
     private TextView timerBtn_tv = null;
     private View timerBtn = null;
+    private Countdown timer = null;
+    private long timer_last_update = 0;
 
     public MessageHandler(Looper looper, Context context){
         super(looper);
@@ -168,7 +172,7 @@ public class MessageHandler extends Handler {
             case MSG_TIMER_START:
                 if(msg.obj != null) {
                     Time timer_timeout = (Time) msg.obj;
-                    Countdown timer = new Countdown(timer_timeout.getMilliseconds(), REFRESH_RATE, this);
+                    timer = new Countdown(timer_timeout.getMilliseconds(), REFRESH_RATE, this);
                     if (timerBtn_tv != null) {
                         timerBtn_tv.setText(R.string.central_btn_stop);
                     }
@@ -186,6 +190,20 @@ public class MessageHandler extends Handler {
                     Time timer_timeout = (Time) msg.obj;
                     updateTimer(timer_timeout);
                 }
+                break;
+
+            case MSG_TIMER_PAUSE:
+                timer.cancel();
+                timer_last_update = timer.getLastUpdate();
+                timer = null;
+                break;
+
+            case MSG_TIMER_RESUME:
+                timer = new Countdown(timer_last_update, REFRESH_RATE, this);
+                if (timerBtn_tv != null) {
+                    timerBtn_tv.setText(R.string.central_btn_stop);
+                }
+                timer.start();
                 break;
 
             default:

@@ -8,7 +8,8 @@ import android.os.Message;
  */
 
 public class Countdown extends CountDownTimer {
-    MessageHandler mHandler;
+    private MessageHandler mHandler;
+    private long lastUpdate = 0;
 
     public Countdown(long millisInFuture, long countDownInterval, MessageHandler messenger) {
         super(millisInFuture, countDownInterval);
@@ -22,6 +23,7 @@ public class Countdown extends CountDownTimer {
         mex.obj = remaining_time;
         mex.what = MessageHandler.MSG_TIMER_UPDATE;
         mHandler.sendMessage(mex);
+        lastUpdate = millisUntilFinished;
     }
 
     @Override
@@ -31,5 +33,9 @@ public class Countdown extends CountDownTimer {
         mex.obj = remaining_time;
         mex.what = MessageHandler.MSG_TIMER_STOP;
         mHandler.sendMessage(mex);
+    }
+
+    public long getLastUpdate() {
+        return lastUpdate;
     }
 }
