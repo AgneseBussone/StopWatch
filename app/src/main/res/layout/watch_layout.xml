@@ -6,102 +6,136 @@
     >
 
 
-    <RelativeLayout
+    <FrameLayout
+        android:id="@+id/clockLayout"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
-        android:id="@+id/relL">
+        android:layout_alignParentBottom="true">
 
-        <ImageView
-            android:layout_width="@dimen/numbers_dimension"
-            android:layout_height="@dimen/numbers_dimension"
-            android:background="@drawable/numbers"
-            android:layout_centerVertical="true"
-            android:layout_centerHorizontal="true"
-            android:layout_gravity="center"/>
-
-        <FrameLayout
-            android:layout_centerVertical="true"
-            android:layout_centerHorizontal="true"
+        <RelativeLayout
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal">
+
+            <ImageView
+                android:layout_width="@dimen/numbers_dimension"
+                android:layout_height="@dimen/numbers_dimension"
+                android:layout_alignParentStart="true"
+                android:layout_alignParentTop="true"
+                android:layout_gravity="center"
+                android:background="@drawable/numbers"/>
+
+            <FrameLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerHorizontal="true"
+                android:layout_centerVertical="true">
+
                 <ImageView
+                    android:id="@+id/imageView3"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
-                    android:background="@drawable/tick_list"
-                    android:id="@+id/imageView3"/>
+                    android:background="@drawable/tick_list"/>
+
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal"
+                    android:layout_marginTop="5dp"
+                    android:background="@drawable/ic_triangle"/>
+            </FrameLayout>
 
             <ImageView
+                android:id="@+id/needle_list"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal"
-                android:layout_marginTop="5dp"
-                android:background="@drawable/ic_triangle"/>
-        </FrameLayout>
+                android:layout_centerHorizontal="true"
+                android:layout_centerVertical="true"
+                android:layout_gravity="center"
+                android:background="@drawable/needle_list"
+                />
 
-        <ImageView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:background="@drawable/needle_list"
-            android:layout_gravity="center"
-            android:layout_centerVertical="true"
-            android:layout_centerHorizontal="true"
-            android:id="@+id/needle_list"
-            />
-
-        <ImageView
-            android:id="@+id/bigBtn"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerHorizontal="true"
-            android:layout_centerVertical="true"
-            android:background="@drawable/center"
-            android:onClick="btnCenter"/>
-
-        <LinearLayout
-            android:id="@+id/linearLayout2"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerHorizontal="true"
-            android:layout_centerVertical="true"
-            android:orientation="vertical">
-
-            <TextView
-                android:id="@+id/btn_text_mode"
+            <ImageView
+                android:id="@+id/bigBtn"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal"
-                android:layout_weight="1"
-                android:text="@string/central_btn_tap"
-                android:textAlignment="center"
-                android:textAppearance="@style/TextAppearance.AppCompat"
-                android:textColor="@color/white"
-                android:textSize="24sp"/>
+                android:layout_centerHorizontal="true"
+                android:layout_centerVertical="true"
+                android:background="@drawable/center"
+                android:onClick="btnCenter"/>
 
-            <TextView
-                android:id="@+id/btn_text_action"
+            <LinearLayout
+                android:id="@+id/linearLayout2"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_centerHorizontal="true"
+                android:layout_centerVertical="true"
+                android:orientation="vertical">
 
-                android:layout_gravity="center_horizontal"
-                android:layout_weight="1"
-                android:text="@string/central_btn_start"
-                android:textAlignment="center"
-                android:textAppearance="@style/TextAppearance.AppCompat"
-                android:textColor="@color/white"
-                android:textSize="24sp"/>
+                <TextView
+                    android:id="@+id/btn_text_mode"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal"
+                    android:layout_weight="1"
+                    android:text="@string/central_btn_tap"
+                    android:textAlignment="center"
+                    android:textAppearance="@style/TextAppearance.AppCompat"
+                    android:textColor="@color/white"
+                    android:textSize="24sp"/>
 
-        </LinearLayout>
-    </RelativeLayout>
+                <TextView
+                    android:id="@+id/btn_text_action"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+
+                    android:layout_gravity="center_horizontal"
+                    android:layout_weight="1"
+                    android:text="@string/central_btn_start"
+                    android:textAlignment="center"
+                    android:textAppearance="@style/TextAppearance.AppCompat"
+                    android:textColor="@color/white"
+                    android:textSize="24sp"/>
+
+            </LinearLayout>
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:id="@+id/addTimeLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom"
+            android:paddingEnd="10dp"
+            android:paddingStart="10dp">
+
+            <ImageView
+                android:id="@+id/addMinBtn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentStart="true"
+                android:src="@drawable/add_btn_placeholder"
+                android:onClick="addMin"/>
+
+            <ImageView
+                android:id="@+id/addSecBtn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:src="@drawable/add_btn_placeholder"
+                android:onClick="addSec"/>
+
+        </RelativeLayout>
+
+    </FrameLayout>
 
 
     <TextView
         android:id="@+id/time_text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_above="@+id/relL"
+        android:layout_above="@+id/clockLayout"
         android:layout_centerHorizontal="true"
         android:text="@string/time_default_stopwatch"
         android:textAppearance="@style/TextAppearance.AppCompat.Display1"

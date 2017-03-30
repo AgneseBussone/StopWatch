@@ -8,6 +8,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import java.util.ArrayList;
@@ -116,15 +117,18 @@ public class SectionsPagerAdapter extends FragmentPagerAdapter {
                                  Bundle savedInstanceState) {
             View rootView = inflater.inflate(R.layout.watch_layout, container, false);
             TextView text = (TextView)rootView.findViewById(R.id.time_text);
+            RelativeLayout addTimeLayout = (RelativeLayout)rootView.findViewById(R.id.addTimeLayout);
 
             // adjust the layout basing on the section number
             int section =  getArguments().getInt(ARG_SECTION_NUMBER);
             switch(section){
                 case 1:
                     text.setText(R.string.time_default_stopwatch);
+                    addTimeLayout.setVisibility(View.INVISIBLE);
                     break;
                 case 2:
                     text.setText(R.string.time_default_timer);
+                    addTimeLayout.setVisibility(View.VISIBLE);
                     break;
                 default:
                     rootView = inflater.inflate(R.layout.fragment_main, container, false);
