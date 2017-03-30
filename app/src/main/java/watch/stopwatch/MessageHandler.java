@@ -34,6 +34,7 @@ public class MessageHandler extends Handler {
     public static final int MSG_TIMER_STOP           = 11;
     public static final int MSG_TIMER_PAUSE          = 12;
     public static final int MSG_TIMER_RESUME         = 13;
+    public static final int MSG_TIMER_RESET          = 14;
 
     private Chronometer stopwatch_chronometer = new Chronometer();
     private final long REFRESH_RATE = 100;
@@ -204,6 +205,19 @@ public class MessageHandler extends Handler {
                     timerBtn_tv.setText(R.string.central_btn_stop);
                 }
                 timer.start();
+                break;
+
+            case MSG_TIMER_RESET:
+                if (timer != null)
+                    timer.cancel();
+                timer_last_update = 0;
+                timer = null;
+                removeMessages(MSG_TIMER_UPDATE);
+                if(timer_needle != null & timerBtn_tv != null) {
+                    timer_tv.setText(R.string.time_default_timer);
+                    timer_needle.animate().rotation(0f);
+                    timerBtn_tv.setText(R.string.central_btn_start);
+                }
                 break;
 
             default:

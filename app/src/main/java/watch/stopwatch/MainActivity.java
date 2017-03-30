@@ -389,7 +389,9 @@ public class MainActivity extends AppCompatActivity {
                 stopwatch_state = StopwatchState.STOPPED;
                 break;
             case R.id.page2:
-                // timer
+                // timer - reset
+                messageHandler.sendEmptyMessage(MessageHandler.MSG_TIMER_RESET);
+                timer_state = TimerState.STOPPED;
                 break;
             case R.id.page3:
                 // TBD
