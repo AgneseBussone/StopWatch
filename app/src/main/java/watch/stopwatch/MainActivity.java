@@ -19,10 +19,13 @@ import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.ListView;
 import android.widget.NumberPicker;
 import android.widget.RadioGroup;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+
+import java.util.ArrayList;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -61,6 +64,8 @@ public class MainActivity extends AppCompatActivity {
     private View timerPresetView = null;
     private RelativeLayout secondary_view;
     private ImageView separator;
+    private ArrayList<Time> preset_timers;
+    private TimerListAdapter presetTimerAdapter;
 
 
     // Listener for buttons in secondary views
@@ -88,9 +93,6 @@ public class MainActivity extends AppCompatActivity {
                     message.what = MessageHandler.MSG_STOPWATCH_LAP_FORMAT;
                     messageHandler.sendMessage(message);
                     }
-                    break;
-                case R.id.timerAddBtn:
-                    //TODO
                     break;
             }
         }
@@ -147,6 +149,9 @@ public class MainActivity extends AppCompatActivity {
         secondary_view = (RelativeLayout)findViewById(R.id.secondary_view);
         separator = (ImageView)findViewById(R.id.buttonsLine);
 
+        // Read the preset timers and set the adapter TODO
+        preset_timers = new ArrayList<>();
+        presetTimerAdapter = new TimerListAdapter(preset_timers, getApplicationContext());
 
         // Page indicator RadioGroup
         page_selector = (RadioGroup)findViewById(R.id.page_selector);
@@ -261,7 +266,7 @@ public class MainActivity extends AppCompatActivity {
                 }
                 break;
             case R.id.page2:
-                // timer - set
+                // timer - set/add
                 AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this);
                 LayoutInflater inflater = this.getLayoutInflater();
                 final View dialogView = inflater.inflate(R.layout.set_timer_layout, null);
@@ -281,18 +286,27 @@ public class MainActivity extends AppCompatActivity {
                 sec.setMinValue(0);
                 sec.setWrapSelectorWheel(true);
 
+                //TODO: set the values to the current timer?
+
                 dialogBuilder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int whichButton) {
-                        // get the values from the number pickers
-                        timer_timeout.h = hours.getValue();
-                        timer_timeout.m = min.getValue();
-                        timer_timeout.s = sec.getValue();
+                        if(timerPresetView == null) { //// SET
+                            // get the values from the number pickers
+                            timer_timeout.h = hours.getValue();
+                            timer_timeout.m = min.getValue();
+                            timer_timeout.s = sec.getValue();
 
-                        setTimer();
+                            setTimer();
 
-                        // mark the timer as set
-                        timer_state = TimerState.SET;
-
+                            // mark the timer as set
+                            timer_state = TimerState.SET;
+                        }
+                        else{ //// ADD
+                            Time t  = new Time(hours.getValue(), min.getValue(), sec.getValue(), 0);
+                            preset_timers.add(t);
+                            presetTimerAdapter.notifyDataSetChanged();
+                            //TODO: save the timer somwhere
+                        }
                         dialog.dismiss();
                     }
                 });
@@ -349,12 +363,17 @@ public class MainActivity extends AppCompatActivity {
                 if(timerPresetView == null){
                     timerPresetView = createSecondaryView(btn, R.layout.timer_list);
 
-                    // set the clickListener for view's buttons
-                    Button viewBtn = (Button)timerPresetView.findViewById(R.id.timerAddBtn);
-                    viewBtn.setOnClickListener(secondaryViewBtnListener);
+                    // Associate the adapter to the list view
+                    ListView list = (ListView) timerPresetView.findViewById(R.id.timerList);
+                    list.setAdapter(presetTimerAdapter);
+
+                    // Change SET to ADD
+                    btn1.setText(R.string.timer_add);
                 }
                 else{
                     destroySecondaryView(btn, R.string.btn2_page2_text, timerPresetView);
+                    // Change ADD to SET
+                    btn1.setText(R.string.btn1_page2_text);
                 }
                 break;
             case R.id.page3:
@@ -587,12 +606,6 @@ public class MainActivity extends AppCompatActivity {
         setTimer();
         // mark the timer as set
         timer_state = TimerState.SET;
-    }
-
-    public void editPresetTimer(View view) {
-    }
-
-    public void deletePresetTimer(View view) {
     }
 
 }

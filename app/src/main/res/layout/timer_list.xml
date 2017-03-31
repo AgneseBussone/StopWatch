@@ -10,7 +10,9 @@
         android:id="@+id/timerBtns"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal">
+        android:orientation="horizontal"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentStart="true">
 
         <!-- fake button for alignment -->
         <Button
@@ -29,15 +31,15 @@
             android:visibility="invisible"/>
 
 
-        <Button
-            android:id="@+id/timerAddBtn"
-            style="@style/Widget.AppCompat.Button.Borderless.Colored"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:background="@color/colorPrimaryLight"
-            android:text="@string/timer_add"
-            android:textColor="@color/white"/>
+        <!--<Button-->
+            <!--android:id="@+id/timerAddBtn"-->
+            <!--style="@style/Widget.AppCompat.Button.Borderless.Colored"-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:layout_weight="1"-->
+            <!--android:background="@color/colorPrimaryLight"-->
+            <!--android:text="@string/timer_add"-->
+            <!--android:textColor="@color/white"/>-->
 
     </LinearLayout>
 
