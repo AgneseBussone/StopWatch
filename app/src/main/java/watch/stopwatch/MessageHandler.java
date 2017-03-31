@@ -237,7 +237,7 @@ public class MessageHandler extends Handler {
     private void updateTimer(Time timer_timeout){
         if(timer_tv != null && timer_needle != null){
             timer_tv.setText(timer_timeout.getFormattedShortTime());
-            timer_needle.setRotation(-(((float) timer_timeout.s + (timer_timeout.ms / 1000f)) * 6f));
+            timer_needle.setRotation(((float) timer_timeout.s + (timer_timeout.ms / 1000f)) * 6f);
         }
     }
 }

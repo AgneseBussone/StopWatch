@@ -263,7 +263,7 @@ public class MainActivity extends AppCompatActivity {
 
                         // set the needle in the correct position
                         ImageView needle = mSectionsPagerAdapter.getTimerNeedle();
-                        needle.setRotation(-((float)timer_timeout.s * 6f));
+                        needle.setRotation((float)timer_timeout.s * 6f);
 
                         dialog.dismiss();
                     }
