@@ -4,7 +4,7 @@
                 android:layout_height="match_parent"
                 android:background="@color/background_color_blurr"
                 android:paddingTop="10dp"
-                android:id="@+id/timerListLayout">
+                android:id="@+id/mainListLayout">
 
     <LinearLayout
         android:id="@+id/timerBtns"
@@ -30,7 +30,7 @@
 
 
         <Button
-            android:id="@+id/lapTimeBtn"
+            android:id="@+id/timerAddBtn"
             style="@style/Widget.AppCompat.Button.Borderless.Colored"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

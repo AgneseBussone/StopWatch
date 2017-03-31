@@ -4,7 +4,7 @@
                 android:layout_height="match_parent"
                 android:background="@color/background_color_blurr"
                 android:paddingTop="10dp"
-                android:id="@+id/lapListLayout">
+                android:id="@+id/mainListLayout">
 
     <LinearLayout
         android:id="@+id/lapBtns"

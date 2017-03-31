@@ -54,10 +54,14 @@ public class MainActivity extends AppCompatActivity {
     private ImageView settingsBtn;
     private Vibrator vibe;
     private MessageHandler messageHandler;
-    StopwatchState stopwatch_state = StopwatchState.STOPPED;
-    TimerState timer_state = TimerState.STOPPED;
+    private StopwatchState stopwatch_state = StopwatchState.STOPPED;
+    private TimerState timer_state = TimerState.STOPPED;
     private View lapRecordView = null;
     private Time timer_timeout = new Time(0, 0, 0, 0);
+    private View timerPresetView = null;
+    private RelativeLayout secondary_view;
+    private ImageView separator;
+
 
     // Listener for buttons in secondary views
     private View.OnClickListener secondaryViewBtnListener = new View.OnClickListener() {
@@ -85,8 +89,36 @@ public class MainActivity extends AppCompatActivity {
                     messageHandler.sendMessage(message);
                     }
                     break;
+                case R.id.timerAddBtn:
+                    //TODO
+                    break;
             }
         }
+    };
+
+    // Listener for the end of closing secondary view animation
+    private Animator.AnimatorListener secondaryViewAnimatorListener = new Animator.AnimatorListener() {
+        @Override
+        public void onAnimationStart(Animator animation) {}
+
+        @Override
+        public void onAnimationEnd(Animator animation) {
+            secondary_view.removeAllViews();
+            if(lapRecordView != null) {
+                lapRecordView.animate().setListener(null);
+                lapRecordView = null;
+            }
+            if(timerPresetView != null) {
+                timerPresetView.animate().setListener(null);
+                timerPresetView = null;
+            }
+        }
+
+        @Override
+        public void onAnimationCancel(Animator animation) {}
+
+        @Override
+        public void onAnimationRepeat(Animator animation) {}
     };
 
     @Override
@@ -111,6 +143,9 @@ public class MainActivity extends AppCompatActivity {
         btn2 = (Button)findViewById(R.id.button2);
         btn3 = (Button)findViewById(R.id.button3);
         settingsBtn = (ImageView)findViewById(R.id.button_settings);
+
+        secondary_view = (RelativeLayout)findViewById(R.id.secondary_view);
+        separator = (ImageView)findViewById(R.id.buttonsLine);
 
 
         // Page indicator RadioGroup
@@ -284,83 +319,43 @@ public class MainActivity extends AppCompatActivity {
     public void btn2Click(View view) {
         vibe.vibrate(30);
         int page = page_selector.getCheckedRadioButtonId();
+
+        Button btn = (Button)view;
+
         switch(page){
             case R.id.page1:
                 // stopwatch - lap record
-                final RelativeLayout secondary_view = (RelativeLayout)findViewById(R.id.secondary_view);
-                ImageView buttonsLine = (ImageView)findViewById(R.id.buttonsLine);
-                Button btn = (Button)view;
-
                 if(lapRecordView == null){
-                    // create and show the view
-                    buttonsLine.setVisibility(View.VISIBLE);
-                    btn.setText("");
-                    btn.setBackgroundResource(R.drawable.btn_pressed);
-                    View laps_view = View.inflate(getApplicationContext(), R.layout.lap_list, secondary_view);
-
-                    // set the y position to the height of the father, so the view'll be out of screen (bottom)
-                    laps_view.setY(secondary_view.getHeight());
-                    float toY = settingsBtn.getY() + settingsBtn.getHeight() + 3;
-
-                    // set the height of the internal layout = parent's height - y offset - line height - button height
-                    // I tried to apply these value to laps_view, but that view IS secondary_view + inflated layout
-                    RelativeLayout lap_list_layout = (RelativeLayout) laps_view.findViewById(R.id.lapListLayout);
-                    ViewGroup.LayoutParams params = lap_list_layout.getLayoutParams();
-                    params.height = (secondary_view.getHeight() - (int)toY - buttonsLine.getHeight() - btn.getHeight());
-                    lap_list_layout.setLayoutParams(params);
-
-                    // use animate() to make the changes permanent
-                    laps_view.animate().translationY(toY);
-                    laps_view.animate().setDuration(500);
-                    laps_view.animate().start();
-                    lapRecordView = laps_view;
+                    lapRecordView = createSecondaryView(btn, R.layout.lap_list);
 
                     // give to the handler the list
                     Message msg = new Message();
-                    msg.obj = findViewById(R.id.lapsList);
+                    msg.obj = lapRecordView.findViewById(R.id.lapsList);
                     msg.what = MessageHandler.MSG_STOPWATCH_SHOW_LAP;
                     messageHandler.sendMessage(msg);
 
                     // set the clickListener for view's buttons
-                    Button viewBtn = (Button)laps_view.findViewById(R.id.lapTimeBtn);
+                    Button viewBtn = (Button)lapRecordView.findViewById(R.id.lapTimeBtn);
                     viewBtn.setOnClickListener(secondaryViewBtnListener);
-                    viewBtn = (Button)laps_view.findViewById(R.id.lapTotalTimeBtn);
+                    viewBtn = (Button)lapRecordView.findViewById(R.id.lapTotalTimeBtn);
                     viewBtn.setOnClickListener(secondaryViewBtnListener);
-
-                    // disable the pager
-                    mViewPager.setSwipeable(false);
                 }
                 else{
-                    // hide and destroy the view
-                    buttonsLine.setVisibility(View.INVISIBLE);
-                    btn.setText(R.string.btn2_page1_text);
-                    btn.setBackgroundResource(0);
-                    btn.setBackgroundColor(getResources().getColor(R.color.colorPrimaryLight));
-                    lapRecordView.animate().setListener(new Animator.AnimatorListener() {
-                        @Override
-                        public void onAnimationStart(Animator animation) {}
-
-                        @Override
-                        public void onAnimationEnd(Animator animation) {
-                            secondary_view.removeAllViews();
-                            lapRecordView.animate().setListener(null);
-                            lapRecordView = null;
-                        }
-
-                        @Override
-                        public void onAnimationCancel(Animator animation) {}
-
-                        @Override
-                        public void onAnimationRepeat(Animator animation) {}
-                    });
-                    lapRecordView.animate().translationY(secondary_view.getHeight());
-                    lapRecordView.animate().setDuration(500);
-                    lapRecordView.animate().start();
-                    mViewPager.setSwipeable(true);
+                    destroySecondaryView(btn, R.string.btn2_page1_text, lapRecordView);
                 }
                 break;
             case R.id.page2:
-                // timer
+                // timer - presets
+                if(timerPresetView == null){
+                    timerPresetView = createSecondaryView(btn, R.layout.timer_list);
+
+                    // set the clickListener for view's buttons
+                    Button viewBtn = (Button)timerPresetView.findViewById(R.id.timerAddBtn);
+                    viewBtn.setOnClickListener(secondaryViewBtnListener);
+                }
+                else{
+                    destroySecondaryView(btn, R.string.btn2_page2_text, timerPresetView);
+                }
                 break;
             case R.id.page3:
                 // TBD
@@ -501,7 +496,56 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    // Method to enable/disable the reset btn easily
+    private View createSecondaryView(Button btn, int mainLayoutResource){
+        // create and show the view
+        separator.setVisibility(View.VISIBLE);
+        btn.setText("");
+        btn.setBackgroundResource(R.drawable.btn_pressed);
+
+        View list_view = View.inflate(getApplicationContext(), mainLayoutResource, secondary_view);
+
+        // set the y position to the height of the father, so the view'll be out of screen (bottom)
+        list_view.setY(secondary_view.getHeight());
+        float toY = settingsBtn.getY() + settingsBtn.getHeight() + 3;
+
+        // set the height of the internal layout = parent's height - y offset - line height - button height
+        // I tried to apply these value to list_view, but that view IS secondary_view + inflated layout
+        RelativeLayout main_list_layout = (RelativeLayout) list_view.findViewById(R.id.mainListLayout);
+        ViewGroup.LayoutParams params = main_list_layout.getLayoutParams();
+        params.height = (secondary_view.getHeight() - (int)toY - separator.getHeight() - btn.getHeight());
+        main_list_layout.setLayoutParams(params);
+
+        // use animate() to make the changes permanent
+        list_view.animate().translationY(toY);
+        list_view.animate().setDuration(500);
+        list_view.animate().start();
+
+        // disable the pager
+        mViewPager.setSwipeable(false);
+
+        return list_view;
+    }
+
+    private void destroySecondaryView(Button btn, int textResource, View activeView) {
+        // hide and destroy the view
+        separator.setVisibility(View.INVISIBLE);
+        btn.setText(textResource);
+        btn.setBackgroundResource(0);
+        btn.setBackgroundColor(getResources().getColor(R.color.colorPrimaryLight));
+
+        // Set a listener for the closing animation
+        activeView.animate().setListener(secondaryViewAnimatorListener);
+
+        // Set the closing animation
+        activeView.animate().translationY(secondary_view.getHeight());
+        activeView.animate().setDuration(500);
+        activeView.animate().start();
+
+        // Enable the pager
+        mViewPager.setSwipeable(true);
+    }
+
+        // Method to enable/disable the reset btn easily
     private void setEnableBtnReset(boolean enable){
         btn3.setEnabled(enable);
         if(enable){
