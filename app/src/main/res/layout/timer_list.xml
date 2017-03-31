@@ -4,10 +4,10 @@
                 android:layout_height="match_parent"
                 android:background="@color/background_color_blurr"
                 android:paddingTop="10dp"
-                android:id="@+id/lapListLayout">
+                android:id="@+id/timerListLayout">
 
     <LinearLayout
-        android:id="@+id/lapBtns"
+        android:id="@+id/timerBtns"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal">
@@ -20,16 +20,14 @@
             android:layout_weight="1"
             android:enabled="false"
             android:visibility="invisible"/>
-
         <Button
-            android:id="@+id/lapTotalTimeBtn"
             style="@style/Widget.AppCompat.Button.Borderless.Colored"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:background="@color/colorPrimaryLight"
-            android:text="@string/totalTimeBtn"
-            android:textColor="@color/white"/>
+            android:enabled="false"
+            android:visibility="invisible"/>
+
 
         <Button
             android:id="@+id/lapTimeBtn"
@@ -37,17 +35,17 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:background="@color/greyLight"
-            android:text="@string/lapTimeBtn"
+            android:background="@color/colorPrimaryLight"
+            android:text="@string/timer_add"
             android:textColor="@color/white"/>
 
     </LinearLayout>
 
     <TextView
-        android:id="@+id/lap_label"
+        android:id="@+id/timer_label"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignBottom="@+id/lapBtns"
+        android:layout_alignBottom="@+id/timerBtns"
         android:layout_alignParentStart="true"
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="false"
@@ -55,7 +53,7 @@
         android:layout_centerVertical="false"
         android:layout_marginStart="@dimen/lap_item_start_alignment"
         android:gravity="center_vertical"
-        android:text="@string/btn1_page1_text"
+        android:text="@string/timer_preset_view"
         android:textAlignment="center"
         android:textColor="@color/colorPrimary"/>
 
@@ -64,12 +62,12 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentStart="true"
-        android:layout_below="@+id/lapBtns"
+        android:layout_below="@+id/timerBtns"
         android:src="@drawable/line"/>
 
     <ListView
         android:theme="@style/MyEdgeOverlayTheme"
-        android:id="@+id/lapsList"
+        android:id="@+id/timerList"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_below="@+id/imageView"

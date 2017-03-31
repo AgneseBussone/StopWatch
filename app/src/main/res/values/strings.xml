@@ -24,4 +24,7 @@
     <string name="setTimer_min">Minutes</string>
     <string name="setTimer_sec">Seconds</string>
 
+    <string name="timer_preset_view">TIMERS</string>
+    <string name="timer_add">ADD</string>
+
 </resources>

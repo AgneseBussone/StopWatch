@@ -485,7 +485,7 @@ public class MainActivity extends AppCompatActivity {
                     // stop animation
                     centralBtn.clearAnimation();
                     timer_timeout.h = timer_timeout.m = timer_timeout.s = 0;
-                    setEnableAddTime(true);
+                    setEnableAddTime(true); //TODO: correct?
                     timer_state = TimerState.STOPPED;
                 }
                 mSectionsPagerAdapter.getTimerButtonText().setText(R.string.central_btn_start);
@@ -518,7 +518,6 @@ public class MainActivity extends AppCompatActivity {
         ImageView secBtn = mSectionsPagerAdapter.getAddSecBtn();
         minBtn.setEnabled(enable);
         secBtn.setEnabled(enable);
-        //TODO: set colors
     }
 
     // Method to set the graphics asset (text and needle)
@@ -545,4 +544,11 @@ public class MainActivity extends AppCompatActivity {
         // mark the timer as set
         timer_state = TimerState.SET;
     }
+
+    public void editPresetTimer(View view) {
+    }
+
+    public void deletePresetTimer(View view) {
+    }
+
 }
