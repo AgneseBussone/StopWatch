@@ -87,6 +87,17 @@ public class SectionsPagerAdapter extends FragmentPagerAdapter {
         return (TextView)view.findViewById(R.id.btn_text_action);
     }
 
+
+    public ImageView getAddMinBtn(){
+        View view = fragment_list.get(1).getView();
+        return (ImageView)view.findViewById(R.id.addMinBtn);
+    }
+
+    public ImageView getAddSecBtn(){
+        View view = fragment_list.get(1).getView();
+        return (ImageView)view.findViewById(R.id.addSecBtn);
+    }
+
     /**
      * Fragment inner class
      */

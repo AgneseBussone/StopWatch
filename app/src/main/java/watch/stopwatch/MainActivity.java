@@ -10,7 +10,6 @@ import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -254,16 +253,10 @@ public class MainActivity extends AppCompatActivity {
                         timer_timeout.m = min.getValue();
                         timer_timeout.s = sec.getValue();
 
-                        // set the text
-                        TextView timeTV = mSectionsPagerAdapter.getTimerTV();
-                        timeTV.setText(timer_timeout.getFormattedShortTime());
+                        setTimer();
 
                         // mark the timer as set
                         timer_state = TimerState.SET;
-
-                        // set the needle in the correct position
-                        ImageView needle = mSectionsPagerAdapter.getTimerNeedle();
-                        needle.setRotation((float)timer_timeout.s * 6f);
 
                         dialog.dismiss();
                     }
@@ -392,6 +385,11 @@ public class MainActivity extends AppCompatActivity {
             case R.id.page2:
                 // timer - reset
                 messageHandler.sendEmptyMessage(MessageHandler.MSG_TIMER_RESET);
+                timer_timeout.h = timer_timeout.m = timer_timeout.s = 0;
+                setTimer();
+                TextView btn = mSectionsPagerAdapter.getTimerButtonText();
+                btn.setText(R.string.central_btn_start);
+                setEnableAddTime(true);
                 timer_state = TimerState.STOPPED;
                 break;
             case R.id.page3:
@@ -472,6 +470,7 @@ public class MainActivity extends AppCompatActivity {
 
                 // disable reset btn
                 setEnableBtnReset(false);
+                setEnableAddTime(false);
                 timer_state = TimerState.RUNNING;
                 break;
             case RUNNING:
@@ -480,18 +479,17 @@ public class MainActivity extends AppCompatActivity {
                 if(anim == null){
                     // no animation running = timer not expired
                     messageHandler.sendEmptyMessage(MessageHandler.MSG_TIMER_PAUSE);
-                    // enable reset btn
-                    setEnableBtnReset(true);
                     timer_state = TimerState.PAUSED;
                 }
                 else{
                     // stop animation
                     centralBtn.clearAnimation();
-
-                    mSectionsPagerAdapter.getTimerButtonText().setText(R.string.central_btn_start);
-                    setEnableBtnReset(true);
+                    timer_timeout.h = timer_timeout.m = timer_timeout.s = 0;
+                    setEnableAddTime(true);
                     timer_state = TimerState.STOPPED;
                 }
+                mSectionsPagerAdapter.getTimerButtonText().setText(R.string.central_btn_start);
+                setEnableBtnReset(true);
                 break;
             case PAUSED:
                 animateBtnCenter(centralBtn);
@@ -514,13 +512,37 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    // Enable the add time buttons
+    private void setEnableAddTime(boolean enable){
+        ImageView minBtn = mSectionsPagerAdapter.getAddMinBtn();
+        ImageView secBtn = mSectionsPagerAdapter.getAddSecBtn();
+        minBtn.setEnabled(enable);
+        secBtn.setEnabled(enable);
+        //TODO: set colors
+    }
+
+    // Method to set the graphics asset (text and needle)
+    private void setTimer(){
+        // set the text
+        TextView timeTV = mSectionsPagerAdapter.getTimerTV();
+        timeTV.setText(timer_timeout.getFormattedShortTime());
+
+        // set the needle in the correct position
+        ImageView needle = mSectionsPagerAdapter.getTimerNeedle();
+        needle.setRotation((float)timer_timeout.s * 6f);
+    }
+
     public void addMin(View view) {
-        //TODO
-        Log.d(TAG, "add 1 MIN");
+        timer_timeout.m++;
+        setTimer();
+        // mark the timer as set
+        timer_state = TimerState.SET;
     }
 
     public void addSec(View view) {
-        //TODO
-        Log.d(TAG, "add 1 SEC");
+        timer_timeout.s++;
+        setTimer();
+        // mark the timer as set
+        timer_state = TimerState.SET;
     }
 }

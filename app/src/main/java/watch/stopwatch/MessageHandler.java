@@ -213,11 +213,6 @@ public class MessageHandler extends Handler {
                 timer_last_update = 0;
                 timer = null;
                 removeMessages(MSG_TIMER_UPDATE);
-                if(timer_needle != null & timerBtn_tv != null) {
-                    timer_tv.setText(R.string.time_default_timer);
-                    timer_needle.animate().rotation(0f);
-                    timerBtn_tv.setText(R.string.central_btn_start);
-                }
                 break;
 
             default:
