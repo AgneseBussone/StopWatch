@@ -286,7 +286,11 @@ public class MainActivity extends AppCompatActivity {
                 sec.setMinValue(0);
                 sec.setWrapSelectorWheel(true);
 
-                //TODO: set the values to the current timer?
+                // Set the values to the current timer
+                String current[] = mSectionsPagerAdapter.getTimerTV().getText().toString().split(":");
+                hours.setValue(Integer.valueOf(current[0]));
+                min.setValue(Integer.valueOf(current[1]));
+                sec.setValue(Integer.valueOf(current[2]));
 
                 dialogBuilder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int whichButton) {
