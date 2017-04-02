@@ -475,11 +475,14 @@ public class MainActivity extends AppCompatActivity {
         // start the timer only if it's set
         switch (timer_state){
             case SET:
-                animateBtnCenter(centralBtn);
                 messageHandler.initTimer(mSectionsPagerAdapter.getTimerTV(),
                                             mSectionsPagerAdapter.getTimerNeedle(),
                                             mSectionsPagerAdapter.getTimerButtonText(),
                                             centralBtn);
+                // fallthrough
+            case PAUSED:
+                animateBtnCenter(centralBtn);
+
                 // send a message with the number of seconds
                 Message mex = new Message();
                 mex.obj = timer_timeout;
@@ -497,24 +500,24 @@ public class MainActivity extends AppCompatActivity {
                 if(anim == null){
                     // no animation running = timer not expired
                     messageHandler.sendEmptyMessage(MessageHandler.MSG_TIMER_PAUSE);
+
+                    // update the internal timeout to the current position, so the user can add time
+                    String current[] = mSectionsPagerAdapter.getTimerTV().getText().toString().split(":");
+                    timer_timeout.h = Integer.valueOf(current[0]);
+                    timer_timeout.m = Integer.valueOf(current[1]);
+                    timer_timeout.s = Integer.valueOf(current[2]);
+
                     timer_state = TimerState.PAUSED;
                 }
                 else{
                     // stop animation
                     centralBtn.clearAnimation();
                     timer_timeout.h = timer_timeout.m = timer_timeout.s = 0;
-                    setEnableAddTime(true); //TODO: correct?
                     timer_state = TimerState.STOPPED;
                 }
                 mSectionsPagerAdapter.getTimerButtonText().setText(R.string.central_btn_start);
                 setEnableBtnReset(true);
-                break;
-            case PAUSED:
-                animateBtnCenter(centralBtn);
-                messageHandler.sendEmptyMessage(MessageHandler.MSG_TIMER_RESUME);
-                // disable reset btn
-                setEnableBtnReset(false);
-                timer_state = TimerState.RUNNING;
+                setEnableAddTime(true);
                 break;
         }
     }

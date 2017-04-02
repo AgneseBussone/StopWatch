@@ -33,8 +33,7 @@ public class MessageHandler extends Handler {
     public static final int MSG_TIMER_UPDATE         = 10;
     public static final int MSG_TIMER_STOP           = 11;
     public static final int MSG_TIMER_PAUSE          = 12;
-    public static final int MSG_TIMER_RESUME         = 13;
-    public static final int MSG_TIMER_RESET          = 14;
+    public static final int MSG_TIMER_RESET          = 13;
 
     private Chronometer stopwatch_chronometer = new Chronometer();
     private final long REFRESH_RATE = 100;
@@ -182,6 +181,7 @@ public class MessageHandler extends Handler {
                 break;
 
             case MSG_TIMER_STOP:
+                // Message received from the Countdown obj
                 // play animation on the central btn
                 Animation animation = AnimationUtils.loadAnimation(context, R.anim.center_btn_anim_timer_out);
                 timerBtn.startAnimation(animation);
@@ -195,16 +195,7 @@ public class MessageHandler extends Handler {
 
             case MSG_TIMER_PAUSE:
                 timer.cancel();
-                timer_last_update = timer.getLastUpdate();
                 timer = null;
-                break;
-
-            case MSG_TIMER_RESUME:
-                timer = new Countdown(timer_last_update, REFRESH_RATE, this);
-                if (timerBtn_tv != null) {
-                    timerBtn_tv.setText(R.string.central_btn_stop);
-                }
-                timer.start();
                 break;
 
             case MSG_TIMER_RESET:
