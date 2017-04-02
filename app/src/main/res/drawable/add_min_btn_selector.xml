@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <selector xmlns:android="http://schemas.android.com/apk/res/android">
-    <item android:drawable="@drawable/add_btn_placeholder_disable" android:state_enabled="false"/>
+    <item android:state_enabled="false">
+        <bitmap android:src="@drawable/ic_min" android:tint="@color/greyLight"/>
+    </item>
     <item android:drawable="@drawable/ic_min"/>
 
 </selector>
