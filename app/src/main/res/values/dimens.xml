@@ -17,4 +17,7 @@
     <dimen name="needleW">35dp</dimen>
     <dimen name="big_shadow">4dp</dimen>
     <dimen name="lap_item_start_alignment">18dp</dimen>
+
+    <!-- used also for add time buttons in timer -->
+    <dimen name="settings_btn_dimen">35dp</dimen>
 </resources>

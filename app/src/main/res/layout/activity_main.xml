@@ -35,8 +35,8 @@
                 android:layout_height="wrap_content"
                 android:layout_alignBottom="@id/container"
                 android:layout_alignEnd="@id/container"
-                android:layout_marginBottom="360dp"
-                android:paddingEnd="5dp"
+                android:layout_marginBottom="357dp"
+                android:paddingEnd="7dp"
                 android:src="@drawable/ic_settings"/>
 
 
