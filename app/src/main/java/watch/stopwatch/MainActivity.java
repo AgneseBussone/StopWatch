@@ -10,7 +10,6 @@ import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -18,7 +17,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
-import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ListView;
@@ -127,11 +125,27 @@ public class MainActivity extends AppCompatActivity {
 
 
     // Listener for a click on a preset timer list item
-    private AdapterView.OnItemClickListener timerPresetItemClickListener = new AdapterView.OnItemClickListener() {
+    private View.OnClickListener timerPresetItemClickListener = new View.OnClickListener() {
         @Override
-        public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-            String selected_timer = ((TextView)view.findViewById(R.id.timerItem_value)).getText().toString();
-            Log.d(TAG, "timer: " + selected_timer);
+        public void onClick(View v) {
+            // Get the parent view and the text with the timer
+            ViewGroup row = (ViewGroup) v.getParent();
+            TextView preset = (TextView)row.findViewById(R.id.timerItem_value);
+            if(preset != null){
+                String[] values = preset.getText().toString().split(":");
+                timer_timeout.h = Integer.valueOf(values[0]);
+                timer_timeout.m = Integer.valueOf(values[1]);
+                timer_timeout.s = Integer.valueOf(values[2]);
+                timer_timeout.ms = 0;
+
+                setTimer();
+
+                // mark the timer as set
+                timer_state = TimerState.SET;
+
+                // click on the second button to close the list
+                btn2.performClick();
+            }
         }
     };
 
@@ -163,7 +177,7 @@ public class MainActivity extends AppCompatActivity {
 
         // Read the preset timers and set the adapter TODO
         preset_timers = new ArrayList<>();
-        presetTimerAdapter = new TimerListAdapter(preset_timers, getApplicationContext(), null);
+        presetTimerAdapter = new TimerListAdapter(preset_timers, getApplicationContext(), timerPresetItemClickListener);
 
         // Page indicator RadioGroup
         page_selector = (RadioGroup)findViewById(R.id.page_selector);
@@ -382,7 +396,6 @@ public class MainActivity extends AppCompatActivity {
                     // Associate the adapter to the list view
                     ListView list = (ListView) timerPresetView.findViewById(R.id.timerList);
                     list.setAdapter(presetTimerAdapter);
-                    list.setOnItemClickListener(timerPresetItemClickListener);
 
                     // Change SET to ADD
                     btn1.setText(R.string.timer_add);

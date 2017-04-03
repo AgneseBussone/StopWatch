@@ -4,7 +4,6 @@ import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.ImageButton;
 import android.widget.TextView;
@@ -21,10 +20,10 @@ public class TimerListAdapter extends BaseAdapter {
     private Context context;
 
     // To set a timer from the list, we need to go back to the MainActivity class
-    private AdapterView.OnItemClickListener setBtn_listener;
+    private View.OnClickListener setBtn_listener;
 
 
-    TimerListAdapter(List<Time> list, Context context, AdapterView.OnItemClickListener setListener){
+    TimerListAdapter(List<Time> list, Context context, View.OnClickListener setListener){
         preset = list;
         this.context = context;
         setBtn_listener = setListener;
@@ -74,15 +73,10 @@ public class TimerListAdapter extends BaseAdapter {
 
         /* set button */
         ImageButton set = (ImageButton)convertView.findViewById(R.id.setBtn);
-        set.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
+        set.setOnClickListener(setBtn_listener);
 
-            }
-        });
-
-        // make the item clickable
-        convertView.setEnabled(true);convertView.setClickable(true);
+        // make the item not clickable
+        convertView.setEnabled(false);
 
         return convertView;
     }
