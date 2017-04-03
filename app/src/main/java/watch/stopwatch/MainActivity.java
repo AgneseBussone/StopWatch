@@ -10,6 +10,7 @@ import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -17,6 +18,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ListView;
@@ -123,6 +125,16 @@ public class MainActivity extends AppCompatActivity {
         public void onAnimationRepeat(Animator animation) {}
     };
 
+
+    // Listener for a click on a preset timer list item
+    private AdapterView.OnItemClickListener timerPresetItemClickListener = new AdapterView.OnItemClickListener() {
+        @Override
+        public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+            String selected_timer = ((TextView)view.findViewById(R.id.timerItem_value)).getText().toString();
+            Log.d(TAG, "timer: " + selected_timer);
+        }
+    };
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -151,7 +163,7 @@ public class MainActivity extends AppCompatActivity {
 
         // Read the preset timers and set the adapter TODO
         preset_timers = new ArrayList<>();
-        presetTimerAdapter = new TimerListAdapter(preset_timers, getApplicationContext());
+        presetTimerAdapter = new TimerListAdapter(preset_timers, getApplicationContext(), null);
 
         // Page indicator RadioGroup
         page_selector = (RadioGroup)findViewById(R.id.page_selector);
@@ -370,6 +382,7 @@ public class MainActivity extends AppCompatActivity {
                     // Associate the adapter to the list view
                     ListView list = (ListView) timerPresetView.findViewById(R.id.timerList);
                     list.setAdapter(presetTimerAdapter);
+                    list.setOnItemClickListener(timerPresetItemClickListener);
 
                     // Change SET to ADD
                     btn1.setText(R.string.timer_add);

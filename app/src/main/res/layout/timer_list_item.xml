@@ -29,10 +29,19 @@
         android:id="@+id/deleteBtn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_centerVertical="true"
+        android:layout_toStartOf="@+id/setBtn"
+        android:backgroundTint="@color/colorPrimary"
+        android:src="@drawable/ic_delete"/>
+
+    <ImageButton
+        android:id="@+id/setBtn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_alignParentEnd="true"
         android:layout_centerVertical="true"
         android:layout_marginEnd="@dimen/lap_item_start_alignment"
         android:backgroundTint="@color/colorPrimary"
-        android:src="@drawable/ic_delete"/>
+        android:src="@drawable/ic_timer"/>
 
 </RelativeLayout>
