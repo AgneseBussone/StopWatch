@@ -3,9 +3,11 @@ package watch.stopwatch;
 import android.animation.Animator;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Message;
 import android.os.Vibrator;
+import android.preference.PreferenceManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AlertDialog;
@@ -34,6 +36,9 @@ public class MainActivity extends AppCompatActivity {
     private enum TimerState {RUNNING, STOPPED, PAUSED, SET}
 
     private static final String TAG = MainActivity.class.getSimpleName();
+
+    // Key for shared preferences to retrieve the preset timers
+    private static String KEY_PRESET_TIMERS = "key_preset_timers";
 
     /**
      * The {@link android.support.v4.view.PagerAdapter} that will provide
@@ -125,26 +130,89 @@ public class MainActivity extends AppCompatActivity {
 
 
     // Listener for a click on a preset timer list item
-    private View.OnClickListener timerPresetItemClickListener = new View.OnClickListener() {
+    private View.OnClickListener timerPresetActionClickListener = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
             // Get the parent view and the text with the timer
             ViewGroup row = (ViewGroup) v.getParent();
-            TextView preset = (TextView)row.findViewById(R.id.timerItem_value);
-            if(preset != null){
-                String[] values = preset.getText().toString().split(":");
-                timer_timeout.h = Integer.valueOf(values[0]);
-                timer_timeout.m = Integer.valueOf(values[1]);
-                timer_timeout.s = Integer.valueOf(values[2]);
-                timer_timeout.ms = 0;
+            TextView preset = (TextView) row.findViewById(R.id.timerItem_value);
+            if (preset != null) {
+                final String[] values = preset.getText().toString().split(":");
+                int id = v.getId();
+                switch (id) {
 
-                setTimer();
+                    case R.id.setBtn: {
+                        timer_timeout.h = Integer.valueOf(values[0]);
+                        timer_timeout.m = Integer.valueOf(values[1]);
+                        timer_timeout.s = Integer.valueOf(values[2]);
+                        timer_timeout.ms = 0;
 
-                // mark the timer as set
-                timer_state = TimerState.SET;
+                        setTimer();
 
-                // click on the second button to close the list
-                btn2.performClick();
+                        // mark the timer as set
+                        timer_state = TimerState.SET;
+
+                        // click on the second button to close the list
+                        btn2.performClick();
+                    }
+                    break;
+
+                    case R.id.editBtn: {
+                        AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(MainActivity.this);
+                        LayoutInflater inflater = getLayoutInflater();
+                        final View dialogView = inflater.inflate(R.layout.set_timer_layout, null);
+                        dialogBuilder.setView(dialogView);
+
+                        // set the max and the min value for number picker or won't show the wheel
+                        final NumberPicker hours = (NumberPicker) dialogView.findViewById(R.id.numberPicker_hours);
+                        final NumberPicker min = (NumberPicker) dialogView.findViewById(R.id.numberPicker_min);
+                        final NumberPicker sec = (NumberPicker) dialogView.findViewById(R.id.numberPicker_sec);
+                        hours.setMaxValue(99);
+                        hours.setMinValue(0);
+                        hours.setWrapSelectorWheel(true);
+                        min.setMaxValue(59);
+                        min.setMinValue(0);
+                        min.setWrapSelectorWheel(true);
+                        sec.setMaxValue(59);
+                        sec.setMinValue(0);
+                        sec.setWrapSelectorWheel(true);
+
+                        // Set the values to the selected timer
+                        hours.setValue(Integer.valueOf(values[0]));
+                        min.setValue(Integer.valueOf(values[1]));
+                        sec.setValue(Integer.valueOf(values[2]));
+
+                        dialogBuilder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int whichButton) {
+                                Time old_timer = new Time(Integer.valueOf(values[0]), Integer.valueOf(values[1]), Integer.valueOf(values[2]), 0);
+                                Time new_timer = new Time(hours.getValue(), min.getValue(), sec.getValue(), 0);
+
+                                // search for this item in the list and update it
+                                preset_timers.set(preset_timers.indexOf(old_timer), new_timer);
+
+                                presetTimerAdapter.notifyDataSetChanged();
+                                dialog.dismiss();
+                            }
+                        });
+                        dialogBuilder.setNegativeButton("CANCEL", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                dialog.dismiss();
+                            }
+                        });
+                        AlertDialog b = dialogBuilder.create();
+                        b.show();
+                    }
+                    break;
+
+                    case R.id.deleteBtn: {
+                        // search for the item in the list and delete it
+                        Time old_timer = new Time(Integer.valueOf(values[0]), Integer.valueOf(values[1]), Integer.valueOf(values[2]), 0);
+                        preset_timers.remove(preset_timers.indexOf(old_timer));
+                        presetTimerAdapter.notifyDataSetChanged();
+                    }
+                    break;
+                }
             }
         }
     };
@@ -175,9 +243,10 @@ public class MainActivity extends AppCompatActivity {
         secondary_view = (RelativeLayout)findViewById(R.id.secondary_view);
         separator = (ImageView)findViewById(R.id.buttonsLine);
 
-        // Read the preset timers and set the adapter TODO
+        // Read the preset timers and set the adapter
         preset_timers = new ArrayList<>();
-        presetTimerAdapter = new TimerListAdapter(preset_timers, getApplicationContext(), timerPresetItemClickListener);
+        readPresetTimers();
+        presetTimerAdapter = new TimerListAdapter(preset_timers, getApplicationContext(), timerPresetActionClickListener);
 
         // Page indicator RadioGroup
         page_selector = (RadioGroup)findViewById(R.id.page_selector);
@@ -252,6 +321,8 @@ public class MainActivity extends AppCompatActivity {
     protected void onStop() {
         super.onStop();
         messageHandler.sendEmptyMessage(MessageHandler.MSG_STOPWATCH_SAVE_LAP);
+        // save preset timer list
+        savePresetTimers();
     }
 
 
@@ -335,7 +406,6 @@ public class MainActivity extends AppCompatActivity {
                             Time t  = new Time(hours.getValue(), min.getValue(), sec.getValue(), 0);
                             preset_timers.add(t);
                             presetTimerAdapter.notifyDataSetChanged();
-                            //TODO: save the timer somwhere
                         }
                         dialog.dismiss();
                     }
@@ -641,4 +711,38 @@ public class MainActivity extends AppCompatActivity {
         timer_state = TimerState.SET;
     }
 
+    /* Save the timers in the shared preferences */
+    private void savePresetTimers(){
+
+        /* Preset timers list format:
+         * hh:mm:ss:mls, hh:mm:ss:mls, ..
+         */
+
+        String list = "";
+        // create the string
+        if(!preset_timers.isEmpty()){
+            list += preset_timers.get(0).getFormattedTime();
+            for(int i = 1; i < preset_timers.size(); i++){
+                list += ", ";
+                list += preset_timers.get(i).getFormattedTime();
+            }
+        }
+        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
+        SharedPreferences.Editor editor = sharedPref.edit();
+        editor.putString(KEY_PRESET_TIMERS, list);
+        editor.apply();
+    }
+
+    private void readPresetTimers(){
+        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
+        String str = sharedPref.getString(KEY_PRESET_TIMERS, "");
+        if(!str.isEmpty()){
+            String[] timers = str.split(", ");
+            for(String t : timers){
+                String[] values = t.split(":");
+                preset_timers.add(new Time(Integer.valueOf(values[0]),Integer.valueOf(values[1]),
+                                           Integer.valueOf(values[2]), Integer.valueOf(values[3])));
+            }
+        }
+    }
 }

@@ -19,14 +19,14 @@ public class TimerListAdapter extends BaseAdapter {
     private List<Time> preset;
     private Context context;
 
-    // To set a timer from the list, we need to go back to the MainActivity class
-    private View.OnClickListener setBtn_listener;
+    // We need to go back to the MainActivity class to set or update the list and the status of the app
+    private View.OnClickListener btn_listener;
 
 
-    TimerListAdapter(List<Time> list, Context context, View.OnClickListener setListener){
+    TimerListAdapter(List<Time> list, Context context, View.OnClickListener btnListener){
         preset = list;
         this.context = context;
-        setBtn_listener = setListener;
+        btn_listener = btnListener;
     }
     @Override
     public int getCount() {
@@ -55,25 +55,15 @@ public class TimerListAdapter extends BaseAdapter {
 
         /* Edit button */
         ImageButton edit = (ImageButton)convertView.findViewById(R.id.editBtn);
-        edit.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                // TODO
-            }
-        });
+        edit.setOnClickListener(btn_listener);
 
         /* Delete button */
         ImageButton delete = (ImageButton)convertView.findViewById(R.id.deleteBtn);
-        delete.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                // TODO
-            }
-        });
+        delete.setOnClickListener(btn_listener);
 
         /* set button */
         ImageButton set = (ImageButton)convertView.findViewById(R.id.setBtn);
-        set.setOnClickListener(setBtn_listener);
+        set.setOnClickListener(btn_listener);
 
         // make the item not clickable
         convertView.setEnabled(false);

@@ -56,4 +56,18 @@ public class Time {
         time += (h * 3600 * 1000);
         return time;
     }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null) {
+            return false;
+        }
+        if (!Time.class.isAssignableFrom(obj.getClass())) {
+            return false;
+        }
+        final Time other = (Time) obj;
+        if(other.h != h || other.m != m || other.s != s)
+            return false;
+        return true;
+    }
 }
