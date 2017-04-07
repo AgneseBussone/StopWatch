@@ -574,7 +574,8 @@ public class MainActivity extends AppCompatActivity {
                 messageHandler.initTimer(mSectionsPagerAdapter.getTimerTV(),
                                             mSectionsPagerAdapter.getTimerNeedle(),
                                             mSectionsPagerAdapter.getTimerButtonText(),
-                                            centralBtn);
+                                            centralBtn,
+                                            mSectionsPagerAdapter.getCircleFillView());
                 // fallthrough
             case PAUSED:
                 animateBtnCenter(centralBtn);

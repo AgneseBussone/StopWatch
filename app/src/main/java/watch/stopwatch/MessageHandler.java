@@ -18,6 +18,7 @@ import java.util.ArrayList;
  */
 
 public class MessageHandler extends Handler {
+    private static final String TAG = MessageHandler.class.getSimpleName();
 
     // Messages available
     public static final int MSG_STOPWATCH_START      = 0;
@@ -55,7 +56,8 @@ public class MessageHandler extends Handler {
     private TextView timerBtn_tv = null;
     private View timerBtn = null;
     private Countdown timer = null;
-    private long timer_last_update = 0;
+    private CircleFillView circleFillView = null;
+    private long total_ms = 0;
 
     public MessageHandler(Looper looper, Context context){
         super(looper);
@@ -71,7 +73,7 @@ public class MessageHandler extends Handler {
             stopwatchBtn_tv = btn_tv;
     }
 
-    void initTimer(TextView time_tv, ImageView img, TextView btn_tv, View btn){
+    void initTimer(TextView time_tv, ImageView img, TextView btn_tv, View btn, CircleFillView circleView){
         if(timer_tv == null)
             timer_tv = time_tv;
         if(timer_needle == null)
@@ -80,6 +82,8 @@ public class MessageHandler extends Handler {
             timerBtn_tv = btn_tv;
         if(timerBtn == null)
             timerBtn = btn;
+        if(circleFillView == null)
+            circleFillView = circleView;
     }
 
     @Override
@@ -172,9 +176,11 @@ public class MessageHandler extends Handler {
             case MSG_TIMER_START:
                 if(msg.obj != null) {
                     Time timer_timeout = (Time) msg.obj;
-                    timer = new Countdown(timer_timeout.getMilliseconds(), REFRESH_RATE, this);
-                    if (timerBtn_tv != null) {
+                    total_ms = timer_timeout.getMilliseconds();
+                    timer = new Countdown(total_ms, REFRESH_RATE, this);
+                    if (timerBtn_tv != null && circleFillView != null) {
                         timerBtn_tv.setText(R.string.central_btn_stop);
+                        circleFillView.setValue(0);
                     }
                     timer.start();
                 }
@@ -201,7 +207,6 @@ public class MessageHandler extends Handler {
             case MSG_TIMER_RESET:
                 if (timer != null)
                     timer.cancel();
-                timer_last_update = 0;
                 timer = null;
                 removeMessages(MSG_TIMER_UPDATE);
                 break;
@@ -221,9 +226,11 @@ public class MessageHandler extends Handler {
     }
 
     private void updateTimer(Time timer_timeout){
-        if(timer_tv != null && timer_needle != null){
+        if(timer_tv != null && timer_needle != null && circleFillView != null){
             timer_tv.setText(timer_timeout.getFormattedShortTime());
             timer_needle.setRotation(((float) timer_timeout.s + (timer_timeout.ms / 1000f)) * 6f);
+            int fill_value = 100 - (int)((100 * timer_timeout.getMilliseconds()) / total_ms);
+            circleFillView.setValue(fill_value);
         }
     }
 }

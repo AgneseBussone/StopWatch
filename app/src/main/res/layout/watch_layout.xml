@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                xmlns:custom="http://schemas.android.com/apk/res-auto"
                 android:orientation="vertical" android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:background="@color/background_color"
@@ -57,15 +58,38 @@
                 android:background="@drawable/needle_list"
                 />
 
-            <ImageView
-                android:id="@+id/bigBtn"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+            <FrameLayout
+                android:layout_width="@dimen/white"
+                android:layout_height="@dimen/white"
                 android:layout_centerHorizontal="true"
-                android:layout_centerVertical="true"
-                android:background="@drawable/center"
-                android:onClick="btnCenter"/>
+                android:layout_centerVertical="true">
 
+                <ImageView
+                    android:id="@+id/bigBtn"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:background="@drawable/center"
+                    android:onClick="btnCenter"/>
+
+                <FrameLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:paddingBottom="5dp">
+
+                    <watch.stopwatch.CircleFillView
+                        android:id="@+id/circleFillView"
+                        android:layout_width="@dimen/center_dimension"
+                        android:layout_height="@dimen/center_dimension"
+                        android:background="@color/transparent"
+                        android:rotation="180"
+                        custom:fillColor="@color/colorAccent"
+                        custom:strokeColor="@color/transparent"
+                        custom:strokeWidth="0"
+                        custom:value="0"/>
+                </FrameLayout>
+            </FrameLayout>
             <LinearLayout
                 android:id="@+id/linearLayout2"
                 android:layout_width="wrap_content"

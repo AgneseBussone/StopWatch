@@ -98,6 +98,11 @@ public class SectionsPagerAdapter extends FragmentPagerAdapter {
         return (ImageView)view.findViewById(R.id.addSecBtn);
     }
 
+    public CircleFillView getCircleFillView(){
+        View view = fragment_list.get(1).getView();
+        return (CircleFillView)view.findViewById(R.id.circleFillView);
+    }
+
     /**
      * Fragment inner class
      */
@@ -129,17 +134,22 @@ public class SectionsPagerAdapter extends FragmentPagerAdapter {
             View rootView = inflater.inflate(R.layout.watch_layout, container, false);
             TextView text = (TextView)rootView.findViewById(R.id.time_text);
             RelativeLayout addTimeLayout = (RelativeLayout)rootView.findViewById(R.id.addTimeLayout);
+            CircleFillView circle = (CircleFillView)rootView.findViewById(R.id.circleFillView);
 
             // adjust the layout basing on the section number
             int section =  getArguments().getInt(ARG_SECTION_NUMBER);
             switch(section){
                 case 1:
+                    // stopwatch
                     text.setText(R.string.time_default_stopwatch);
                     addTimeLayout.setVisibility(View.INVISIBLE);
+                    circle.setVisibility(View.INVISIBLE);
                     break;
                 case 2:
+                    // timer
                     text.setText(R.string.time_default_timer);
                     addTimeLayout.setVisibility(View.VISIBLE);
+                    circle.setVisibility(View.VISIBLE);
                     break;
                 default:
                     rootView = inflater.inflate(R.layout.fragment_main, container, false);
