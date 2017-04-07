@@ -181,6 +181,7 @@ public class MessageHandler extends Handler {
                     if (timerBtn_tv != null && circleFillView != null) {
                         timerBtn_tv.setText(R.string.central_btn_stop);
                         circleFillView.setValue(0);
+                        circleFillView.setVisibility(View.VISIBLE);
                     }
                     timer.start();
                 }
@@ -188,6 +189,10 @@ public class MessageHandler extends Handler {
 
             case MSG_TIMER_STOP:
                 // Message received from the Countdown obj
+                // set the color of the central btn
+                timerBtn.setBackgroundTintList(context.getResources().getColorStateList(R.color.timer_btn_statelist));
+                // hide the filling circle
+                circleFillView.setVisibility(View.INVISIBLE);
                 // play animation on the central btn
                 Animation animation = AnimationUtils.loadAnimation(context, R.anim.center_btn_anim_timer_out);
                 timerBtn.startAnimation(animation);

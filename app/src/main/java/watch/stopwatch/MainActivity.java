@@ -578,8 +578,6 @@ public class MainActivity extends AppCompatActivity {
                                             mSectionsPagerAdapter.getCircleFillView());
                 // fallthrough
             case PAUSED:
-                animateBtnCenter(centralBtn);
-
                 // send a message with the number of seconds
                 Message mex = new Message();
                 mex.obj = timer_timeout;
@@ -609,6 +607,8 @@ public class MainActivity extends AppCompatActivity {
                 else{
                     // stop animation
                     centralBtn.clearAnimation();
+                    // reset color
+                    centralBtn.setBackgroundTintList(null);
                     timer_timeout.h = timer_timeout.m = timer_timeout.s = 0;
                     timer_state = TimerState.STOPPED;
                 }
