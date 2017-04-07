@@ -12,6 +12,7 @@ import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -500,6 +501,7 @@ public class MainActivity extends AppCompatActivity {
                 // timer - reset
                 messageHandler.sendEmptyMessage(MessageHandler.MSG_TIMER_RESET);
                 timer_timeout.h = timer_timeout.m = timer_timeout.s = 0;
+                mSectionsPagerAdapter.getCircleFillView().setValue(CircleFillView.MIN_VALUE);
                 setTimer();
                 TextView btn = mSectionsPagerAdapter.getTimerButtonText();
                 btn.setText(R.string.central_btn_start);
@@ -570,14 +572,12 @@ public class MainActivity extends AppCompatActivity {
     private void manage_timer(View centralBtn){
         // start the timer only if it's set
         switch (timer_state){
-            case SET:
+            case SET:{
                 messageHandler.initTimer(mSectionsPagerAdapter.getTimerTV(),
                                             mSectionsPagerAdapter.getTimerNeedle(),
                                             mSectionsPagerAdapter.getTimerButtonText(),
                                             centralBtn,
                                             mSectionsPagerAdapter.getCircleFillView());
-                // fallthrough
-            case PAUSED:
                 // send a message with the number of seconds
                 Message mex = new Message();
                 mex.obj = timer_timeout;
@@ -588,7 +588,19 @@ public class MainActivity extends AppCompatActivity {
                 setEnableBtnReset(false);
                 setEnableAddTime(false);
                 timer_state = TimerState.RUNNING;
-                break;
+                break;}
+            case PAUSED:{
+                // send a message with the number of seconds
+                Message mex = new Message();
+                mex.obj = timer_timeout;
+                mex.what = MessageHandler.MSG_TIMER_RESUME;
+                messageHandler.sendMessage(mex);
+
+                // disable reset btn
+                setEnableBtnReset(false);
+                setEnableAddTime(false);
+                timer_state = TimerState.RUNNING;
+                break;}
             case RUNNING:
                 // check if the timer is expired
                 Animation anim = centralBtn.getAnimation();
@@ -696,6 +708,15 @@ public class MainActivity extends AppCompatActivity {
         // set the needle in the correct position
         ImageView needle = mSectionsPagerAdapter.getTimerNeedle();
         needle.setRotation((float)timer_timeout.s * 6f);
+
+        //set the fill
+        CircleFillView circle = mSectionsPagerAdapter.getCircleFillView();
+        //TODO: set the correct fill...ms = 0 at this point....
+        if(circle.getValue() > 0 && timer_timeout.getMilliseconds() != 0){
+            int fill_value = CircleFillView.MAX_VALUE - (int)((CircleFillView.MAX_VALUE * timer_timeout.getMilliseconds()) / timer_timeout.getMilliseconds()) + circle.getValue();
+            circle.setValue(fill_value);
+            Log.d(TAG, "circle fill: " + fill_value);
+        }
     }
 
     public void addMin(View view) {
