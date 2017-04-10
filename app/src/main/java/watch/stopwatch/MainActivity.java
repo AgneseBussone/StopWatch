@@ -35,7 +35,6 @@ import java.util.TimerTask;
 /*
 * TODO list:
 * - third screen: settings
-* - preset timer screen: add "add" btn (like laps screen)
 * */
 
 
@@ -414,6 +413,8 @@ public class MainActivity extends AppCompatActivity {
                     messageHandler.sendEmptyMessage(MessageHandler.MSG_STOPWATCH_LAP);
                 }
                 break;
+            case R.id.timerListAddBtn:
+                // fallthrough
             case R.id.page2:
                 // timer - set/add
                 AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this);
@@ -518,6 +519,15 @@ public class MainActivity extends AppCompatActivity {
                     // Associate the adapter to the list view
                     ListView list = (ListView) timerPresetView.findViewById(R.id.timerList);
                     list.setAdapter(presetTimerAdapter);
+
+                    // set addPresetTimer button listener
+                    Button addPreset = (Button)timerPresetView.findViewById(R.id.timerListAddBtn);
+                    addPreset.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            btn1Click(v);
+                        }
+                    });
 
                     // Change SET to ADD
                     btn1.setText(R.string.timer_add);

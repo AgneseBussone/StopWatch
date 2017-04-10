@@ -29,17 +29,15 @@
             android:layout_weight="1"
             android:enabled="false"
             android:visibility="invisible"/>
-
-
-        <!--<Button-->
-            <!--android:id="@+id/timerAddBtn"-->
-            <!--style="@style/Widget.AppCompat.Button.Borderless.Colored"-->
-            <!--android:layout_width="wrap_content"-->
-            <!--android:layout_height="wrap_content"-->
-            <!--android:layout_weight="1"-->
-            <!--android:background="@color/colorPrimaryLight"-->
-            <!--android:text="@string/timer_add"-->
-            <!--android:textColor="@color/white"/>-->
+        <Button
+            android:id="@+id/timerListAddBtn"
+            style="@style/Widget.AppCompat.Button.Borderless.Colored"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/timer_add"
+            android:background="@color/colorPrimaryLight"
+            android:textColor="@color/white"/>
 
     </LinearLayout>
 
