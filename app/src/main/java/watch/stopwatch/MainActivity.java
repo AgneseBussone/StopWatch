@@ -34,8 +34,6 @@ import java.util.TimerTask;
 
 /*
 * TODO list:
-* - rebuild the add time icons (bigger)
-* - delete settings btn
 * - third screen: settings
 * - preset timer screen: add "add" btn (like laps screen)
 * */
@@ -65,12 +63,11 @@ public class MainActivity extends AppCompatActivity {
      * The {@link ViewPager} that will host the section contents.
      */
     private CustomViewPager mViewPager;
-    ViewPager.OnPageChangeListener pageListener;
+    private ViewPager.OnPageChangeListener pageListener;
     private RadioGroup page_selector;
     private Button btn1;
     private Button btn2;
     private Button btn3;
-    private ImageView settingsBtn;
     private Vibrator vibe;
     private MessageHandler messageHandler;
     private StopwatchState stopwatch_state = StopwatchState.STOPPED;
@@ -277,7 +274,6 @@ public class MainActivity extends AppCompatActivity {
         btn1 = (Button)findViewById(R.id.button1);
         btn2 = (Button)findViewById(R.id.button2);
         btn3 = (Button)findViewById(R.id.button3);
-        settingsBtn = (ImageView)findViewById(R.id.button_settings);
 
         // Attach the long listener when the view has been drawn
         mViewPager.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
@@ -496,7 +492,7 @@ public class MainActivity extends AppCompatActivity {
             case R.id.page1:
                 // stopwatch - lap record
                 if(lapRecordView == null){
-                    lapRecordView = createSecondaryView(btn, R.layout.lap_list);
+                    lapRecordView = createSecondaryView(btn, R.layout.lap_list, mSectionsPagerAdapter.getStopwatchTV());
 
                     // give to the handler the list
                     Message msg = new Message();
@@ -517,7 +513,7 @@ public class MainActivity extends AppCompatActivity {
             case R.id.page2:
                 // timer - presets
                 if(timerPresetView == null){
-                    timerPresetView = createSecondaryView(btn, R.layout.timer_list);
+                    timerPresetView = createSecondaryView(btn, R.layout.timer_list, mSectionsPagerAdapter.getTimerTV());
 
                     // Associate the adapter to the list view
                     ListView list = (ListView) timerPresetView.findViewById(R.id.timerList);
@@ -675,7 +671,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private View createSecondaryView(Button btn, int mainLayoutResource){
+    private View createSecondaryView(Button btn, int mainLayoutResource, TextView clockTV){
         // create and show the view
         separator.setVisibility(View.VISIBLE);
         btn.setText("");
@@ -685,13 +681,15 @@ public class MainActivity extends AppCompatActivity {
 
         // set the y position to the height of the father, so the view'll be out of screen (bottom)
         list_view.setY(secondary_view.getHeight());
-        float toY = settingsBtn.getY() + settingsBtn.getHeight() + 3;
+        int[] locationOnScreen = {0, 0};
+        clockTV.getLocationOnScreen(locationOnScreen);
+        int toY = locationOnScreen[1] + (clockTV.getHeight() / 2);
 
         // set the height of the internal layout = parent's height - y offset - line height - button height
         // I tried to apply these value to list_view, but that view IS secondary_view + inflated layout
         RelativeLayout main_list_layout = (RelativeLayout) list_view.findViewById(R.id.mainListLayout);
         ViewGroup.LayoutParams params = main_list_layout.getLayoutParams();
-        params.height = (secondary_view.getHeight() - (int)toY - separator.getHeight() - btn.getHeight());
+        params.height = (secondary_view.getHeight() - toY - separator.getHeight() - btn.getHeight());
         main_list_layout.setLayoutParams(params);
 
         // use animate() to make the changes permanent
