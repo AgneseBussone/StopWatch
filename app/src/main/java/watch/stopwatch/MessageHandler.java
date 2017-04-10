@@ -35,7 +35,6 @@ public class MessageHandler extends Handler {
     public static final int MSG_TIMER_STOP           = 11;
     public static final int MSG_TIMER_PAUSE          = 12;
     public static final int MSG_TIMER_RESET          = 13;
-    public static final int MSG_TIMER_RESUME         = 14;
 
     private Chronometer stopwatch_chronometer = new Chronometer();
     private final long REFRESH_RATE = 100;
@@ -59,7 +58,6 @@ public class MessageHandler extends Handler {
     private Countdown timer = null;
     private CircleFillView circleFillView = null;
     private long total_ms = 0;
-    private int offset = 0;
 
     public MessageHandler(Looper looper, Context context){
         super(looper);
@@ -183,20 +181,7 @@ public class MessageHandler extends Handler {
                     if (timerBtn_tv != null && circleFillView != null) {
                         timerBtn_tv.setText(R.string.central_btn_stop);
                         circleFillView.setValue(CircleFillView.MIN_VALUE);
-                        offset = 0;
                         circleFillView.setVisibility(View.VISIBLE);
-                    }
-                    timer.start();
-                }
-                break;
-
-            case MSG_TIMER_RESUME:
-                if(msg.obj != null) {
-                    Time timer_timeout = (Time) msg.obj;
-                    total_ms = timer_timeout.getMilliseconds();
-                    timer = new Countdown(total_ms, REFRESH_RATE, this);
-                    if (timerBtn_tv != null) {
-                        timerBtn_tv.setText(R.string.central_btn_stop);
                     }
                     timer.start();
                 }
@@ -204,13 +189,15 @@ public class MessageHandler extends Handler {
 
             case MSG_TIMER_STOP:
                 // Message received from the Countdown obj
-                // set the color of the central btn
-                timerBtn.setBackgroundTintList(context.getResources().getColorStateList(R.color.timer_btn_statelist));
-                // hide the filling circle
-                circleFillView.setVisibility(View.INVISIBLE);
-                // play animation on the central btn
-                Animation animation = AnimationUtils.loadAnimation(context, R.anim.center_btn_anim_timer_out);
-                timerBtn.startAnimation(animation);
+                if(timerBtn != null && circleFillView != null) {
+                    // set the color of the central btn
+                    timerBtn.setBackgroundTintList(context.getResources().getColorStateList(R.color.timer_btn_statelist));
+                    // hide the filling circle
+                    circleFillView.setVisibility(View.INVISIBLE);
+                    // play animation on the central btn
+                    Animation animation = AnimationUtils.loadAnimation(context, R.anim.center_btn_anim_timer_out);
+                    timerBtn.startAnimation(animation);
+                }
                 // fallthrough
             case MSG_TIMER_UPDATE:
                 if(msg.obj != null) {
@@ -220,16 +207,22 @@ public class MessageHandler extends Handler {
                 break;
 
             case MSG_TIMER_PAUSE:
-                timer.cancel();
-                timer = null;
-                offset = circleFillView.getValue();
+                if(timer != null) {
+                    timer.cancel();
+                    timer = null;
+                }
                 break;
 
             case MSG_TIMER_RESET:
-                if (timer != null)
+                if (timer != null) {
                     timer.cancel();
-                timer = null;
+                    timer = null;
+                }
                 removeMessages(MSG_TIMER_UPDATE);
+                if(circleFillView != null) {
+                    circleFillView.setValue(CircleFillView.MIN_VALUE);
+                    circleFillView.setVisibility(View.INVISIBLE);
+                }
                 break;
 
             default:
@@ -250,10 +243,8 @@ public class MessageHandler extends Handler {
         if(timer_tv != null && timer_needle != null && circleFillView != null){
             timer_tv.setText(timer_timeout.getFormattedShortTime());
             timer_needle.setRotation(((float) timer_timeout.s + (timer_timeout.ms / 1000f)) * 6f);
-            if(total_ms != 0) { // avoid division by 0
-                int fill_value = CircleFillView.MAX_VALUE - (int) ((CircleFillView.MAX_VALUE * timer_timeout.getMilliseconds()) / total_ms) + offset;
-                circleFillView.setValue(fill_value);
-            }
+            int fill_value = CircleFillView.MAX_VALUE - (int)((CircleFillView.MAX_VALUE * timer_timeout.getMilliseconds()) / total_ms);
+            circleFillView.setValue(fill_value);
         }
     }
 }

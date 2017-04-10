@@ -12,12 +12,12 @@ import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.Button;
@@ -29,6 +29,16 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import java.util.ArrayList;
+import java.util.Timer;
+import java.util.TimerTask;
+
+/*
+* TODO list:
+* - rebuild the add time icons (bigger)
+* - delete settings btn
+* - third screen: settings
+* - preset timer screen: add "add" btn (like laps screen)
+* */
 
 
 public class MainActivity extends AppCompatActivity {
@@ -218,6 +228,34 @@ public class MainActivity extends AppCompatActivity {
         }
     };
 
+    // Listener for long click on addTime btn in timer view
+    private View.OnLongClickListener longClickListener = new View.OnLongClickListener() {
+        @Override
+        public boolean onLongClick(final View v) {
+            final Timer timer = new Timer();
+            timer.schedule(new TimerTask() {
+                @Override
+                public void run() {
+                    if(v.isPressed()) {
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                if(v.getId() == R.id.addSecBtn)
+                                    addSec(v);
+                                else
+                                    addMin(v);
+                            }
+                        });
+                    }
+                    else
+                        timer.cancel();
+                }
+            },100,200);
+
+            return true;
+        }
+    };
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -241,6 +279,23 @@ public class MainActivity extends AppCompatActivity {
         btn3 = (Button)findViewById(R.id.button3);
         settingsBtn = (ImageView)findViewById(R.id.button_settings);
 
+        // Attach the long listener when the view has been drawn
+        mViewPager.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+
+            public void onGlobalLayout() {
+                // remove the listener or it will be called every time the view is drawn
+                mViewPager.getViewTreeObserver().removeOnGlobalLayoutListener(this);
+                // addMin and addSec LONG listener
+                ImageView addTime = mSectionsPagerAdapter.getAddSecBtn();
+                addTime.setOnLongClickListener(longClickListener);
+                addTime = mSectionsPagerAdapter.getAddMinBtn();
+                addTime.setOnLongClickListener(longClickListener);
+            }
+        });
+
+
+
+        // Other elements
         secondary_view = (RelativeLayout)findViewById(R.id.secondary_view);
         separator = (ImageView)findViewById(R.id.buttonsLine);
 
@@ -501,7 +556,6 @@ public class MainActivity extends AppCompatActivity {
                 // timer - reset
                 messageHandler.sendEmptyMessage(MessageHandler.MSG_TIMER_RESET);
                 timer_timeout.h = timer_timeout.m = timer_timeout.s = 0;
-                mSectionsPagerAdapter.getCircleFillView().setValue(CircleFillView.MIN_VALUE);
                 setTimer();
                 TextView btn = mSectionsPagerAdapter.getTimerButtonText();
                 btn.setText(R.string.central_btn_start);
@@ -572,12 +626,14 @@ public class MainActivity extends AppCompatActivity {
     private void manage_timer(View centralBtn){
         // start the timer only if it's set
         switch (timer_state){
-            case SET:{
+            case SET:
                 messageHandler.initTimer(mSectionsPagerAdapter.getTimerTV(),
                                             mSectionsPagerAdapter.getTimerNeedle(),
                                             mSectionsPagerAdapter.getTimerButtonText(),
                                             centralBtn,
                                             mSectionsPagerAdapter.getCircleFillView());
+                // fallthrough
+            case PAUSED:
                 // send a message with the number of seconds
                 Message mex = new Message();
                 mex.obj = timer_timeout;
@@ -588,19 +644,7 @@ public class MainActivity extends AppCompatActivity {
                 setEnableBtnReset(false);
                 setEnableAddTime(false);
                 timer_state = TimerState.RUNNING;
-                break;}
-            case PAUSED:{
-                // send a message with the number of seconds
-                Message mex = new Message();
-                mex.obj = timer_timeout;
-                mex.what = MessageHandler.MSG_TIMER_RESUME;
-                messageHandler.sendMessage(mex);
-
-                // disable reset btn
-                setEnableBtnReset(false);
-                setEnableAddTime(false);
-                timer_state = TimerState.RUNNING;
-                break;}
+                break;
             case RUNNING:
                 // check if the timer is expired
                 Animation anim = centralBtn.getAnimation();
@@ -709,13 +753,11 @@ public class MainActivity extends AppCompatActivity {
         ImageView needle = mSectionsPagerAdapter.getTimerNeedle();
         needle.setRotation((float)timer_timeout.s * 6f);
 
-        //set the fill
+        // hide the filling circle
         CircleFillView circle = mSectionsPagerAdapter.getCircleFillView();
-        //TODO: set the correct fill...ms = 0 at this point....
-        if(circle.getValue() > 0 && timer_timeout.getMilliseconds() != 0){
-            int fill_value = CircleFillView.MAX_VALUE - (int)((CircleFillView.MAX_VALUE * timer_timeout.getMilliseconds()) / timer_timeout.getMilliseconds()) + circle.getValue();
-            circle.setValue(fill_value);
-            Log.d(TAG, "circle fill: " + fill_value);
+        if(circle.getVisibility() == View.VISIBLE){
+            circle.setVisibility(View.INVISIBLE);
+            circle.setValue(CircleFillView.MIN_VALUE);
         }
     }
 

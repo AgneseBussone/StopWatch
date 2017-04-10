@@ -143,6 +143,7 @@
                     android:id="@+id/addMinBtn"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:longClickable="true"
                     android:onClick="addMin"
                     android:src="@drawable/add_min_btn_selector" />
 
@@ -159,12 +160,14 @@
                 android:layout_alignParentEnd="true"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content">
+
                 <ImageView
                     android:id="@+id/addSecBtn"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:src="@drawable/add_sec_btn_selector"
-                    android:onClick="addSec"/>
+                    android:longClickable="true"
+                    android:onClick="addSec"
+                    android:src="@drawable/add_time_placeholder" />
 
                 <TextView
                     android:layout_width="wrap_content"
