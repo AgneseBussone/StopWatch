@@ -17,34 +17,34 @@ import java.util.Map;
 public class CustomExpandableListAdapter extends BaseExpandableListAdapter {
 
     private Context context;
-    private List<String> expandableListTitle;
-    private Map<String, List<String>> expandableListDetail;
+    private List<String> groups;
+    private Map<String, List<String[]>> group_detail;
 
     public CustomExpandableListAdapter(Context context, List<String> expandableListTitle,
-                                       Map<String, List<String>> expandableListDetail) {
+                                       Map<String, List<String[]>> expandableListDetail) {
         this.context = context;
-        this.expandableListTitle = expandableListTitle;
-        this.expandableListDetail = expandableListDetail;
+        this.groups = expandableListTitle;
+        this.group_detail = expandableListDetail;
     }
 
     @Override
     public int getGroupCount() {
-        return this.expandableListTitle.size();
+        return this.groups.size();
     }
 
     @Override
     public int getChildrenCount(int groupPosition) {
-        return this.expandableListDetail.get(this.expandableListTitle.get(groupPosition)).size();
+        return this.group_detail.get(this.groups.get(groupPosition)).size();
     }
 
     @Override
     public Object getGroup(int groupPosition) {
-        return this.expandableListTitle.get(groupPosition);
+        return this.groups.get(groupPosition);
     }
 
     @Override
     public Object getChild(int groupPosition, int childPosition) {
-        return this.expandableListDetail.get(this.expandableListTitle.get(groupPosition)).get(childPosition);
+        return this.group_detail.get(this.groups.get(groupPosition)).get(childPosition);
     }
 
     @Override
@@ -76,13 +76,14 @@ public class CustomExpandableListAdapter extends BaseExpandableListAdapter {
 
     @Override
     public View getChildView(int groupPosition, int childPosition, boolean isLastChild, View convertView, ViewGroup parent) {
-        final String expandedListText = (String) getChild(groupPosition, childPosition);
+        final String[] expandedListText = (String[]) getChild(groupPosition, childPosition);
         if (convertView == null) {
             LayoutInflater layoutInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             convertView = layoutInflater.inflate(R.layout.settings_item, null);
         }
         TextView expandedListTextView = (TextView) convertView.findViewById(R.id.settings_item);
-        expandedListTextView.setText(expandedListText);
+        expandedListTextView.setText(expandedListText[0]);
+        expandedListTextView.setTag(expandedListText[1]); // preference key
         return convertView;
     }
 

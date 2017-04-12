@@ -155,7 +155,7 @@ public class SectionsPagerAdapter extends FragmentPagerAdapter {
                     addTimeLayout.setVisibility(View.VISIBLE);
                     circle.setVisibility(View.VISIBLE);
                     break;
-                default:
+                case 3:
                     // settings
                     rootView = inflater.inflate(R.layout.settings_layout, container, false);
 
@@ -163,7 +163,7 @@ public class SectionsPagerAdapter extends FragmentPagerAdapter {
                     ExpandableListView settingsList = (ExpandableListView) rootView.findViewById(R.id.settingExpandableList);
 
                     // create the hash table with groups and subitems
-                    Map<String, List<String>> settingsDetail = SettingsData.getData();
+                    Map<String, List<String[]>> settingsDetail = SettingsData.getData();
 
                     // Get the groups titles
                     List<String> settingsGroupsTitle = new ArrayList<String>(settingsDetail.keySet());
