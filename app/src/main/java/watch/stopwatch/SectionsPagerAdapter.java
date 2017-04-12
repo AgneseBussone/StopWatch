@@ -7,11 +7,15 @@ import android.support.v4.app.FragmentPagerAdapter;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ExpandableListAdapter;
+import android.widget.ExpandableListView;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 
 /**
  * A {@link FragmentPagerAdapter} that returns a fragment corresponding to
@@ -152,9 +156,23 @@ public class SectionsPagerAdapter extends FragmentPagerAdapter {
                     circle.setVisibility(View.VISIBLE);
                     break;
                 default:
-                    rootView = inflater.inflate(R.layout.fragment_main, container, false);
-                    TextView textView = (TextView) rootView.findViewById(R.id.section_label);
-                    textView.setText(getString(R.string.section_format, getArguments().getInt(ARG_SECTION_NUMBER)));
+                    // settings
+                    rootView = inflater.inflate(R.layout.settings_layout, container, false);
+
+                    // get the expandable list
+                    ExpandableListView settingsList = (ExpandableListView) rootView.findViewById(R.id.settingExpandableList);
+
+                    // create the hash table with groups and subitems
+                    HashMap<String, List<String>> settingsDetail = SettingsData.getData();
+
+                    // Get the groups titles
+                    List<String> settingsGroupsTitle = new ArrayList<String>(settingsDetail.keySet());
+
+                    // set the adapter for the view
+                    ExpandableListAdapter listAdapter = new CustomExpandableListAdapter(getContext(), settingsGroupsTitle, settingsDetail);
+                    settingsList.setAdapter(listAdapter);
+                    
+                    //// TODO: 4/12/2017 add onGroupExpandListener, onGroupCollapseListener, onChildClickListener if needed
             }
             return rootView;
         }
