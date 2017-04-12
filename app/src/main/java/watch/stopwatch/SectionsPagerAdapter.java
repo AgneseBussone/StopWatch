@@ -14,8 +14,8 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * A {@link FragmentPagerAdapter} that returns a fragment corresponding to
@@ -163,7 +163,7 @@ public class SectionsPagerAdapter extends FragmentPagerAdapter {
                     ExpandableListView settingsList = (ExpandableListView) rootView.findViewById(R.id.settingExpandableList);
 
                     // create the hash table with groups and subitems
-                    HashMap<String, List<String>> settingsDetail = SettingsData.getData();
+                    Map<String, List<String>> settingsDetail = SettingsData.getData();
 
                     // Get the groups titles
                     List<String> settingsGroupsTitle = new ArrayList<String>(settingsDetail.keySet());

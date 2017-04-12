@@ -13,8 +13,6 @@ import android.support.v4.view.ViewPager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
@@ -293,6 +291,7 @@ public class MainActivity extends AppCompatActivity {
         // Other elements
         secondary_view = (RelativeLayout)findViewById(R.id.secondary_view);
         separator = (ImageView)findViewById(R.id.buttonsLine);
+        final RelativeLayout main_content = (RelativeLayout)findViewById(R.id.main_content);
 
         // Read the preset timers and set the adapter
         preset_timers = new ArrayList<>();
@@ -326,6 +325,8 @@ public class MainActivity extends AppCompatActivity {
                         page_selector.check(R.id.page1);
                         btn1.setText(R.string.btn1_page1_text);
                         btn2.setText(R.string.btn2_page1_text);
+                        btn1.setVisibility(View.VISIBLE);
+                        btn3.setVisibility(View.VISIBLE);
                         if(stopwatch_state == StopwatchState.RUNNING){
                             // disable reset btn
                             setEnableBtnReset(false);
@@ -334,10 +335,13 @@ public class MainActivity extends AppCompatActivity {
                             // enable reset btn
                             setEnableBtnReset(true);
                         }
+                        main_content.setBackgroundColor(getResources().getColor(R.color.background_color));
                         break;
                     case 1:
                         // timer
                         page_selector.check(R.id.page2);
+                        btn1.setVisibility(View.VISIBLE);
+                        btn3.setVisibility(View.VISIBLE);
                         btn1.setText(R.string.btn1_page2_text);
                         btn2.setText(R.string.btn2_page2_text);
                         if(timer_state == TimerState.RUNNING){
@@ -348,10 +352,16 @@ public class MainActivity extends AppCompatActivity {
                             // enable reset btn
                             setEnableBtnReset(true);
                         }
+                        main_content.setBackgroundColor(getResources().getColor(R.color.background_color));
                         break;
                     case 2:
-                        // TBD
+                        // settings
                         page_selector.check(R.id.page3);
+                        main_content.setBackgroundColor(getResources().getColor(R.color.colorPrimaryLight));
+                        btn1.setVisibility(View.GONE);
+                        btn3.setVisibility(View.GONE);
+                        btn2.setText("Designed by ???");
+//                        btn2.setBackgroundColor(getResources().getColor(R.color.light_blue2));
                         break;
                 }
             }
@@ -374,29 +384,6 @@ public class MainActivity extends AppCompatActivity {
         messageHandler.sendEmptyMessage(MessageHandler.MSG_STOPWATCH_SAVE_LAP);
         // save preset timer list
         savePresetTimers();
-    }
-
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_main, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
-        }
-
-        return super.onOptionsItemSelected(item);
     }
 
     /**
