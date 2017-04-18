@@ -31,5 +31,6 @@
         android:layout_below="@+id/imageView2"
         android:divider="@drawable/line_settings"
         android:footerDividersEnabled="false"
-        android:headerDividersEnabled="false"/>
+        android:headerDividersEnabled="false"
+        android:groupIndicator="@null"/>
 </RelativeLayout>

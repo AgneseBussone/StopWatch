@@ -2,9 +2,11 @@ package watch.stopwatch;
 
 import android.content.Context;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseExpandableListAdapter;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import java.util.List;
@@ -71,6 +73,27 @@ public class CustomExpandableListAdapter extends BaseExpandableListAdapter {
         }
         TextView listTitleTextView = (TextView) convertView.findViewById(R.id.group_title);
         listTitleTextView.setText(listTitle);
+
+        // add listener to the image
+        ImageView icon = (ImageView)convertView.findViewById(R.id.group_icon);
+        icon.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                if(event.getAction() == MotionEvent.ACTION_UP) {
+                    //// TODO: 4/18/2017 save the setting
+                    ImageView image = (ImageView) v;
+                    String status = String.valueOf(image.getTag());
+                    if (status.equals("off")) {
+                        image.setImageResource(R.drawable.ic_setting_on_placeholder);
+                        image.setTag("on");
+                    } else {
+                        image.setImageResource(R.drawable.ic_setting_off_placeholder);
+                        image.setTag("off");
+                    }
+                }
+                return true;
+            }
+        });
         return convertView;
     }
 
