@@ -4,6 +4,10 @@ import android.animation.Animator;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
+import android.hardware.Sensor;
+import android.hardware.SensorEvent;
+import android.hardware.SensorEventListener;
+import android.hardware.SensorManager;
 import android.os.Bundle;
 import android.os.Message;
 import android.os.Vibrator;
@@ -12,6 +16,7 @@ import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -70,7 +75,12 @@ public class MainActivity extends AppCompatActivity {
     private ImageView separator;
     private ArrayList<Time> preset_timers;
     private TimerListAdapter presetTimerAdapter;
+    private SensorManager sensorManager;
 
+    /***********************************************************************************************
+     *
+     * LISTENERS
+     */
 
     // Listener for buttons in secondary views
     private View.OnClickListener secondaryViewBtnListener = new View.OnClickListener() {
@@ -244,6 +254,41 @@ public class MainActivity extends AppCompatActivity {
         }
     };
 
+    // Listener for accelerometer values
+    private SensorEventListener movementSensorListener = new SensorEventListener() {
+        private final int MAGNITUDE_THRESHOLD = 35; // sensitivity to the movement
+        private final int ACC_FILTER_DATA_MIN_TIME = 50; // ms
+        long lastSaved = System.currentTimeMillis();
+
+        @Override
+        public void onSensorChanged(SensorEvent event) {
+            if(event.sensor.getType() == Sensor.TYPE_ACCELEROMETER) {
+                // filter some samples in order to avoid multiple matches at the same movement
+                if ((System.currentTimeMillis() - lastSaved) > ACC_FILTER_DATA_MIN_TIME) {
+                    lastSaved = System.currentTimeMillis();
+
+                    // Get the values from the sensor
+                    float[] acceleration = new float[3];
+                    System.arraycopy(event.values, 0, acceleration, 0, event.values.length);
+
+                    double magnitude = Math.sqrt((acceleration[0] * acceleration[0]) +
+                            (acceleration[1] * acceleration[1]) +
+                            (acceleration[2] * acceleration[2]));
+
+                    Log.d(TAG, String.valueOf(magnitude));
+
+                    if (magnitude > MAGNITUDE_THRESHOLD) {
+                        Log.d(TAG, "------CLICK------");
+                        (findViewById(R.id.bigBtn)).performClick();
+                    }
+                }
+            }
+        }
+
+        @Override
+        public void onAccuracyChanged(Sensor sensor, int accuracy) {}
+    };
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -366,10 +411,24 @@ public class MainActivity extends AppCompatActivity {
 
         mViewPager.addOnPageChangeListener(pageListener);
 
-        vibe = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE) ;
+        vibe = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
+        sensorManager = (SensorManager)getSystemService(Context.SENSOR_SERVICE);
 
         // message handler setup
         messageHandler = new MessageHandler(getMainLooper(), getApplicationContext());
+
+        // read settings
+        readSettings();
+    }
+
+    private void readSettings() {
+        //// TODO: 4/20/2017 read settings
+
+        // register motion sensor
+        sensorManager.registerListener(movementSensorListener,
+                                        sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER),
+                                        SensorManager.SENSOR_DELAY_NORMAL);
+        Log.d(TAG, "listener registered");
     }
 
     @Override
@@ -378,6 +437,7 @@ public class MainActivity extends AppCompatActivity {
         messageHandler.sendEmptyMessage(MessageHandler.MSG_STOPWATCH_SAVE_LAP);
         // save preset timer list
         savePresetTimers();
+        sensorManager.unregisterListener(movementSensorListener);
     }
 
     /**
