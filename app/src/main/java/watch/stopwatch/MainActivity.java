@@ -16,7 +16,6 @@ import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -254,8 +253,9 @@ public class MainActivity extends AppCompatActivity {
         }
     };
 
-    // Listener for accelerometer values
-    private SensorEventListener movementSensorListener = new SensorEventListener() {
+    // Listener for accelerometer and proximity sensors
+    private SensorEventListener sensorEventListener = new SensorEventListener() {
+        private final int PROXIMITY_THRESHOLD = 4;
         private final int MAGNITUDE_THRESHOLD = 35; // sensitivity to the movement
         private final int ACC_FILTER_DATA_MIN_TIME = 50; // ms
         long lastSaved = System.currentTimeMillis();
@@ -275,12 +275,21 @@ public class MainActivity extends AppCompatActivity {
                             (acceleration[1] * acceleration[1]) +
                             (acceleration[2] * acceleration[2]));
 
-                    Log.d(TAG, String.valueOf(magnitude));
+//                    Log.d(TAG, String.valueOf(magnitude));
 
                     if (magnitude > MAGNITUDE_THRESHOLD) {
-                        Log.d(TAG, "------CLICK------");
-                        (findViewById(R.id.bigBtn)).performClick();
+//                        Log.d(TAG, "------CLICK------");
+                        ImageView btn = (ImageView)findViewById(R.id.bigBtn);
+                        if(btn != null)
+                            btn.performClick();
                     }
+                }
+            }
+            else if (event.sensor.getType() == Sensor.TYPE_PROXIMITY) {
+                if(event.values[0] <= PROXIMITY_THRESHOLD){
+                    ImageView btn = (ImageView)findViewById(R.id.bigBtn);
+                    if(btn != null)
+                        btn.performClick();
                 }
             }
         }
@@ -310,6 +319,7 @@ public class MainActivity extends AppCompatActivity {
         btn1 = (Button)findViewById(R.id.button1);
         btn2 = (Button)findViewById(R.id.button2);
         btn3 = (Button)findViewById(R.id.button3);
+
 
         // Attach the long listener when the view has been drawn
         mViewPager.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
@@ -425,10 +435,14 @@ public class MainActivity extends AppCompatActivity {
         //// TODO: 4/20/2017 read settings
 
         // register motion sensor
-        sensorManager.registerListener(movementSensorListener,
+        sensorManager.registerListener(sensorEventListener,
                                         sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER),
                                         SensorManager.SENSOR_DELAY_NORMAL);
-        Log.d(TAG, "listener registered");
+
+        // register proximity sensor
+        sensorManager.registerListener(sensorEventListener,
+                                        sensorManager.getDefaultSensor(Sensor.TYPE_PROXIMITY),
+                                        SensorManager.SENSOR_DELAY_NORMAL);
     }
 
     @Override
@@ -437,7 +451,7 @@ public class MainActivity extends AppCompatActivity {
         messageHandler.sendEmptyMessage(MessageHandler.MSG_STOPWATCH_SAVE_LAP);
         // save preset timer list
         savePresetTimers();
-        sensorManager.unregisterListener(movementSensorListener);
+        sensorManager.unregisterListener(sensorEventListener);
     }
 
     /**
