@@ -577,14 +577,12 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private void animateBtnCenter(View btnView){
-        Animation animation = AnimationUtils.loadAnimation(this, R.anim.center_btn_anim);
-        btnView.startAnimation(animation);
-        vibe.vibrate(50);
-    }
-
     private void manage_stopwatch(View centralBtn){
-        animateBtnCenter(centralBtn);
+        // button animation
+        Animation animation = AnimationUtils.loadAnimation(this, R.anim.center_btn_anim);
+        centralBtn.startAnimation(animation);
+        vibe.vibrate(50);
+
         switch(stopwatch_state){
             case STOPPED:
                 messageHandler.initStopwatch(mSectionsPagerAdapter.getStopwatchTV(),
@@ -631,6 +629,7 @@ public class MainActivity extends AppCompatActivity {
                 setEnableBtnReset(false);
                 setEnableAddTime(false);
                 timer_state = TimerState.RUNNING;
+                vibe.vibrate(50);
                 break;
             case RUNNING:
                 // check if the timer is expired
@@ -658,6 +657,7 @@ public class MainActivity extends AppCompatActivity {
                 mSectionsPagerAdapter.getTimerButtonText().setText(R.string.central_btn_start);
                 setEnableBtnReset(true);
                 setEnableAddTime(true);
+                vibe.vibrate(50);
                 break;
         }
     }
