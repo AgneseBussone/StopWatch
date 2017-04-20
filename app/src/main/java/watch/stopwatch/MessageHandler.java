@@ -243,8 +243,13 @@ public class MessageHandler extends Handler {
         if(timer_tv != null && timer_needle != null && circleFillView != null){
             timer_tv.setText(timer_timeout.getFormattedShortTime());
             timer_needle.setRotation(((float) timer_timeout.s + (timer_timeout.ms / 1000f)) * 6f);
-            int fill_value = CircleFillView.MAX_VALUE - (int)((CircleFillView.MAX_VALUE * timer_timeout.getMilliseconds()) / total_ms);
-            circleFillView.setValue(fill_value);
+            if(total_ms > 0) {
+                int fill_value = CircleFillView.MAX_VALUE - (int) ((CircleFillView.MAX_VALUE * timer_timeout.getMilliseconds()) / total_ms);
+                circleFillView.setValue(fill_value);
+            }
+            else{
+                circleFillView.setValue(0);
+            }
         }
     }
 }
