@@ -10,7 +10,6 @@ import android.view.ViewGroup;
 import android.widget.ExpandableListAdapter;
 import android.widget.ExpandableListView;
 import android.widget.ImageView;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import java.util.ArrayList;
@@ -135,25 +134,20 @@ public class SectionsPagerAdapter extends FragmentPagerAdapter {
         @Override
         public View onCreateView(LayoutInflater inflater, ViewGroup container,
                                  Bundle savedInstanceState) {
-            View rootView = inflater.inflate(R.layout.watch_layout, container, false);
-            TextView text = (TextView)rootView.findViewById(R.id.time_text);
-            RelativeLayout addTimeLayout = (RelativeLayout)rootView.findViewById(R.id.addTimeLayout);
-            CircleFillView circle = (CircleFillView)rootView.findViewById(R.id.circleFillView);
+            View rootView = null;
 
             // adjust the layout basing on the section number
             int section =  getArguments().getInt(ARG_SECTION_NUMBER);
             switch(section){
                 case 1:
                     // stopwatch
-                    text.setText(R.string.time_default_stopwatch);
-                    addTimeLayout.setVisibility(View.INVISIBLE);
-                    circle.setVisibility(View.INVISIBLE);
+                    rootView = inflater.inflate(R.layout.stopwatch_layout, container, false);
+                    ((TextView)rootView.findViewById(R.id.time_text)).setText(R.string.time_default_stopwatch);
                     break;
                 case 2:
                     // timer
-                    text.setText(R.string.time_default_timer);
-                    addTimeLayout.setVisibility(View.VISIBLE);
-                    circle.setVisibility(View.VISIBLE);
+                    rootView = inflater.inflate(R.layout.timer_layout, container, false);
+                    ((TextView)rootView.findViewById(R.id.time_text)).setText(R.string.time_default_timer);
                     break;
                 case 3:
                     // settings

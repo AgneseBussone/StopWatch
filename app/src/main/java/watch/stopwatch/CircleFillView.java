@@ -32,13 +32,7 @@ public class CircleFillView extends View {
     private float strokeWidth;
     private int value;
 
-    public CircleFillView(Context context)
-    {
-        this(context, null);
-    }
-
-    public CircleFillView(Context context, AttributeSet attrs)
-    {
+    public CircleFillView(Context context, AttributeSet attrs) {
         super(context, attrs);
 
         // Get the styleable attributes
@@ -66,63 +60,84 @@ public class CircleFillView extends View {
         strokePaint.setStyle(Paint.Style.STROKE);
     }
 
-    public void setFillColor(int fillColor)
-    {
+    @Override
+    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+        int desiredWidth = 100;
+        int desiredHeight = 100;
+
+        int widthMode = MeasureSpec.getMode(widthMeasureSpec);
+        int widthSize = MeasureSpec.getSize(widthMeasureSpec);
+        int heightMode = MeasureSpec.getMode(heightMeasureSpec);
+        int heightSize = MeasureSpec.getSize(heightMeasureSpec);
+
+        int width;
+        int height;
+
+        //Measure Width
+        if (widthMode == MeasureSpec.EXACTLY) {
+            //Must be this size
+            width = widthSize;
+        } else if (widthMode == MeasureSpec.AT_MOST) {
+            //Can't be bigger than...
+            width = Math.min(desiredWidth, widthSize);
+        } else {
+            //Be whatever you want
+            width = desiredWidth;
+        }
+
+        //Measure Height
+        if (heightMode == MeasureSpec.EXACTLY) {
+            //Must be this size
+            height = heightSize;
+        } else if (heightMode == MeasureSpec.AT_MOST) {
+            //Can't be bigger than...
+            height = Math.min(desiredHeight, heightSize);
+        } else {
+            //Be whatever you want
+            height = desiredHeight;
+        }
+
+        //MUST CALL THIS
+        setMeasuredDimension(width, height);
+    }
+
+    public void setFillColor(int fillColor) {
         this.fillColor = fillColor;
         fillPaint.setColor(fillColor);
         invalidate();
     }
 
-    public int getFillColor()
-    {
-        return fillColor;
-    }
+    public int getFillColor() { return fillColor; }
 
-    public void setStrokeColor(int strokeColor)
-    {
+    public void setStrokeColor(int strokeColor) {
         this.strokeColor = strokeColor;
         strokePaint.setColor(strokeColor);
         invalidate();
     }
 
-    public int getStrokeColor()
-    {
-        return strokeColor;
-    }
+    public int getStrokeColor() { return strokeColor; }
 
-    public void setStrokeWidth(float strokeWidth)
-    {
+    public void setStrokeWidth(float strokeWidth) {
         this.strokeWidth = strokeWidth;
         strokePaint.setStrokeWidth(strokeWidth);
         invalidate();
     }
 
-    public float getStrokeWidth()
-    {
-        return strokeWidth;
-    }
+    public float getStrokeWidth() { return strokeWidth; }
 
-    public void setValue(int value)
-    {
+    public void setValue(int value) {
         adjustValue(value);
         setPaths();
 
         invalidate();
     }
 
-    public int getValue()
-    {
-        return value;
-    }
+    public int getValue() { return value; }
 
-    private void adjustValue(int value)
-    {
-        this.value = Math.min(MAX_VALUE, Math.max(MIN_VALUE, value));
-    }
+    private void adjustValue(int value) { this.value = Math.min(MAX_VALUE, Math.max(MIN_VALUE, value)); }
 
     @Override
-    protected void onSizeChanged(int w, int h, int oldw, int oldh)
-    {
+    protected void onSizeChanged(int w, int h, int oldw, int oldh) {
         super.onSizeChanged(w, h, oldw, oldh);
 
         center.x = getWidth() / 2;
@@ -133,8 +148,7 @@ public class CircleFillView extends View {
         setPaths();
     }
 
-    private void setPaths()
-    {
+    private void setPaths() {
         float y = center.y + radius - (2 * radius * value / 100 - 1);
         float x = center.x - (float) Math.sqrt(Math.pow(radius, 2) - Math.pow(y - center.y, 2));
 
@@ -148,8 +162,7 @@ public class CircleFillView extends View {
     }
 
     @Override
-    protected void onDraw(Canvas canvas)
-    {
+    protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
 
         canvas.drawPath(segment, fillPaint);

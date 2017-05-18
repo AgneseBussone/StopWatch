@@ -6,11 +6,11 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:fitsSystemWindows="true"
-                android:background="@color/background_color"
                 tools:context="watch.stopwatch.MainActivity">
 
         <RelativeLayout
             android:id="@+id/main_content"
+            android:background="@color/background_color"
             android:layout_width="match_parent"
             android:layout_height="match_parent">
 
