@@ -163,15 +163,20 @@ public class SectionsPagerAdapter extends FragmentPagerAdapter {
                     ExpandableListView settingsList = (ExpandableListView) rootView.findViewById(R.id.settingExpandableList);
 
                     // create the hash table with groups and subitems
-                    Map<String, List<String[]>> settingsDetail = SettingsData.getData();
+                    Map<String, List<String[]>> settingsDetail = SettingsData.getData(getContext());
 
                     // Get the groups titles
-                    List<String> settingsGroupsTitle = new ArrayList<String>(settingsDetail.keySet());
+                    List<String> settingsGroupsTitle = new ArrayList<>(settingsDetail.keySet());
 
                     // set the adapter for the view
                     ExpandableListAdapter listAdapter = new CustomExpandableListAdapter(getContext(), settingsGroupsTitle, settingsDetail);
                     settingsList.setAdapter(listAdapter);
-                    
+                    settingsList.setOnChildClickListener(new ExpandableListView.OnChildClickListener() {
+                        @Override
+                        public boolean onChildClick(ExpandableListView parent, View v, int groupPosition, int childPosition, long id) {
+                            return false;
+                        }
+                    });
                     //// TODO: 4/12/2017 add onGroupExpandListener, onGroupCollapseListener, onChildClickListener if needed
             }
             return rootView;

@@ -26,4 +26,15 @@
     <string name="timer_preset_view">TIMERS</string>
     <string name="timer_add">ADD</string>
 
+    <!-- Preferences keys -->
+    <string name="KEY_SOUND">key_pref_sound</string>
+    <string name="KEY_RINGTONE">key_pref_ringtone</string>
+    <string name="KEY_START">key_pref_start_mode</string>
+    <string name="KEY_STOP">key_pref_stop_mode</string>
+    <string name="KEY_LAP">key_pref_lap</string>
+    <string name="KEY_TOUCHBTN">key_pref_touchBtn</string>
+    <string name="KEY_SCREEN">key_pref_screen_on</string>
+    <string name="KEY_NIGHT">key_pref_night_mode</string>
+
+
 </resources>
