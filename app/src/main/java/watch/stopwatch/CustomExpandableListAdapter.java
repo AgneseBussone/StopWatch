@@ -20,10 +20,10 @@ public class CustomExpandableListAdapter extends BaseExpandableListAdapter {
 
     private Context context;
     private List<String> groups;
-    private Map<String, List<String[]>> group_detail;
+    private Map<String, List<Item>> group_detail;
 
     public CustomExpandableListAdapter(Context context, List<String> expandableListTitle,
-                                       Map<String, List<String[]>> expandableListDetail) {
+                                       Map<String, List<Item>> expandableListDetail) {
         this.context = context;
         this.groups = expandableListTitle;
         this.group_detail = expandableListDetail;
@@ -99,14 +99,17 @@ public class CustomExpandableListAdapter extends BaseExpandableListAdapter {
 
     @Override
     public View getChildView(int groupPosition, int childPosition, boolean isLastChild, View convertView, ViewGroup parent) {
-        final String[] expandedListText = (String[]) getChild(groupPosition, childPosition);
+        final Item item = (Item) getChild(groupPosition, childPosition);
         if (convertView == null) {
             LayoutInflater layoutInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             convertView = layoutInflater.inflate(R.layout.settings_item, null);
         }
         TextView expandedListTextView = (TextView) convertView.findViewById(R.id.settings_item);
-        expandedListTextView.setText(expandedListText[0]);
-        expandedListTextView.setTag(expandedListText[1]); // preference key
+        expandedListTextView.setText(item.text);
+
+        // assign the id to the parent view (avoid findViewById step in the childClickListener)
+        convertView.setTag(item.id);
+
         return convertView;
     }
 

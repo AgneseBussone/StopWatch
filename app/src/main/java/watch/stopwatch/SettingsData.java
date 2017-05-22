@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import watch.stopwatch.Item.DATA_ID;
 
 /**
  * Class to map the group header with the respective children
@@ -13,33 +14,32 @@ import java.util.Map;
 
 public class SettingsData {
 
-    public static Map<String, List<String[]>> getData(Context context) {
+    public static Map<String, List<Item>> getData(Context context) {
 
         /* Structure of the map:
          * key (string) = text to display as a group element (the category)
-         * value: string[0] = text to display as a subitem
-         *        string[1] = tag of the textview (preference key)
+         * value: Item object with text and numeric id
          */
-        Map<String, List<String[]>> expandableListDetail = new LinkedHashMap<>();
+        Map<String, List<Item>> expandableListDetail = new LinkedHashMap<>();
 
-        List<String[]> sound_alarm = new ArrayList<>();
-        sound_alarm.add(new String[]{"Sound | Vibrate | None", context.getResources().getString(R.string.KEY_SOUND)});
-        sound_alarm.add(new String[]{"Ringtone", context.getResources().getString(R.string.KEY_RINGTONE)});
+        List<Item> sound_alarm = new ArrayList<>();
+        sound_alarm.add(new Item("Sound | Vibrate | None", DATA_ID.ID_SOUND));
+        sound_alarm.add(new Item("Ringtone", DATA_ID.ID_RINGTONE));
 
-        List<String[]> haptics_input = new ArrayList<>();
-        haptics_input.add(new String[]{"Start Mode", context.getResources().getString(R.string.KEY_START)});
-        haptics_input.add(new String[]{"Stop Mode", context.getResources().getString(R.string.KEY_STOP)});
-        haptics_input.add(new String[]{"Lap Mode", context.getResources().getString(R.string.KEY_LAP)});
-        haptics_input.add(new String[]{"Touch Button Feedback", context.getResources().getString(R.string.KEY_TOUCHBTN)});
+        List<Item> haptics_input = new ArrayList<>();
+        haptics_input.add(new Item("Start Mode", DATA_ID.ID_START));
+        haptics_input.add(new Item("Stop Mode", DATA_ID.ID_STOP));
+        haptics_input.add(new Item("Lap Mode", DATA_ID.ID_LAP));
+        haptics_input.add(new Item("Touch Button Feedback", DATA_ID.ID_TOUCHBTN));
 
-        List<String[]> screen_display = new ArrayList<>();
-        screen_display.add(new String[]{"Always ON screen", context.getResources().getString(R.string.KEY_SCREEN)});
-        screen_display.add(new String[]{"Night Mode", context.getResources().getString(R.string.KEY_NIGHT)});
+        List<Item> screen_display = new ArrayList<>();
+        screen_display.add(new Item("Always ON screen", DATA_ID.ID_SCREEN));
+        screen_display.add(new Item("Night Mode", DATA_ID.ID_NIGHT));
 
-        List <String[]> about = new ArrayList<>();
-        about.add(new String[]{"Enjoying our App?", ""});
-        about.add(new String[]{"Who we are", ""});
-        about.add(new String[]{"App version", ""});
+        List <Item> about = new ArrayList<>();
+        about.add(new Item("Enjoying our App?", DATA_ID.ID_RATE));
+        about.add(new Item("Who we are", DATA_ID.ID_DEV));
+        about.add(new Item("App version", DATA_ID.ID_VERSION));
 
         expandableListDetail.put("SOUND / ALARM", sound_alarm);
         expandableListDetail.put("HAPTICS / INPUT", haptics_input);
