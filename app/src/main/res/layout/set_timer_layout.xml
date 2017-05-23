@@ -35,8 +35,7 @@
                 android:id="@+id/numberPicker_hours"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:theme="@android:style/Theme.Holo" />
+                android:layout_weight="1"/>
         </LinearLayout>
 
         <LinearLayout
@@ -55,7 +54,6 @@
                 android:id="@+id/numberPicker_min"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:theme="@android:style/Theme.Holo"
                 android:layout_weight="1" />
         </LinearLayout>
 
@@ -75,7 +73,6 @@
                 android:id="@+id/numberPicker_sec"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:theme="@android:style/Theme.Holo"
                 android:layout_weight="1" />
         </LinearLayout>
     </LinearLayout>

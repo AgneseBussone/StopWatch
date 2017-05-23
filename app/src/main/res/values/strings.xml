@@ -36,5 +36,10 @@
     <string name="KEY_SCREEN">key_pref_screen_on</string>
     <string name="KEY_NIGHT">key_pref_night_mode</string>
 
+    <!-- Possible values for preferences -->
+    <string name="sound_only">sound_only</string>
+    <string name="vibrate_only">vibrate_only</string>
+    <string name="soundAndVibrate">soundAndVibrate</string>
+    <string name="none">none</string>
 
 </resources>

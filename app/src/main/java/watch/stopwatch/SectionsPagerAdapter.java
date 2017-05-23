@@ -4,7 +4,6 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,8 +16,6 @@ import android.widget.TextView;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-
-import watch.stopwatch.Item.DATA_ID;
 
 /**
  * A {@link FragmentPagerAdapter} that returns a fragment corresponding to
@@ -64,6 +61,7 @@ public class SectionsPagerAdapter extends FragmentPagerAdapter {
         return null;
     }
 
+    //TODO: check all the call of these methods for nullPtrExc and add null check here
     public TextView getStopwatchTV() {
         View view = fragment_list.get(0).getView();
         return (TextView) view.findViewById(R.id.time_text);
@@ -166,7 +164,7 @@ public class SectionsPagerAdapter extends FragmentPagerAdapter {
                     ExpandableListView settingsList = (ExpandableListView) rootView.findViewById(R.id.settingExpandableList);
 
                     // create the hash table with groups and subitems
-                    Map<String, List<Item>> settingsDetail = SettingsData.getData(getContext());
+                    Map<String, List<Item>> settingsDetail = SettingsData.getData();
 
                     // Get the groups titles
                     List<String> settingsGroupsTitle = new ArrayList<>(settingsDetail.keySet());
@@ -181,51 +179,7 @@ public class SectionsPagerAdapter extends FragmentPagerAdapter {
                         }
                     });
                     //// TODO: 4/12/2017 add onGroupExpandListener, onGroupCollapseListener, onChildClickListener if needed
-                    settingsList.setOnChildClickListener(new ExpandableListView.OnChildClickListener() {
-                        @Override
-                        public boolean onChildClick(ExpandableListView parent, View v, int groupPosition, int childPosition, long id) {
-                            // Get the id assigned during the creation
-                            DATA_ID tag = (DATA_ID)v.getTag();
-
-                            // Execute different actions basing on the selected preference
-                            switch (tag){
-                                case ID_SOUND:
-                                    Log.d(TAG, "sound popup");
-                                    break;
-                                case ID_RINGTONE:
-                                    Log.d(TAG, "ringtone popup");
-                                    break;
-                                case ID_START:
-                                    Log.d(TAG, "start popup");
-                                    break;
-                                case ID_STOP:
-                                    Log.d(TAG, "stop popup");
-                                    break;
-                                case ID_LAP:
-                                    Log.d(TAG, "lap popup");
-                                    break;
-                                case ID_TOUCHBTN:
-                                    Log.d(TAG, "touch popup");
-                                    break;
-                                case ID_SCREEN:
-                                    Log.d(TAG, "screen popup");
-                                    break;
-                                case ID_NIGHT:
-                                    Log.d(TAG, "night popup");
-                                    break;
-                                case ID_RATE:
-                                    Log.d(TAG, "rate popup");
-                                    break;
-                                case ID_DEV:
-                                    Log.d(TAG, "name popup");
-                                    break;
-                                case ID_VERSION:
-                                    Log.d(TAG, "app popup");
-                                    break;
-                            }
-                            return true;
-                        }
-                    });
+                    settingsList.setOnChildClickListener(new PreferenceClickListener(getContext()));
             }
             return rootView;
         }

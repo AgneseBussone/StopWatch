@@ -1,11 +1,10 @@
 package watch.stopwatch;
 
-import android.content.Context;
-
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+
 import watch.stopwatch.Item.DATA_ID;
 
 /**
@@ -14,7 +13,7 @@ import watch.stopwatch.Item.DATA_ID;
 
 public class SettingsData {
 
-    public static Map<String, List<Item>> getData(Context context) {
+    public static Map<String, List<Item>> getData() {
 
         /* Structure of the map:
          * key (string) = text to display as a group element (the category)

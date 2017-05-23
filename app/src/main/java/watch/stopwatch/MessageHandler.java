@@ -194,6 +194,9 @@ public class MessageHandler extends Handler {
                     timerBtn.setBackgroundTintList(context.getResources().getColorStateList(R.color.timer_btn_statelist));
                     // hide the filling circle
                     circleFillView.setVisibility(View.INVISIBLE);
+
+                    //TODO: read preference KEY_SOUND
+
                     // play animation on the central btn
                     Animation animation = AnimationUtils.loadAnimation(context, R.anim.center_btn_anim_timer_out);
                     timerBtn.startAnimation(animation);

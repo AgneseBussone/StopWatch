@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Dialog boxes strings for preference screen -->
+    <string-array name="sound_pref_items">
+        <item>Sound</item>
+        <item>Vibrate</item>
+        <item>None</item>
+    </string-array>
+</resources>
