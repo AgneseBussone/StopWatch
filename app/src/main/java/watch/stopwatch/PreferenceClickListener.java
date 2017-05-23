@@ -48,7 +48,7 @@ public class PreferenceClickListener implements ExpandableListView.OnChildClickL
                 Log.d(TAG, "lap popup");
                 break;
             case ID_TOUCHBTN:
-                Log.d(TAG, "touch popup");
+                showTouchButtonFeedbackPopup();
                 break;
             case ID_SCREEN:
                 Log.d(TAG, "screen popup");
@@ -69,6 +69,33 @@ public class PreferenceClickListener implements ExpandableListView.OnChildClickL
         return true;
     }
 
+    private void showTouchButtonFeedbackPopup() {
+        // Create the dialog
+        AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(context);
+        dialogBuilder.setTitle("Haptic feedback on central button");
+        CharSequence[] items = context.getResources().getTextArray(R.array.yes_or_no);
+
+        // read current preferences
+        String pref = sp.getString(context.getString(R.string.KEY_TOUCHBTN), context.getString(R.string.no));
+        final int checkedItem = (pref.equals(context.getString(R.string.yes)))? 0 : 1;
+        dialogBuilder.setSingleChoiceItems(items, checkedItem, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                // save preference
+                SharedPreferences.Editor editor = sp.edit();
+                if(which == 0)
+                    editor.putString(context.getString(R.string.KEY_TOUCHBTN), context.getString(R.string.yes));
+                else
+                    editor.putString(context.getString(R.string.KEY_TOUCHBTN), context.getString(R.string.no));
+                editor.apply();
+                dialog.dismiss();
+            }
+        });
+
+        AlertDialog b = dialogBuilder.create();
+        b.show();
+    }
+
     private void showSoundPopup() {
         // Create the dialog
         AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(context);
@@ -77,27 +104,27 @@ public class PreferenceClickListener implements ExpandableListView.OnChildClickL
 
         // read current preferences
         String pref = sp.getString(context.getString(R.string.KEY_SOUND), context.getString(R.string.none));
-        final boolean[] checkedItem = new boolean[3];
-        checkedItem[0] = (pref.equals(context.getString(R.string.sound_only)) || pref.equals(context.getString(R.string.soundAndVibrate)));
-        checkedItem[1] = (pref.equals(context.getString(R.string.vibrate_only)) || pref.equals(context.getString(R.string.soundAndVibrate)));
-        checkedItem[2] = (pref.equals(context.getString(R.string.none)));
+        final boolean[] checkedItems = new boolean[3];
+        checkedItems[0] = (pref.equals(context.getString(R.string.sound_only)) || pref.equals(context.getString(R.string.soundAndVibrate)));
+        checkedItems[1] = (pref.equals(context.getString(R.string.vibrate_only)) || pref.equals(context.getString(R.string.soundAndVibrate)));
+        checkedItems[2] = (pref.equals(context.getString(R.string.none)));
 
-        dialogBuilder.setMultiChoiceItems(items, checkedItem, new DialogInterface.OnMultiChoiceClickListener() {
+        dialogBuilder.setMultiChoiceItems(items, checkedItems, new DialogInterface.OnMultiChoiceClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which, boolean isChecked) {
                 switch(which){
                     case 0:
                     case 1:
                         if(isChecked){
-                            checkedItem[which] = true;
-                            checkedItem[2] = false;
+                            checkedItems[which] = true;
+                            checkedItems[2] = false;
                             ((AlertDialog) dialog).getListView().setItemChecked(2, false);
                         }
                         break;
                     case 2:
                         if(isChecked){
-                            checkedItem[which] = true;
-                            checkedItem[0] = checkedItem[1] = false;
+                            checkedItems[which] = true;
+                            checkedItems[0] = checkedItems[1] = false;
                             ((AlertDialog) dialog).getListView().setItemChecked(0, false);
                             ((AlertDialog) dialog).getListView().setItemChecked(1, false);
                         }
@@ -111,13 +138,13 @@ public class PreferenceClickListener implements ExpandableListView.OnChildClickL
             public void onClick(DialogInterface dialog, int which) {
                 // save preferences
                 SharedPreferences.Editor editor = sp.edit();
-                if(checkedItem[0] && checkedItem [1]){
+                if(checkedItems[0] && checkedItems [1]){
                     editor.putString(context.getString(R.string.KEY_SOUND), context.getString(R.string.soundAndVibrate));
                     editor.apply();
-                }else if(checkedItem[0]){
+                }else if(checkedItems[0]){
                     editor.putString(context.getString(R.string.KEY_SOUND), context.getString(R.string.sound_only));
                     editor.apply();
-                }else if(checkedItem[1]){
+                }else if(checkedItems[1]){
                     editor.putString(context.getString(R.string.KEY_SOUND), context.getString(R.string.vibrate_only));
                     editor.apply();
                 }else{

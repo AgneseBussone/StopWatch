@@ -30,6 +30,7 @@ import java.util.ArrayList;
 import java.util.Timer;
 import java.util.TimerTask;
 
+//TODO: check preferences for big button
 public class MainActivity extends AppCompatActivity {
 
     private enum StopwatchState {RUNNING, STOPPED, PAUSED}
