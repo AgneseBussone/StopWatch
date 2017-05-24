@@ -3,11 +3,18 @@ package watch.stopwatch;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
+import android.database.Cursor;
+import android.media.Ringtone;
+import android.media.RingtoneManager;
+import android.net.Uri;
 import android.preference.PreferenceManager;
 import android.support.v7.app.AlertDialog;
 import android.util.Log;
 import android.view.View;
 import android.widget.ExpandableListView;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Listener to the click on preferences.
@@ -19,6 +26,11 @@ public class PreferenceClickListener implements ExpandableListView.OnChildClickL
     private static final String TAG = PreferenceClickListener.class.getSimpleName();
     private Context context;
     private SharedPreferences sp;
+
+    // Variable used to retrieve values from some of the alert dialogs
+    // (if declared local, it's must be final, but I need to change the value
+    private int alarm_sound_index;
+    private Ringtone alarm_sound;
 
     public PreferenceClickListener(Context context){
         this.context = context;
@@ -36,7 +48,7 @@ public class PreferenceClickListener implements ExpandableListView.OnChildClickL
                 showSoundPopup();
                 break;
             case ID_RINGTONE:
-                Log.d(TAG, "ringtone popup");
+                showRingtonePopup();
                 break;
             case ID_START:
                 Log.d(TAG, "start popup");
@@ -60,13 +72,112 @@ public class PreferenceClickListener implements ExpandableListView.OnChildClickL
                 Log.d(TAG, "rate popup");
                 break;
             case ID_DEV:
-                Log.d(TAG, "name popup");
+                showDevPopup();
                 break;
             case ID_VERSION:
-                Log.d(TAG, "app popup");
+                showVersionPopup();
                 break;
         }
         return true;
+    }
+
+    private void showRingtonePopup() {
+        // Create the dialog
+        AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(context);
+        dialogBuilder.setTitle("Select an alarm sound");
+        final Map<String, String> sound_list = getNotifications();
+        final CharSequence[] titles = sound_list.keySet().toArray(new CharSequence[sound_list.size()]);
+
+        // read current preferences
+        String pref = sp.getString(context.getString(R.string.KEY_RINGTONE_TITLE), "");
+        alarm_sound_index = 0;
+        if(!pref.isEmpty() && sound_list.containsKey(pref)){
+            for(int i = 0; i < titles.length; i++){
+                if(pref.equals(titles[i].toString())){
+                    alarm_sound_index = i;
+                    break;
+                }
+            }
+        }
+
+        dialogBuilder.setSingleChoiceItems(titles, alarm_sound_index, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                // play the sample
+                if(alarm_sound!= null && alarm_sound.isPlaying())
+                    alarm_sound.stop();
+                alarm_sound = RingtoneManager.getRingtone(context, Uri.parse(sound_list.get(String.valueOf(titles[which]))));
+                alarm_sound.play();
+                alarm_sound_index = which;
+            }
+        });
+
+        dialogBuilder.setPositiveButton("SELECT", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                // stop the sound
+                if(alarm_sound!= null && alarm_sound.isPlaying())
+                    alarm_sound.stop();
+                // save preference
+                SharedPreferences.Editor editor = sp.edit();
+                String title = String.valueOf(titles[alarm_sound_index]);
+                editor.putString(context.getString(R.string.KEY_RINGTONE_TITLE), title);
+                editor.putString(context.getString(R.string.KEY_RINGTONE_URI), sound_list.get(title));
+                editor.apply();
+                dialog.dismiss();
+                Log.d(TAG, "title: " + title + " uri: "+ sound_list.get(title));
+            }
+        });
+        dialogBuilder.setNegativeButton("CANCEL", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                // stop the sound
+                if(alarm_sound!= null && alarm_sound.isPlaying())
+                    alarm_sound.stop();
+            }
+        });
+
+        AlertDialog b = dialogBuilder.create();
+        b.show();
+    }
+
+    // Key: title
+    // Value: uri
+    private Map<String, String> getNotifications() {
+        // Get a list of the available alarm sound
+        RingtoneManager manager = new RingtoneManager(context);
+        manager.setType(RingtoneManager.TYPE_ALARM);
+        Cursor cursor = manager.getCursor();
+
+        Map<String, String> list = new HashMap<>();
+        while (cursor.moveToNext()) {
+            String title = cursor.getString(RingtoneManager.TITLE_COLUMN_INDEX);
+            String uri = cursor.getString(RingtoneManager.URI_COLUMN_INDEX);
+            String id = cursor.getString(RingtoneManager.ID_COLUMN_INDEX);
+
+            list.put(title, uri + "/" + id);
+        }
+        return list;
+    }
+
+    private void showDevPopup() {
+        // Create the dialog
+        AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(context);
+        dialogBuilder.setTitle("Creators");
+        dialogBuilder.setMessage("Designer: Jeeho Cha\nDevelopers: \n\tAgnese Bussone\n\tFabrizio Perria");
+        dialogBuilder.setNeutralButton("Close", null);
+        AlertDialog b = dialogBuilder.create();
+        b.show();
+    }
+
+    private void showVersionPopup() {
+        // Create the dialog
+        AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(context);
+        dialogBuilder.setTitle("App version");
+        dialogBuilder.setMessage(BuildConfig.VERSION_NAME);
+        dialogBuilder.setNeutralButton("Close", null);
+        AlertDialog b = dialogBuilder.create();
+        b.show();
     }
 
     private void showTouchButtonFeedbackPopup() {

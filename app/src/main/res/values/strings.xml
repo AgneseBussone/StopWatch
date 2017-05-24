@@ -28,7 +28,8 @@
 
     <!-- Preferences keys -->
     <string name="KEY_SOUND">key_pref_sound</string>
-    <string name="KEY_RINGTONE">key_pref_ringtone</string>
+    <string name="KEY_RINGTONE_URI">key_pref_uri</string>
+    <string name="KEY_RINGTONE_TITLE">key_pref_title</string>
     <string name="KEY_START">key_pref_start_mode</string>
     <string name="KEY_STOP">key_pref_stop_mode</string>
     <string name="KEY_LAP">key_pref_lap</string>
