@@ -12,6 +12,7 @@ import android.support.v7.app.AlertDialog;
 import android.util.Log;
 import android.view.View;
 import android.widget.ExpandableListView;
+import android.widget.ImageView;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -44,30 +45,42 @@ public class PreferenceClickListener implements ExpandableListView.OnChildClickL
 
         // Execute different actions basing on the selected preference
         switch (tag) {
-            case ID_SOUND:
-                showSoundPopup();
+            case ID_SOUND: {
+                CustomExpandableListAdapter listAdapter = (CustomExpandableListAdapter) parent.getExpandableListAdapter();
+                ImageView shortcut = listAdapter.getImageShortcut(groupPosition);
+                GroupInfo groupInfo = (GroupInfo)listAdapter.getGroup(groupPosition);
+                showSoundPopup(shortcut, groupInfo);
                 break;
+            }
             case ID_RINGTONE:
                 showRingtonePopup();
                 break;
             case ID_START:
-                Log.d(TAG, "start popup");
+                showStartStopPopup("Select start mode", context.getString(R.string.KEY_START));
                 break;
             case ID_STOP:
-                Log.d(TAG, "stop popup");
+                showStartStopPopup("Select stop mode", context.getString(R.string.KEY_STOP));
                 break;
             case ID_LAP:
                 Log.d(TAG, "lap popup");
                 break;
-            case ID_TOUCHBTN:
-                showTouchButtonFeedbackPopup();
+            case ID_TOUCHBTN: {
+                CustomExpandableListAdapter listAdapter = (CustomExpandableListAdapter) parent.getExpandableListAdapter();
+                ImageView shortcut = listAdapter.getImageShortcut(groupPosition);
+                GroupInfo groupInfo = (GroupInfo) listAdapter.getGroup(groupPosition);
+                showTouchButtonFeedbackPopup(shortcut, groupInfo);
                 break;
+            }
             case ID_SCREEN:
-                Log.d(TAG, "screen popup");
+                showYesNoPopup("Keep the screen always ON", context.getString(R.string.KEY_SCREEN), null, null);
                 break;
-            case ID_NIGHT:
-                Log.d(TAG, "night popup");
+            case ID_NIGHT: {
+                CustomExpandableListAdapter listAdapter = (CustomExpandableListAdapter) parent.getExpandableListAdapter();
+                ImageView shortcut = listAdapter.getImageShortcut(groupPosition);
+                GroupInfo groupInfo = (GroupInfo)listAdapter.getGroup(groupPosition);
+                showYesNoPopup("Night theme", context.getString(R.string.KEY_NIGHT), shortcut, groupInfo);
                 break;
+            }
             case ID_RATE:
                 Log.d(TAG, "rate popup");
                 break;
@@ -79,6 +92,69 @@ public class PreferenceClickListener implements ExpandableListView.OnChildClickL
                 break;
         }
         return true;
+    }
+
+    private void showStartStopPopup(CharSequence title, final String pref_key){
+        // Create the dialog
+        AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(context);
+        dialogBuilder.setTitle(title);
+        final CharSequence[] items = context.getResources().getTextArray(R.array.mode_items);
+
+        // read current preferences
+        String pref = sp.getString(pref_key, items[0].toString()); //Default: touch
+        int start_index = 0;
+        if(!pref.isEmpty()){
+            for(int i = 0; i < items.length; i++){
+                if(pref.equals(items[i].toString())){
+                    start_index = i;
+                    break;
+                }
+            }
+        }
+        dialogBuilder.setSingleChoiceItems(items, start_index, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                // save preference
+                SharedPreferences.Editor editor = sp.edit();
+                editor.putString(pref_key, items[which].toString());
+                editor.apply();
+                dialog.dismiss();
+            }
+        });
+        AlertDialog b = dialogBuilder.create();
+        b.show();
+    }
+
+    private void showYesNoPopup(CharSequence title, final String pref_key, final ImageView shortcut, final GroupInfo groupInfo) {
+        // Create the dialog
+        AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(context);
+        dialogBuilder.setTitle(title);
+        final CharSequence[] items = context.getResources().getTextArray(R.array.yes_or_no);
+
+        // read current preferences
+        String pref = sp.getString(pref_key, items[1].toString()); //default: no
+        final int checkedItem = (pref.equals(items[0].toString()))? 0 : 1;
+        dialogBuilder.setSingleChoiceItems(items, checkedItem, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                // save preference
+                SharedPreferences.Editor editor = sp.edit();
+                String value = items[which].toString();
+                editor.putString(pref_key, value);
+                editor.apply();
+                if(shortcut != null && groupInfo != null){
+                    shortcut.setTag(value);
+                    if(which == 0) // Yes
+                        shortcut.setImageResource(groupInfo.imageResourceON);
+                    else
+                        shortcut.setImageResource(groupInfo.imageResourceOFF);
+                }
+                dialog.dismiss();
+            }
+        });
+
+        AlertDialog b = dialogBuilder.create();
+        b.show();
     }
 
     private void showRingtonePopup() {
@@ -171,6 +247,7 @@ public class PreferenceClickListener implements ExpandableListView.OnChildClickL
     }
 
     private void showVersionPopup() {
+        //TODO: check the version online
         // Create the dialog
         AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(context);
         dialogBuilder.setTitle("App version");
@@ -180,37 +257,91 @@ public class PreferenceClickListener implements ExpandableListView.OnChildClickL
         b.show();
     }
 
-    private void showTouchButtonFeedbackPopup() {
+    private void showTouchButtonFeedbackPopup(final ImageView shortcut, final GroupInfo groupInfo) {
         // Create the dialog
         AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(context);
-        dialogBuilder.setTitle("Haptic feedback on central button");
-        CharSequence[] items = context.getResources().getTextArray(R.array.yes_or_no);
+        dialogBuilder.setTitle("Central button feedback");
+        CharSequence[] items = context.getResources().getTextArray(R.array.sound_pref_items);
 
         // read current preferences
-        String pref = sp.getString(context.getString(R.string.KEY_TOUCHBTN), context.getString(R.string.no));
-        final int checkedItem = (pref.equals(context.getString(R.string.yes)))? 0 : 1;
-        dialogBuilder.setSingleChoiceItems(items, checkedItem, new DialogInterface.OnClickListener() {
+        String pref = sp.getString(context.getString(R.string.KEY_TOUCHBTN), context.getString(R.string.vibrate_only));
+        final boolean[] checkedItems = new boolean[3];
+        checkedItems[0] = (pref.equals(context.getString(R.string.sound_only)) || pref.equals(context.getString(R.string.soundAndVibrate)));
+        checkedItems[1] = (pref.equals(context.getString(R.string.vibrate_only)) || pref.equals(context.getString(R.string.soundAndVibrate)));
+        checkedItems[2] = (pref.equals(context.getString(R.string.none)));
+
+        dialogBuilder.setMultiChoiceItems(items, checkedItems, new DialogInterface.OnMultiChoiceClickListener() {
             @Override
-            public void onClick(DialogInterface dialog, int which) {
-                // save preference
-                SharedPreferences.Editor editor = sp.edit();
-                if(which == 0)
-                    editor.putString(context.getString(R.string.KEY_TOUCHBTN), context.getString(R.string.yes));
-                else
-                    editor.putString(context.getString(R.string.KEY_TOUCHBTN), context.getString(R.string.no));
-                editor.apply();
-                dialog.dismiss();
+            public void onClick(DialogInterface dialog, int which, boolean isChecked) {
+                switch(which){
+                    case 0:
+                    case 1:
+                        if(isChecked){
+                            checkedItems[which] = true;
+                            checkedItems[2] = false;
+                            ((AlertDialog) dialog).getListView().setItemChecked(2, false);
+                        }
+                        break;
+                    case 2:
+                        if(isChecked){
+                            checkedItems[which] = true;
+                            checkedItems[0] = checkedItems[1] = false;
+                            ((AlertDialog) dialog).getListView().setItemChecked(0, false);
+                            ((AlertDialog) dialog).getListView().setItemChecked(1, false);
+                        }
+                        break;
+                }
+
             }
         });
-
+        dialogBuilder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                // save preferences
+                SharedPreferences.Editor editor = sp.edit();
+                if(checkedItems[0] && checkedItems [1]){
+                    String value = context.getString(R.string.soundAndVibrate);
+                    editor.putString(context.getString(R.string.KEY_TOUCHBTN), value);
+                    editor.apply();
+                    if(shortcut != null && groupInfo != null){
+                        shortcut.setTag(value);
+                        shortcut.setImageResource(groupInfo.imageResourceON);
+                    }
+                }else if(checkedItems[0]){
+                    String value = context.getString(R.string.sound_only);
+                    editor.putString(context.getString(R.string.KEY_TOUCHBTN), value);
+                    editor.apply();
+                    if(shortcut != null && groupInfo != null){
+                        shortcut.setTag(value);
+                        shortcut.setImageResource(groupInfo.imageResourceOFF);
+                    }
+                }else if(checkedItems[1]){
+                    String value = context.getString(R.string.vibrate_only);
+                    editor.putString(context.getString(R.string.KEY_TOUCHBTN), value);
+                    editor.apply();
+                    if(shortcut != null && groupInfo != null){
+                        shortcut.setTag(value);
+                        shortcut.setImageResource(groupInfo.imageResourceON);
+                    }
+                }else{
+                    String value = context.getString(R.string.none);
+                    editor.putString(context.getString(R.string.KEY_TOUCHBTN), value);
+                    editor.apply();
+                    if(shortcut != null && groupInfo != null){
+                        shortcut.setTag(value);
+                        shortcut.setImageResource(groupInfo.imageResourceOFF);
+                    }
+                }
+            }
+        });
         AlertDialog b = dialogBuilder.create();
         b.show();
     }
 
-    private void showSoundPopup() {
+    private void showSoundPopup(final ImageView shortcut, final GroupInfo groupInfo) {
         // Create the dialog
         AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(context);
-        dialogBuilder.setTitle("Timer expired action");
+        dialogBuilder.setTitle("Timer expired feedback");
         CharSequence[] items = context.getResources().getTextArray(R.array.sound_pref_items);
 
         // read current preferences
@@ -250,17 +381,37 @@ public class PreferenceClickListener implements ExpandableListView.OnChildClickL
                 // save preferences
                 SharedPreferences.Editor editor = sp.edit();
                 if(checkedItems[0] && checkedItems [1]){
-                    editor.putString(context.getString(R.string.KEY_SOUND), context.getString(R.string.soundAndVibrate));
+                    String value = context.getString(R.string.soundAndVibrate);
+                    editor.putString(context.getString(R.string.KEY_SOUND), value);
                     editor.apply();
+                    if(shortcut != null && groupInfo != null){
+                        shortcut.setTag(value);
+                        shortcut.setImageResource(groupInfo.imageResourceON);
+                    }
                 }else if(checkedItems[0]){
-                    editor.putString(context.getString(R.string.KEY_SOUND), context.getString(R.string.sound_only));
+                    String value = context.getString(R.string.sound_only);
+                    editor.putString(context.getString(R.string.KEY_SOUND), value);
                     editor.apply();
+                    if(shortcut != null && groupInfo != null){
+                        shortcut.setTag(value);
+                        shortcut.setImageResource(groupInfo.imageResourceON);
+                    }
                 }else if(checkedItems[1]){
-                    editor.putString(context.getString(R.string.KEY_SOUND), context.getString(R.string.vibrate_only));
+                    String value = context.getString(R.string.vibrate_only);
+                    editor.putString(context.getString(R.string.KEY_SOUND), value);
                     editor.apply();
+                    if(shortcut != null && groupInfo != null){
+                        shortcut.setTag(value);
+                        shortcut.setImageResource(groupInfo.imageResourceOFF);
+                    }
                 }else{
-                    editor.putString(context.getString(R.string.KEY_SOUND), context.getString(R.string.none));
+                    String value = context.getString(R.string.none);
+                    editor.putString(context.getString(R.string.KEY_SOUND), value);
                     editor.apply();
+                    if(shortcut != null && groupInfo != null){
+                        shortcut.setTag(value);
+                        shortcut.setImageResource(groupInfo.imageResourceOFF);
+                    }
                 }
             }
         });

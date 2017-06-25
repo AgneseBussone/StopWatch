@@ -9,9 +9,7 @@
         android:id="@+id/group_icon"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:src="@drawable/ic_setting_on_placeholder"
-        android:tag="on"/>
+        android:layout_gravity="center"/>
 
     <TextView
         android:id="@+id/group_title"

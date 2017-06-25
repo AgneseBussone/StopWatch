@@ -10,4 +10,12 @@
         <item>Yes</item>
         <item>No</item>
     </string-array>
+    <string-array name="mode_items">
+        <item>Touch</item>
+        <item>Volume up</item>
+        <item>Volume down</item>
+        <item>Clap sound</item>
+        <item>Swing motion</item>
+        <item>Proximity sensor</item>
+    </string-array>
 </resources>
