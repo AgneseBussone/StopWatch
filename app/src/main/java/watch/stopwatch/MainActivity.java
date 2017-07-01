@@ -1,9 +1,12 @@
 package watch.stopwatch;
 
 import android.animation.Animator;
+import android.animation.Animator.AnimatorListener;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
+import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
+import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.os.Message;
 import android.os.Vibrator;
@@ -14,6 +17,8 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.View.OnClickListener;
+import android.view.View.OnLongClickListener;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
 import android.view.animation.Animation;
@@ -30,11 +35,11 @@ import java.util.ArrayList;
 import java.util.Timer;
 import java.util.TimerTask;
 
-//TODO: check preferences for big button, screen, night mode, start and stop
 public class MainActivity extends AppCompatActivity {
 
     private enum StopwatchState {RUNNING, STOPPED, PAUSED}
     private enum TimerState {RUNNING, STOPPED, PAUSED, SET}
+    private enum CenterBtnFeedback {SOUND, VIBRATE, BOTH, NONE}
 
     private static final String TAG = MainActivity.class.getSimpleName();
 
@@ -72,9 +77,22 @@ public class MainActivity extends AppCompatActivity {
     private ArrayList<Time> preset_timers;
     private TimerListAdapter presetTimerAdapter;
 
+    // Preference variables
+    private CenterBtnFeedback centerBtnFeedback = CenterBtnFeedback.VIBRATE;
+
+    // Listener for certain preference
+    private OnSharedPreferenceChangeListener preferenceChangeListener = new OnSharedPreferenceChangeListener() {
+        @Override
+        public void onSharedPreferenceChanged(SharedPreferences sp, String key) {
+            Context context = getApplicationContext();
+            if(key.equals(context.getString(R.string.KEY_TOUCHBTN))){
+                setCenterBtnFeedback(sp, context);
+            }
+        }
+    };
 
     // Listener for buttons in secondary views
-    private View.OnClickListener secondaryViewBtnListener = new View.OnClickListener() {
+    private OnClickListener secondaryViewBtnListener = new OnClickListener() {
         @Override
         public void onClick(View v) {
             int id = v.getId();
@@ -104,7 +122,7 @@ public class MainActivity extends AppCompatActivity {
     };
 
     // Listener for the end of closing secondary view animation
-    private Animator.AnimatorListener secondaryViewAnimatorListener = new Animator.AnimatorListener() {
+    private AnimatorListener secondaryViewAnimatorListener = new AnimatorListener() {
         @Override
         public void onAnimationStart(Animator animation) {}
 
@@ -130,7 +148,7 @@ public class MainActivity extends AppCompatActivity {
 
 
     // Listener for a click on a preset timer list item
-    private View.OnClickListener timerPresetActionClickListener = new View.OnClickListener() {
+    private OnClickListener timerPresetActionClickListener = new OnClickListener() {
         @Override
         public void onClick(View v) {
             // Get the parent view and the text with the timer
@@ -218,7 +236,7 @@ public class MainActivity extends AppCompatActivity {
     };
 
     // Listener for long click on addTime btn in timer view
-    private View.OnLongClickListener longClickListener = new View.OnLongClickListener() {
+    private OnLongClickListener longClickListener = new OnLongClickListener() {
         @Override
         public boolean onLongClick(final View v) {
             final Timer timer = new Timer();
@@ -248,6 +266,9 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        readPreferences();
+
         setContentView(R.layout.activity_main);
 
         // Create the adapter that will return a fragment for each of the three
@@ -373,12 +394,43 @@ public class MainActivity extends AppCompatActivity {
         messageHandler = new MessageHandler(getMainLooper(), getApplicationContext());
     }
 
+    private void setCenterBtnFeedback(SharedPreferences sp, Context context){
+        String pref = sp.getString(context.getString(R.string.KEY_TOUCHBTN), context.getString(R.string.vibrate_only));
+        if(pref.equals(context.getString(R.string.vibrate_only)))
+            centerBtnFeedback = CenterBtnFeedback.VIBRATE;
+        else if(pref.equals(context.getString(R.string.sound_only)))
+            centerBtnFeedback = CenterBtnFeedback.SOUND;
+        else if(pref.equals(context.getString(R.string.soundAndVibrate)))
+            centerBtnFeedback = CenterBtnFeedback.BOTH;
+        else //none
+            centerBtnFeedback = CenterBtnFeedback.NONE;
+    }
+
+    private void readPreferences() {
+        //TODO: read preferences
+        Context context = getApplicationContext();
+        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(context);
+
+        // touch button feedback
+        setCenterBtnFeedback(sp, context);
+
+        // night mode
+        // start / stop / lap
+        // screen always on
+
+        // register listener
+        sp.registerOnSharedPreferenceChangeListener(preferenceChangeListener);
+    }
+
     @Override
     protected void onStop() {
         super.onStop();
         messageHandler.sendEmptyMessage(MessageHandler.MSG_STOPWATCH_SAVE_LAP);
         // save preset timer list
         savePresetTimers();
+        // unregister preference change listener
+        PreferenceManager.getDefaultSharedPreferences(getApplicationContext())
+                .unregisterOnSharedPreferenceChangeListener(preferenceChangeListener);
     }
 
     /**
@@ -504,7 +556,7 @@ public class MainActivity extends AppCompatActivity {
 
                     // set addPresetTimer button listener
                     Button addPreset = (Button)timerPresetView.findViewById(R.id.timerListAddBtn);
-                    addPreset.setOnClickListener(new View.OnClickListener() {
+                    addPreset.setOnClickListener(new OnClickListener() {
                         @Override
                         public void onClick(View v) {
                             btn1Click(v);
@@ -578,11 +630,28 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    // Provide the correct feedback (sound, vibrate, both or none)
+    private void btnCenterFeedback(){
+        switch (centerBtnFeedback){
+            case VIBRATE:
+                vibe.vibrate(50);
+                break;
+            case SOUND:
+                MediaPlayer.create(getApplicationContext(), R.raw.tiny_btn_push).start();
+                break;
+            case BOTH:
+                vibe.vibrate(50);
+                MediaPlayer.create(getApplicationContext(), R.raw.tiny_btn_push).start();
+                break;
+            case NONE: break;
+        }
+    }
+
     private void manage_stopwatch(View centralBtn){
         // button animation
         Animation animation = AnimationUtils.loadAnimation(this, R.anim.center_btn_anim);
         centralBtn.startAnimation(animation);
-        vibe.vibrate(50);
+        btnCenterFeedback();
 
         switch(stopwatch_state){
             case STOPPED:
@@ -630,7 +699,7 @@ public class MainActivity extends AppCompatActivity {
                 setEnableBtnReset(false);
                 setEnableAddTime(false);
                 timer_state = TimerState.RUNNING;
-                vibe.vibrate(50);
+                btnCenterFeedback();
                 break;
             case RUNNING:
                 // check if the timer is expired
@@ -658,7 +727,7 @@ public class MainActivity extends AppCompatActivity {
                 mSectionsPagerAdapter.getTimerButtonText().setText(R.string.central_btn_start);
                 setEnableBtnReset(true);
                 setEnableAddTime(true);
-                vibe.vibrate(50);
+                btnCenterFeedback();
                 break;
         }
     }

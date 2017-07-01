@@ -70,6 +70,7 @@
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
                     android:background="@drawable/center"
+                    android:soundEffectsEnabled="false"
                     android:onClick="btnCenter"/>
 
                 <FrameLayout

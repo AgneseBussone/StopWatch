@@ -27,7 +27,7 @@ public class SettingsData {
         sound_alarm.add(new Item("Ringtone", DATA_ID.ID_RINGTONE));
 
         List<Item> haptics_input = new ArrayList<>(4);
-        haptics_input.add(new Item("Touch Button Feedback", DATA_ID.ID_TOUCHBTN));
+        haptics_input.add(new Item("Central Button Feedback", DATA_ID.ID_TOUCHBTN));
         haptics_input.add(new Item("Start Mode", DATA_ID.ID_START));
         haptics_input.add(new Item("Stop Mode", DATA_ID.ID_STOP));
         haptics_input.add(new Item("Lap Mode", DATA_ID.ID_LAP));
