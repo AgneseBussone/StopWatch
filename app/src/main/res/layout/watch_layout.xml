@@ -2,9 +2,7 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
                 xmlns:custom="http://schemas.android.com/apk/res-auto"
                 android:orientation="vertical" android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:background="@color/background_color"
-    >
+                android:layout_height="match_parent">
 
 
     <FrameLayout
@@ -25,7 +23,8 @@
                 android:layout_alignParentStart="true"
                 android:layout_alignParentTop="true"
                 android:layout_gravity="center"
-                android:background="@drawable/numbers"/>
+                android:background="@drawable/numbers"
+                android:id="@+id/watch_numbers"/>
 
             <FrameLayout
                 android:layout_width="wrap_content"
@@ -45,7 +44,7 @@
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_horizontal"
                     android:layout_marginTop="5dp"
-                    android:background="@drawable/ic_triangle"/>
+                    android:background="@drawable/ic_triangle" />
             </FrameLayout>
 
             <ImageView

@@ -108,6 +108,16 @@ public class SectionsPagerAdapter extends FragmentPagerAdapter {
         return (CircleFillView)view.findViewById(R.id.circleFillView);
     }
 
+    public ImageView getStopwatchNumbers(){
+        View view = fragment_list.get(0).getView();
+        return (ImageView) view.findViewById(R.id.watch_numbers);
+    }
+
+    public ImageView getTimerNumbers(){
+        View view = fragment_list.get(1).getView();
+        return (ImageView) view.findViewById(R.id.watch_numbers);
+    }
+
     /**
      * Fragment inner class
      */

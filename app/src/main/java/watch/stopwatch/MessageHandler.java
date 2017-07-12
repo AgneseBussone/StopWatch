@@ -1,9 +1,14 @@
 package watch.stopwatch;
 
 import android.content.Context;
+import android.content.SharedPreferences;
+import android.media.Ringtone;
+import android.media.RingtoneManager;
+import android.net.Uri;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
+import android.preference.PreferenceManager;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
@@ -19,6 +24,7 @@ import java.util.ArrayList;
 
 public class MessageHandler extends Handler {
     private static final String TAG = MessageHandler.class.getSimpleName();
+    private enum TimerExpiredFeedback {SOUND, VIBRATE, BOTH, NONE}
 
     // Messages available
     public static final int MSG_STOPWATCH_START      = 0;
@@ -27,7 +33,7 @@ public class MessageHandler extends Handler {
     public static final int MSG_STOPWATCH_PAUSE      = 3;
     public static final int MSG_STOPWATCH_RESUME     = 4;
     public static final int MSG_STOPWATCH_LAP        = 5;
-    public static final int MSG_STOPWATCH_SAVE_LAP   = 6;
+    public static final int MSG_STOPWATCH_SAVE_LAP   = 6; //TODO: create a method for closure ops? (save laps, unregister listeners....)
     public static final int MSG_STOPWATCH_SHOW_LAP   = 7;
     public static final int MSG_STOPWATCH_LAP_FORMAT = 8;
     public static final int MSG_TIMER_START          = 9;
@@ -35,6 +41,7 @@ public class MessageHandler extends Handler {
     public static final int MSG_TIMER_STOP           = 11;
     public static final int MSG_TIMER_PAUSE          = 12;
     public static final int MSG_TIMER_RESET          = 13;
+    public static final int MSG_TIMER_CLEAR          = 14;
 
     private Chronometer stopwatch_chronometer = new Chronometer();
     private final long REFRESH_RATE = 100;
@@ -58,10 +65,57 @@ public class MessageHandler extends Handler {
     private Countdown timer = null;
     private CircleFillView circleFillView = null;
     private long total_ms = 0;
+    private TimerExpiredFeedback timerExpiredFeedback = TimerExpiredFeedback.NONE;
+    private Ringtone alarm_sound;
+
+
+    // Listener for certain preference
+    private SharedPreferences.OnSharedPreferenceChangeListener preferenceChangeListener = new SharedPreferences.OnSharedPreferenceChangeListener() {
+        @Override
+        public void onSharedPreferenceChanged(SharedPreferences sp, String key) {
+            if(key.equals(context.getString(R.string.KEY_SOUND))){
+                setTimerExpiredFeedback(sp, key);
+            }else if(key.equals(context.getString(R.string.KEY_RINGTONE_URI))){
+                String ringtone = sp.getString(key, context.getString(R.string.none));
+                alarm_sound = RingtoneManager.getRingtone(context, Uri.parse(ringtone));
+
+            }
+        }
+    };
 
     public MessageHandler(Looper looper, Context context){
         super(looper);
         this.context = context;
+
+        readPreferences();
+    }
+
+    private void readPreferences() {
+        //TODO: read preference
+        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(context);
+
+        // sound timer expired
+        setTimerExpiredFeedback(sp, context.getString(R.string.KEY_SOUND));
+
+        // ringtone
+        String ringtone = sp.getString(context.getString(R.string.KEY_RINGTONE_URI), context.getString(R.string.none));
+        alarm_sound = RingtoneManager.getRingtone(context, Uri.parse(ringtone));
+
+        // register listener
+        sp.registerOnSharedPreferenceChangeListener(preferenceChangeListener);
+        //TODO: unregister listener (method?)
+    }
+
+    private void setTimerExpiredFeedback(SharedPreferences sp, String key) {
+        String pref = sp.getString(key, context.getString(R.string.none));
+        if(pref.equals(context.getString(R.string.vibrate_only)))
+            timerExpiredFeedback = TimerExpiredFeedback.VIBRATE;
+        else if(pref.equals(context.getString(R.string.sound_only)))
+            timerExpiredFeedback = TimerExpiredFeedback.SOUND;
+        else if(pref.equals(context.getString(R.string.soundAndVibrate)))
+            timerExpiredFeedback = TimerExpiredFeedback.BOTH;
+        else //none
+            timerExpiredFeedback = TimerExpiredFeedback.NONE;
     }
 
     void initStopwatch(TextView time_tv, ImageView img, TextView btn_tv){
@@ -195,11 +249,22 @@ public class MessageHandler extends Handler {
                     // hide the filling circle
                     circleFillView.setVisibility(View.INVISIBLE);
 
-                    //TODO: read preference KEY_SOUND
-
                     // play animation on the central btn
                     Animation animation = AnimationUtils.loadAnimation(context, R.anim.center_btn_anim_timer_out);
                     timerBtn.startAnimation(animation);
+
+                    // TODO: provide feedback
+                    switch (timerExpiredFeedback){
+                        case SOUND:
+                            if(alarm_sound != null)
+                                alarm_sound.play();
+                            break;
+                        case VIBRATE:
+                            break;
+                        case BOTH:
+                            break;
+                        case NONE: break;
+                    }
                 }
                 // fallthrough
             case MSG_TIMER_UPDATE:
@@ -226,6 +291,11 @@ public class MessageHandler extends Handler {
                     circleFillView.setValue(CircleFillView.MIN_VALUE);
                     circleFillView.setVisibility(View.INVISIBLE);
                 }
+                break;
+
+            case MSG_TIMER_CLEAR:
+                if(alarm_sound!= null && alarm_sound.isPlaying())
+                    alarm_sound.stop();
                 break;
 
             default:

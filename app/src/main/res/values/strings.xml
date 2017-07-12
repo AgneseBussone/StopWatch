@@ -43,5 +43,7 @@
     <string name="vibrate_only">vibrate_only</string>
     <string name="soundAndVibrate">soundAndVibrate</string>
     <string name="none">none</string>
+    <string name="yes">Yes</string>
+    <string name="no">No</string>
 
 </resources>

@@ -170,7 +170,7 @@ public class CustomExpandableListAdapter extends BaseExpandableListAdapter {
         return convertView;
     }
 
-    // read the preference an set image and tag accordingly
+    // read the preference an set image and tag ( = preference value)
     private void setShortcut(ImageView imageView, GroupInfo groupInfo) {
         SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(context);
         String pref;

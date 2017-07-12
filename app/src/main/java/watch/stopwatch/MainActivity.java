@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
+import android.graphics.PorterDuff;
 import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.os.Message;
@@ -76,6 +77,8 @@ public class MainActivity extends AppCompatActivity {
     private ImageView separator;
     private ArrayList<Time> preset_timers;
     private TimerListAdapter presetTimerAdapter;
+    private int background_color;
+    private RelativeLayout main_content;
 
     // Preference variables
     private CenterBtnFeedback centerBtnFeedback = CenterBtnFeedback.VIBRATE;
@@ -86,7 +89,10 @@ public class MainActivity extends AppCompatActivity {
         public void onSharedPreferenceChanged(SharedPreferences sp, String key) {
             Context context = getApplicationContext();
             if(key.equals(context.getString(R.string.KEY_TOUCHBTN))){
-                setCenterBtnFeedback(sp, context);
+                setCenterBtnFeedback(sp, context, key);
+            }else if(key.equals(context.getString(R.string.KEY_NIGHT))){
+                setTheme(sp, context, key);
+                setThemeOnWatch(sp, context, key);
             }
         }
     };
@@ -264,10 +270,14 @@ public class MainActivity extends AppCompatActivity {
     };
 
     @Override
+    protected void onResume(){
+        super.onResume();
+        readPreferences();
+    }
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        readPreferences();
 
         setContentView(R.layout.activity_main);
 
@@ -299,6 +309,10 @@ public class MainActivity extends AppCompatActivity {
                 addTime.setOnLongClickListener(longClickListener);
                 addTime = mSectionsPagerAdapter.getAddMinBtn();
                 addTime.setOnLongClickListener(longClickListener);
+                // set theme on objects inside the watch_layout
+                Context context = getApplicationContext();
+                SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(context);
+                setThemeOnWatch(sp, context, context.getString(R.string.KEY_NIGHT));
             }
         });
 
@@ -307,7 +321,7 @@ public class MainActivity extends AppCompatActivity {
         // Other elements
         secondary_view = (RelativeLayout)findViewById(R.id.secondary_view);
         separator = (ImageView)findViewById(R.id.buttonsLine);
-        final RelativeLayout main_content = (RelativeLayout)findViewById(R.id.main_content);
+        main_content = (RelativeLayout)findViewById(R.id.main_content);
 
         // Read the preset timers and set the adapter
         preset_timers = new ArrayList<>();
@@ -351,7 +365,7 @@ public class MainActivity extends AppCompatActivity {
                             // enable reset btn
                             setEnableBtnReset(true);
                         }
-                        main_content.setBackgroundColor(getResources().getColor(R.color.background_color));
+                        main_content.setBackgroundColor(background_color);
                         break;
                     case 1:
                         // timer
@@ -368,12 +382,15 @@ public class MainActivity extends AppCompatActivity {
                             // enable reset btn
                             setEnableBtnReset(true);
                         }
-                        main_content.setBackgroundColor(getResources().getColor(R.color.background_color));
+                        main_content.setBackgroundColor(background_color);
                         break;
                     case 2:
                         // settings
                         page_selector.check(R.id.page3);
-                        main_content.setBackgroundColor(getResources().getColor(R.color.colorPrimaryLight));
+                        if(background_color == getResources().getColor(R.color.background_color_night))
+                            main_content.setBackgroundColor(background_color);
+                        else
+                            main_content.setBackgroundColor(getResources().getColor(R.color.colorPrimaryLight));
                         btn1.setVisibility(View.GONE);
                         btn3.setVisibility(View.GONE);
                         btn2.setText("Designed by ???");
@@ -394,8 +411,8 @@ public class MainActivity extends AppCompatActivity {
         messageHandler = new MessageHandler(getMainLooper(), getApplicationContext());
     }
 
-    private void setCenterBtnFeedback(SharedPreferences sp, Context context){
-        String pref = sp.getString(context.getString(R.string.KEY_TOUCHBTN), context.getString(R.string.vibrate_only));
+    private void setCenterBtnFeedback(SharedPreferences sp, Context context, String key){
+        String pref = sp.getString(key, context.getString(R.string.vibrate_only));
         if(pref.equals(context.getString(R.string.vibrate_only)))
             centerBtnFeedback = CenterBtnFeedback.VIBRATE;
         else if(pref.equals(context.getString(R.string.sound_only)))
@@ -406,15 +423,50 @@ public class MainActivity extends AppCompatActivity {
             centerBtnFeedback = CenterBtnFeedback.NONE;
     }
 
+    private void setThemeOnWatch(SharedPreferences sp, Context context, String key){
+        String pref = sp.getString(key, context.getString(R.string.no));
+        ImageView stopwatchNumbers = mSectionsPagerAdapter.getStopwatchNumbers();
+        ImageView timerNumbers = mSectionsPagerAdapter.getTimerNumbers();
+        if(pref.equals(context.getString(R.string.yes))){
+            // set white tint on numbers
+            stopwatchNumbers.setColorFilter(context.getResources().getColor(R.color.white), PorterDuff.Mode.DST);
+            timerNumbers.setColorFilter(context.getResources().getColor(R.color.white), PorterDuff.Mode.DST);
+        }
+        else{
+            // remove tint from numbers
+            stopwatchNumbers.setColorFilter(null);
+            timerNumbers.setColorFilter(null);
+        }
+    }
+
+    private void setTheme(SharedPreferences sp, Context context, String key){
+        String pref = sp.getString(key, context.getString(R.string.no));
+
+        if(pref.equals(context.getString(R.string.yes))){
+            background_color = getResources().getColor(R.color.background_color_night);
+            main_content.setBackgroundColor(background_color);
+        }
+        else { // no
+            background_color = getResources().getColor(R.color.background_color);
+            // special treatment for settings page
+            if(page_selector.getCheckedRadioButtonId() == R.id.page3)
+                main_content.setBackgroundColor(getResources().getColor(R.color.colorPrimaryLight));
+            else
+                main_content.setBackgroundColor(background_color);
+        }
+    }
+
     private void readPreferences() {
         //TODO: read preferences
         Context context = getApplicationContext();
         SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(context);
 
         // touch button feedback
-        setCenterBtnFeedback(sp, context);
+        setCenterBtnFeedback(sp, context, context.getString(R.string.KEY_TOUCHBTN));
 
         // night mode
+        setTheme(sp, context, context.getString(R.string.KEY_NIGHT));
+
         // start / stop / lap
         // screen always on
 
@@ -540,6 +592,7 @@ public class MainActivity extends AppCompatActivity {
                     viewBtn.setOnClickListener(secondaryViewBtnListener);
                     viewBtn = (Button)lapRecordView.findViewById(R.id.lapTotalTimeBtn);
                     viewBtn.setOnClickListener(secondaryViewBtnListener);
+
                 }
                 else{
                     destroySecondaryView(btn, R.string.btn2_page1_text, lapRecordView);
@@ -721,6 +774,8 @@ public class MainActivity extends AppCompatActivity {
                     centralBtn.clearAnimation();
                     // reset color
                     centralBtn.setBackgroundTintList(null);
+                    // stop sound and vibration, if any
+                    messageHandler.sendEmptyMessage(MessageHandler.MSG_TIMER_CLEAR);
                     timer_timeout.h = timer_timeout.m = timer_timeout.s = 0;
                     timer_state = TimerState.STOPPED;
                 }
@@ -760,6 +815,12 @@ public class MainActivity extends AppCompatActivity {
 
         // disable the pager
         mViewPager.setSwipeable(false);
+
+        // set background color
+        if(background_color == getResources().getColor(R.color.background_color_night))
+            main_list_layout.setBackgroundColor(getResources().getColor(R.color.background_color_night_blurr));
+        else
+            main_list_layout.setBackgroundColor(getResources().getColor(R.color.background_color_blurr));
 
         return list_view;
     }

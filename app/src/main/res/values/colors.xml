@@ -7,6 +7,8 @@
     <color name="white">#ffffff</color>
     <color name="background_color">#e3e3e3</color>
     <color name="background_color_blurr">#dae3e3e3</color>
+    <color name="background_color_night">#3a4551</color>
+    <color name="background_color_night_blurr">#da3a4551</color>
     <color name="light_blue">#bad2de</color>
     <color name="transparent">#00ffffff</color>
     <color name="black">#000000</color>
