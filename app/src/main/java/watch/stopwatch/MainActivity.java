@@ -7,6 +7,10 @@ import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.media.MediaPlayer;
+import android.hardware.Sensor;
+import android.hardware.SensorEvent;
+import android.hardware.SensorEventListener;
+import android.hardware.SensorManager;
 import android.os.Bundle;
 import android.os.Message;
 import android.os.Vibrator;
@@ -81,7 +85,12 @@ public class MainActivity extends AppCompatActivity {
     private Mode start_mode = Mode.BTN;
     private Mode stop_mode = Mode.BTN;
     private Mode lap_mode = Mode.BTN;
+    private SensorManager sensorManager;
 
+    /***********************************************************************************************
+     *
+     * LISTENERS
+     */
     // Preference variables
     private CenterBtnFeedback centerBtnFeedback = CenterBtnFeedback.VIBRATE;
 
@@ -268,6 +277,51 @@ public class MainActivity extends AppCompatActivity {
         }
     };
 
+    // Listener for accelerometer and proximity sensors
+    private SensorEventListener sensorEventListener = new SensorEventListener() {
+        private final int PROXIMITY_THRESHOLD = 4;
+        private final int MAGNITUDE_THRESHOLD = 35; // sensitivity to the movement
+        private final int ACC_FILTER_DATA_MIN_TIME = 50; // ms
+        long lastSaved = System.currentTimeMillis();
+
+        @Override
+        public void onSensorChanged(SensorEvent event) {
+            if(event.sensor.getType() == Sensor.TYPE_ACCELEROMETER) {
+                // filter some samples in order to avoid multiple matches at the same movement
+                if ((System.currentTimeMillis() - lastSaved) > ACC_FILTER_DATA_MIN_TIME) {
+                    lastSaved = System.currentTimeMillis();
+
+                    // Get the values from the sensor
+                    float[] acceleration = new float[3];
+                    System.arraycopy(event.values, 0, acceleration, 0, event.values.length);
+
+                    double magnitude = Math.sqrt((acceleration[0] * acceleration[0]) +
+                            (acceleration[1] * acceleration[1]) +
+                            (acceleration[2] * acceleration[2]));
+
+//                    Log.d(TAG, String.valueOf(magnitude));
+
+                    if (magnitude > MAGNITUDE_THRESHOLD) {
+//                        Log.d(TAG, "------CLICK------");
+                        ImageView btn = (ImageView)findViewById(R.id.bigBtn);
+                        if(btn != null)
+                            btn.performClick();
+                    }
+                }
+            }
+            else if (event.sensor.getType() == Sensor.TYPE_PROXIMITY) {
+                if(event.values[0] <= PROXIMITY_THRESHOLD){
+                    ImageView btn = (ImageView)findViewById(R.id.bigBtn);
+                    if(btn != null)
+                        btn.performClick();
+                }
+            }
+        }
+
+        @Override
+        public void onAccuracyChanged(Sensor sensor, int accuracy) {}
+    };
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -381,6 +435,7 @@ public class MainActivity extends AppCompatActivity {
                         // set the background color only for day theme
                         if(!nightModeOn)
                             main_content.setBackgroundColor(getResources().getColor(R.color.background_color));                        break;
+                        break;
                     case 2:
                         // settings
                         page_selector.check(R.id.page3);
@@ -400,10 +455,29 @@ public class MainActivity extends AppCompatActivity {
 
         mViewPager.addOnPageChangeListener(pageListener);
 
-        vibe = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE) ;
+        vibe = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
+        sensorManager = (SensorManager)getSystemService(Context.SENSOR_SERVICE);
 
         // message handler setup
         messageHandler = new MessageHandler(getMainLooper(), getApplicationContext());
+
+        // read settings
+        readSettings();
+    }
+
+    // TODO: check!!!
+    private void readSettings() {
+        //// TODO: 4/20/2017 read settings
+
+        // register motion sensor
+        sensorManager.registerListener(sensorEventListener,
+                                        sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER),
+                                        SensorManager.SENSOR_DELAY_NORMAL);
+
+        // register proximity sensor
+        sensorManager.registerListener(sensorEventListener,
+                                        sensorManager.getDefaultSensor(Sensor.TYPE_PROXIMITY),
+                                        SensorManager.SENSOR_DELAY_NORMAL);
     }
 
     private void setCenterBtnFeedback(SharedPreferences sp, Context context, String key){
@@ -474,6 +548,7 @@ public class MainActivity extends AppCompatActivity {
         messageHandler.cleanUp();
         // save preset timer list
         savePresetTimers();
+        sensorManager.unregisterListener(sensorEventListener);
         // unregister preference change listener
         PreferenceManager.getDefaultSharedPreferences(getApplicationContext())
                 .unregisterOnSharedPreferenceChangeListener(preferenceChangeListener);
