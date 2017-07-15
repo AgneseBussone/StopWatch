@@ -6,19 +6,22 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
-import android.media.MediaPlayer;
+import android.content.res.Resources;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
+import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.os.Message;
 import android.os.Vibrator;
 import android.preference.PreferenceManager;
+import android.support.annotation.ColorInt;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -70,6 +73,7 @@ public class MainActivity extends AppCompatActivity {
     private Button btn1;
     private Button btn2;
     private Button btn3;
+    private ImageView bigBtn;
     private Vibrator vibe;
     private MessageHandler messageHandler;
     private StopwatchState stopwatch_state = StopwatchState.STOPPED;
@@ -81,6 +85,10 @@ public class MainActivity extends AppCompatActivity {
     private ImageView separator;
     private ArrayList<Time> preset_timers;
     private TimerListAdapter presetTimerAdapter;
+    private SharedPreferences sp;
+
+    // Preference variables
+    private CenterBtnFeedback centerBtnFeedback = CenterBtnFeedback.VIBRATE;
     private boolean nightModeOn = false;
     private Mode start_mode = Mode.BTN;
     private Mode stop_mode = Mode.BTN;
@@ -91,8 +99,6 @@ public class MainActivity extends AppCompatActivity {
      *
      * LISTENERS
      */
-    // Preference variables
-    private CenterBtnFeedback centerBtnFeedback = CenterBtnFeedback.VIBRATE;
 
     // Listener for certain preference
     private OnSharedPreferenceChangeListener preferenceChangeListener = new OnSharedPreferenceChangeListener() {
@@ -100,8 +106,12 @@ public class MainActivity extends AppCompatActivity {
         public void onSharedPreferenceChanged(SharedPreferences sp, String key) {
             Context context = getApplicationContext();
             if(key.equals(context.getString(R.string.KEY_TOUCHBTN))){
-                setCenterBtnFeedback(sp, context, key);
+                setCenterBtnFeedback(context, key);
             }
+            else if(key.equals(context.getString(R.string.KEY_START)) ||
+                    key.equals(context.getString(R.string.KEY_STOP)) ||
+                    key.equals(context.getString(R.string.KEY_LAP)))
+                setStartStopLapMode(context, key);
         }
     };
 
@@ -287,33 +297,44 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public void onSensorChanged(SensorEvent event) {
             if(event.sensor.getType() == Sensor.TYPE_ACCELEROMETER) {
-                // filter some samples in order to avoid multiple matches at the same movement
-                if ((System.currentTimeMillis() - lastSaved) > ACC_FILTER_DATA_MIN_TIME) {
-                    lastSaved = System.currentTimeMillis();
+                // select the correct button
+                View btn = null;
+                if(start_mode == Mode.SWING || stop_mode == Mode.SWING)
+                    btn = bigBtn;
+                else if(lap_mode == Mode.SWING)
+                    btn = btn1;
 
-                    // Get the values from the sensor
-                    float[] acceleration = new float[3];
-                    System.arraycopy(event.values, 0, acceleration, 0, event.values.length);
+                if(btn != null) {
+                    // filter some samples in order to avoid multiple matches at the same movement
+                    if ((System.currentTimeMillis() - lastSaved) > ACC_FILTER_DATA_MIN_TIME) {
+                        lastSaved = System.currentTimeMillis();
 
-                    double magnitude = Math.sqrt((acceleration[0] * acceleration[0]) +
-                            (acceleration[1] * acceleration[1]) +
-                            (acceleration[2] * acceleration[2]));
+                        // Get the values from the sensor
+                        float[] acceleration = new float[3];
+                        System.arraycopy(event.values, 0, acceleration, 0, event.values.length);
 
-//                    Log.d(TAG, String.valueOf(magnitude));
+                        double magnitude = Math.sqrt((acceleration[0] * acceleration[0]) +
+                                (acceleration[1] * acceleration[1]) +
+                                (acceleration[2] * acceleration[2]));
 
-                    if (magnitude > MAGNITUDE_THRESHOLD) {
-//                        Log.d(TAG, "------CLICK------");
-                        ImageView btn = (ImageView)findViewById(R.id.bigBtn);
-                        if(btn != null)
+                        if (magnitude > MAGNITUDE_THRESHOLD) {
                             btn.performClick();
+                        }
                     }
                 }
             }
             else if (event.sensor.getType() == Sensor.TYPE_PROXIMITY) {
                 if(event.values[0] <= PROXIMITY_THRESHOLD){
-                    ImageView btn = (ImageView)findViewById(R.id.bigBtn);
-                    if(btn != null)
+                    // select the correct button
+                    View btn = null;
+                    if(start_mode == Mode.PROX || stop_mode == Mode.PROX)
+                        btn = bigBtn;
+                    else if(lap_mode == Mode.PROX)
+                        btn = btn1;
+                    if (btn != null) {
                         btn.performClick();
+
+                    }
                 }
             }
         }
@@ -325,6 +346,9 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        // get the sensor manager before reading prefs
+        sensorManager = (SensorManager)getSystemService(Context.SENSOR_SERVICE);
 
         readPreferences();
 
@@ -361,6 +385,10 @@ public class MainActivity extends AppCompatActivity {
                 addTime.setOnLongClickListener(longClickListener);
                 addTime = mSectionsPagerAdapter.getAddMinBtn();
                 addTime.setOnLongClickListener(longClickListener);
+                // I believe there are 2 big buttons, but it doesn't matter which one is given here
+                // because this reference will be used just for perform the click
+                // and the callback will take care of everything
+                bigBtn = (ImageView)findViewById(R.id.bigBtn);
             }
         });
 
@@ -456,31 +484,12 @@ public class MainActivity extends AppCompatActivity {
         mViewPager.addOnPageChangeListener(pageListener);
 
         vibe = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
-        sensorManager = (SensorManager)getSystemService(Context.SENSOR_SERVICE);
 
         // message handler setup
         messageHandler = new MessageHandler(getMainLooper(), getApplicationContext());
-
-        // read settings
-        readSettings();
     }
 
-    // TODO: check!!!
-    private void readSettings() {
-        //// TODO: 4/20/2017 read settings
-
-        // register motion sensor
-        sensorManager.registerListener(sensorEventListener,
-                                        sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER),
-                                        SensorManager.SENSOR_DELAY_NORMAL);
-
-        // register proximity sensor
-        sensorManager.registerListener(sensorEventListener,
-                                        sensorManager.getDefaultSensor(Sensor.TYPE_PROXIMITY),
-                                        SensorManager.SENSOR_DELAY_NORMAL);
-    }
-
-    private void setCenterBtnFeedback(SharedPreferences sp, Context context, String key){
+    private void setCenterBtnFeedback(Context context, String key){
         String pref = sp.getString(key, context.getString(R.string.vibrate_only));
         if(pref.equals(context.getString(R.string.vibrate_only)))
             centerBtnFeedback = CenterBtnFeedback.VIBRATE;
@@ -495,10 +504,10 @@ public class MainActivity extends AppCompatActivity {
     private void readPreferences() {
         //TODO: read preferences
         Context context = getApplicationContext();
-        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(context);
+        sp = PreferenceManager.getDefaultSharedPreferences(context);
 
         // touch button feedback
-        setCenterBtnFeedback(sp, context, context.getString(R.string.KEY_TOUCHBTN));
+        setCenterBtnFeedback(context, context.getString(R.string.KEY_TOUCHBTN));
 
         // night mode
         String no = context.getString(R.string.no);
@@ -509,17 +518,16 @@ public class MainActivity extends AppCompatActivity {
             nightModeOn = true;
 
         // start / stop / lap
-        setStartStopLapMode(sp, context, context.getString(R.string.KEY_START));
+        setStartStopLapMode(context, context.getString(R.string.KEY_START));
 
         // screen always on
 
-        // register listener
-        sp.registerOnSharedPreferenceChangeListener(preferenceChangeListener);
     }
 
-    private void setStartStopLapMode(SharedPreferences sp, Context context, String key) {
+    private void setStartStopLapMode(Context context, String key) {
         // TODO: finish
         String pref = sp.getString(key, context.getString(R.string.KEY_START_STOP_LAP_DEFAULT));
+
         if(key.equals(context.getString(R.string.KEY_START))){
             if(pref.equals(context.getString(R.string.dedicated_button))){
                 start_mode = Mode.BTN;
@@ -540,6 +548,35 @@ public class MainActivity extends AppCompatActivity {
                 start_mode = Mode.PROX;
             }
         }
+        // register listeners in case this method is been called by the preferenceChange Listener
+        registerSensorsListener();
+    }
+
+    private void registerSensorsListener(){
+        // register sensors listeners only if there is some feature that needs it selected
+
+        // motion sensor
+        if(start_mode == Mode.SWING ||
+                stop_mode == Mode.SWING ||
+                lap_mode == Mode.SWING)
+            sensorManager.registerListener(sensorEventListener,
+                    sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER),
+                    SensorManager.SENSOR_DELAY_NORMAL);
+        // proximity sensor
+        if(start_mode == Mode.PROX ||
+                stop_mode == Mode.PROX ||
+                lap_mode == Mode.PROX)
+            sensorManager.registerListener(sensorEventListener,
+                    sensorManager.getDefaultSensor(Sensor.TYPE_PROXIMITY),
+                    SensorManager.SENSOR_DELAY_NORMAL);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        // register listener
+        sp.registerOnSharedPreferenceChangeListener(preferenceChangeListener);
+        registerSensorsListener();
     }
 
     @Override
@@ -548,6 +585,7 @@ public class MainActivity extends AppCompatActivity {
         messageHandler.cleanUp();
         // save preset timer list
         savePresetTimers();
+        // unregister sensor listener
         sensorManager.unregisterListener(sensorEventListener);
         // unregister preference change listener
         PreferenceManager.getDefaultSharedPreferences(getApplicationContext())
@@ -875,6 +913,12 @@ public class MainActivity extends AppCompatActivity {
         ViewGroup.LayoutParams params = main_list_layout.getLayoutParams();
         params.height = (secondary_view.getHeight() - toY - separator.getHeight() - btn.getHeight());
         main_list_layout.setLayoutParams(params);
+        // set background color based on theme
+        TypedValue typedValue = new TypedValue();
+        Resources.Theme theme = getTheme();
+        theme.resolveAttribute(R.attr.background_color_blurr, typedValue, true);
+        @ColorInt int color = typedValue.data;
+        main_list_layout.setBackgroundColor(color);
 
         // use animate() to make the changes permanent
         list_view.animate().translationY(toY);

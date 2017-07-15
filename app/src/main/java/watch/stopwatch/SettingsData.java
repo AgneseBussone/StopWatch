@@ -27,7 +27,7 @@ public class SettingsData {
         sound_alarm.add(new Item("Ringtone", DATA_ID.ID_RINGTONE));
 
         List<Item> haptics_input = new ArrayList<>(4);
-        haptics_input.add(new Item("Central Button Feedback", DATA_ID.ID_TOUCHBTN));
+        haptics_input.add(new Item("Start and Stop Feedback", DATA_ID.ID_TOUCHBTN));
         haptics_input.add(new Item("Start Mode", DATA_ID.ID_START));
         haptics_input.add(new Item("Stop Mode", DATA_ID.ID_STOP));
         haptics_input.add(new Item("Lap Mode", DATA_ID.ID_LAP));
@@ -41,11 +41,12 @@ public class SettingsData {
         about.add(new Item("Who we are", DATA_ID.ID_DEV));
         about.add(new Item("App version", DATA_ID.ID_VERSION));
 
-        expandableListDetail.put(new GroupInfo("SOUND / ALARM", DATA_ID.ID_SOUND,
+        expandableListDetail.put(new GroupInfo("ALARM", DATA_ID.ID_SOUND,
                 R.drawable.ic_sound_on, R.drawable.ic_sound_off), sound_alarm);
+        //TODO: find a better name
         expandableListDetail.put(new GroupInfo("HAPTICS / INPUT", DATA_ID.ID_TOUCHBTN,
                 R.drawable.ic_vibrate, R.drawable.ic_no_haptic), haptics_input);
-        expandableListDetail.put(new GroupInfo("SCREEN / DISPLAY", DATA_ID.ID_NIGHT,
+        expandableListDetail.put(new GroupInfo("SCREEN", DATA_ID.ID_NIGHT,
                 R.drawable.ic_night, R.drawable.ic_day), screen_display);
         expandableListDetail.put(new GroupInfo("ABOUT APP", DATA_ID.ID_RATE,
                 R.drawable.ic_smile, R.drawable.ic_smile_2), about);
