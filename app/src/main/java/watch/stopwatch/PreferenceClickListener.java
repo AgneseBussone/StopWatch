@@ -23,6 +23,9 @@ import java.util.Map;
  * Based on the tag assigned to the view during the creation, it'll show the correct popup
  */
 
+
+//TODO: create string for default choices
+
 public class PreferenceClickListener implements ExpandableListView.OnChildClickListener {
 
     private static final String TAG = PreferenceClickListener.class.getSimpleName();
@@ -102,7 +105,7 @@ public class PreferenceClickListener implements ExpandableListView.OnChildClickL
         final CharSequence[] items = context.getResources().getTextArray(R.array.mode_items);
 
         // read current preferences
-        String pref = sp.getString(pref_key, items[0].toString()); //Default: touch
+        String pref = sp.getString(pref_key, context.getResources().getString(R.string.KEY_START_STOP_LAP_DEFAULT));
         int start_index = 0;
         if(!pref.isEmpty()){
             for(int i = 0; i < items.length; i++){

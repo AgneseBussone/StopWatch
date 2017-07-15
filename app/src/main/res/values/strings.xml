@@ -45,5 +45,13 @@
     <string name="none">none</string>
     <string name="yes">Yes</string>
     <string name="no">No</string>
+    <string name="dedicated_button">Dedicated button</string>
+    <string name="volume_up">Volume up</string>
+    <string name="volume_down">Volume down</string>
+    <string name="clap_sound">Clap sound</string>
+    <string name="swing_motion">Swing Motion</string>
+    <string name="proximity_sensor">Proximity sensor</string>
 
+    <!-- Default values for preferences -->
+    <string name="KEY_START_STOP_LAP_DEFAULT">@string/dedicated_button</string>
 </resources>

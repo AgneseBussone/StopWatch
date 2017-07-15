@@ -40,6 +40,7 @@ public class MainActivity extends AppCompatActivity {
     private enum StopwatchState {RUNNING, STOPPED, PAUSED}
     private enum TimerState {RUNNING, STOPPED, PAUSED, SET}
     private enum CenterBtnFeedback {SOUND, VIBRATE, BOTH, NONE}
+    private enum Mode {BTN, VOL_UP, VOL_DN, CLAP, SWING, PROX}
 
     private static final String TAG = MainActivity.class.getSimpleName();
 
@@ -77,6 +78,9 @@ public class MainActivity extends AppCompatActivity {
     private ArrayList<Time> preset_timers;
     private TimerListAdapter presetTimerAdapter;
     private boolean nightModeOn = false;
+    private Mode start_mode = Mode.BTN;
+    private Mode stop_mode = Mode.BTN;
+    private Mode lap_mode = Mode.BTN;
 
     // Preference variables
     private CenterBtnFeedback centerBtnFeedback = CenterBtnFeedback.VIBRATE;
@@ -431,10 +435,37 @@ public class MainActivity extends AppCompatActivity {
             nightModeOn = true;
 
         // start / stop / lap
+        setStartStopLapMode(sp, context, context.getString(R.string.KEY_START));
+
         // screen always on
 
         // register listener
         sp.registerOnSharedPreferenceChangeListener(preferenceChangeListener);
+    }
+
+    private void setStartStopLapMode(SharedPreferences sp, Context context, String key) {
+        // TODO: finish
+        String pref = sp.getString(key, context.getString(R.string.KEY_START_STOP_LAP_DEFAULT));
+        if(key.equals(context.getString(R.string.KEY_START))){
+            if(pref.equals(context.getString(R.string.dedicated_button))){
+                start_mode = Mode.BTN;
+            }
+            else if(pref.equals(context.getString(R.string.volume_up))){
+                start_mode = Mode.VOL_UP;
+            }
+            else if(pref.equals(context.getString(R.string.volume_down))){
+                start_mode = Mode.VOL_DN;
+            }
+            else if(pref.equals(context.getString(R.string.clap_sound))){
+                start_mode = Mode.CLAP;
+            }
+            else if(pref.equals(context.getString(R.string.swing_motion))){
+                start_mode = Mode.SWING;
+            }
+            else if(pref.equals(context.getString(R.string.proximity_sensor))){
+                start_mode = Mode.PROX;
+            }
+        }
     }
 
     @Override
