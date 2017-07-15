@@ -69,7 +69,7 @@
             android:shape="oval">
             <size android:width="@dimen/white"
                 android:height="@dimen/white"/>
-            <solid android:color="@color/background_color"/>
+            <solid android:color="?attr/background_color"/>
             <stroke android:color="@color/white"
                 android:width="10dp"/>
 

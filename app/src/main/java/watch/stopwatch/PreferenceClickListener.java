@@ -150,6 +150,8 @@ public class PreferenceClickListener implements ExpandableListView.OnChildClickL
                         shortcut.setImageResource(groupInfo.imageResourceOFF);
                 }
                 dialog.dismiss();
+                if(pref_key.equals(context.getString(R.string.KEY_NIGHT)) && context instanceof MainActivity)
+                    ((MainActivity)context).recreate();
             }
         });
 

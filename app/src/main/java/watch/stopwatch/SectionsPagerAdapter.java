@@ -13,7 +13,6 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -25,21 +24,39 @@ public class SectionsPagerAdapter extends FragmentPagerAdapter {
 
     private static final String TAG = SectionsPagerAdapter.class.getSimpleName();
     private final int PAGES = 3;
-
-    private ArrayList<WatchFragment> fragment_list;
+    private Fragment stopwatch_fragment;
+    private Fragment timer_fragment;
+    private final int STOPWATCH_INDEX = 0;
+    private final int TIMER_INDEX = 1;
 
     public SectionsPagerAdapter(FragmentManager fm) {
         super(fm);
-        fragment_list = new ArrayList<>(PAGES);
     }
 
+    // Do NOT try to save references to the Fragments in getItem(),
+    // because getItem() is not always called. If the Fragment
+    // was already created then it will be retrieved from the FragmentManger
+    // and not here (i.e. getItem() won't be called again).
     @Override
     public Fragment getItem(int position) {
-        // getItem is called to instantiate the fragment for the given page.
-        // Return a WatchFragment (defined as a static inner class below).
-        WatchFragment fragment = WatchFragment.newInstance(position + 1);
-        fragment_list.add(position, fragment);
-        return fragment;
+        return WatchFragment.newInstance(position);
+    }
+
+    // Here we can finally safely save a reference to the created
+    // Fragment, no matter where it came from (either getItem() or
+    // FragmentManger). Simply save the returned Fragment from
+    // super.instantiateItem() into an appropriate reference depending
+    // on the ViewPager position.
+    @Override
+    public Object instantiateItem(ViewGroup container, int position) {
+        Fragment createdFragment = (Fragment) super.instantiateItem(container, position);
+        // save the appropriate reference depending on position
+        switch (position){
+            case STOPWATCH_INDEX: stopwatch_fragment = createdFragment; break;
+            case TIMER_INDEX: timer_fragment = createdFragment; break;
+            default: break;
+        }
+        return createdFragment;
     }
 
     @Override
@@ -61,51 +78,65 @@ public class SectionsPagerAdapter extends FragmentPagerAdapter {
         return null;
     }
 
-    //TODO: check all the call of these methods for nullPtrExc and add null check here
+    // Security checks
+    private View getView(int index){
+        Fragment f = null;
+        switch (index){
+            case STOPWATCH_INDEX:
+                f = stopwatch_fragment;
+                break;
+            case TIMER_INDEX:
+                f = timer_fragment;
+                break;
+            default: break;
+        }
+        return (f != null) ? f.getView() : null;
+    }
+
     public TextView getStopwatchTV() {
-        View view = fragment_list.get(0).getView();
-        return (TextView) view.findViewById(R.id.time_text);
+        View view = getView(STOPWATCH_INDEX);
+        return (view != null) ? (TextView) view.findViewById(R.id.time_text) : null;
     }
 
     public ImageView getStopwatchNeedle() {
-        View view = fragment_list.get(0).getView();
-        return (ImageView) view.findViewById(R.id.needle_list);
+        View view = getView(STOPWATCH_INDEX);
+        return (view != null) ? (ImageView) view.findViewById(R.id.needle_list) : null;
     }
 
     public TextView getStopwatchButtonText(){
-        View view = fragment_list.get(0).getView();
-        return (TextView)view.findViewById(R.id.btn_text_action);
+        View view = getView(STOPWATCH_INDEX);
+        return (view != null) ? (TextView)view.findViewById(R.id.btn_text_action) : null;
     }
 
     public TextView getTimerTV() {
-        View view = fragment_list.get(1).getView();
-        return (TextView) view.findViewById(R.id.time_text);
+        View view = getView(TIMER_INDEX);
+        return (view != null) ? (TextView) view.findViewById(R.id.time_text) : null;
     }
 
     public ImageView getTimerNeedle() {
-        View view = fragment_list.get(1).getView();
-        return (ImageView) view.findViewById(R.id.needle_list);
+        View view = getView(TIMER_INDEX);
+        return (view != null) ? (ImageView) view.findViewById(R.id.needle_list) : null;
     }
 
     public TextView getTimerButtonText(){
-        View view = fragment_list.get(1).getView();
-        return (TextView)view.findViewById(R.id.btn_text_action);
+        View view = getView(TIMER_INDEX);
+        return (view != null) ? (TextView)view.findViewById(R.id.btn_text_action) : null;
     }
 
 
     public ImageView getAddMinBtn(){
-        View view = fragment_list.get(1).getView();
-        return (ImageView)view.findViewById(R.id.addMinBtn);
+        View view = getView(TIMER_INDEX);
+        return (view != null) ? (ImageView)view.findViewById(R.id.addMinBtn) : null;
     }
 
     public ImageView getAddSecBtn(){
-        View view = fragment_list.get(1).getView();
-        return (ImageView)view.findViewById(R.id.addSecBtn);
+        View view = getView(TIMER_INDEX);
+        return (view != null) ? (ImageView)view.findViewById(R.id.addSecBtn) : null;
     }
 
     public CircleFillView getCircleFillView(){
-        View view = fragment_list.get(1).getView();
-        return (CircleFillView)view.findViewById(R.id.circleFillView);
+        View view = getView(TIMER_INDEX);
+        return (view != null) ? (CircleFillView)view.findViewById(R.id.circleFillView) : null;
     }
 
     /**
@@ -144,19 +175,19 @@ public class SectionsPagerAdapter extends FragmentPagerAdapter {
             // adjust the layout basing on the section number
             int section =  getArguments().getInt(ARG_SECTION_NUMBER);
             switch(section){
-                case 1:
+                case 0:
                     // stopwatch
                     text.setText(R.string.time_default_stopwatch);
                     addTimeLayout.setVisibility(View.INVISIBLE);
                     circle.setVisibility(View.INVISIBLE);
                     break;
-                case 2:
+                case 1:
                     // timer
                     text.setText(R.string.time_default_timer);
                     addTimeLayout.setVisibility(View.VISIBLE);
                     circle.setVisibility(View.VISIBLE);
                     break;
-                case 3:
+                case 2:
                     // settings
                     rootView = inflater.inflate(R.layout.settings_layout, container, false);
 

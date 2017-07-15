@@ -147,6 +147,10 @@ public class CustomExpandableListAdapter extends BaseExpandableListAdapter {
                             editor = sp.edit();
                             editor.putString(context.getString(R.string.KEY_NIGHT),tag);
                             editor.apply();
+                            // Call recreate() to recreate the MainActivity
+                            if(context instanceof MainActivity){
+                                ((MainActivity)context).recreate();
+                            }
                             break;
                         case ID_RATE:
                             // for the smiling face there's nothing to do

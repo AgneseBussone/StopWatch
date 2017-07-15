@@ -76,6 +76,7 @@ public class MainActivity extends AppCompatActivity {
     private ImageView separator;
     private ArrayList<Time> preset_timers;
     private TimerListAdapter presetTimerAdapter;
+    private boolean nightModeOn = false;
 
     // Preference variables
     private CenterBtnFeedback centerBtnFeedback = CenterBtnFeedback.VIBRATE;
@@ -269,6 +270,9 @@ public class MainActivity extends AppCompatActivity {
 
         readPreferences();
 
+        if(nightModeOn)
+            setTheme(R.style.NightAppTheme);
+
         setContentView(R.layout.activity_main);
 
         // Create the adapter that will return a fragment for each of the three
@@ -351,7 +355,9 @@ public class MainActivity extends AppCompatActivity {
                             // enable reset btn
                             setEnableBtnReset(true);
                         }
-                        main_content.setBackgroundColor(getResources().getColor(R.color.background_color));
+                        // set the background color only for day theme
+                        if(!nightModeOn)
+                            main_content.setBackgroundColor(getResources().getColor(R.color.background_color));
                         break;
                     case 1:
                         // timer
@@ -368,16 +374,18 @@ public class MainActivity extends AppCompatActivity {
                             // enable reset btn
                             setEnableBtnReset(true);
                         }
-                        main_content.setBackgroundColor(getResources().getColor(R.color.background_color));
-                        break;
+                        // set the background color only for day theme
+                        if(!nightModeOn)
+                            main_content.setBackgroundColor(getResources().getColor(R.color.background_color));                        break;
                     case 2:
                         // settings
                         page_selector.check(R.id.page3);
-                        main_content.setBackgroundColor(getResources().getColor(R.color.colorPrimaryLight));
                         btn1.setVisibility(View.GONE);
                         btn3.setVisibility(View.GONE);
                         btn2.setText("Designed by ???");
-//                        btn2.setBackgroundColor(getResources().getColor(R.color.light_blue2));
+                        // set the background color only for day theme
+                        if(!nightModeOn)
+                            main_content.setBackgroundColor(getResources().getColor(R.color.colorPrimaryLight));
                         break;
                 }
             }
@@ -415,6 +423,11 @@ public class MainActivity extends AppCompatActivity {
         setCenterBtnFeedback(sp, context);
 
         // night mode
+        String pref = sp.getString(context.getString(R.string.KEY_NIGHT), "No");
+        if(pref.equals("No"))
+            nightModeOn = false;
+        else
+            nightModeOn = true;
         // start / stop / lap
         // screen always on
 

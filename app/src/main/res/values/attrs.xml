@@ -5,5 +5,9 @@
         <attr name="strokeColor" format="color" />
         <attr name="strokeWidth" format="float" />
         <attr name="value" format="integer" />
+        <attr name="background_color" format="reference"/>
+        <attr name="background_color_blurr" format="reference"/>
+        <attr name="numbers_color" format="reference"/>
+        <attr name="settings_background" format="reference"/>
     </declare-styleable>
 </resources>
