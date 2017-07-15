@@ -434,7 +434,7 @@ public class MainActivity extends AppCompatActivity {
                         }
                         // set the background color only for day theme
                         if(!nightModeOn)
-                            main_content.setBackgroundColor(getResources().getColor(R.color.background_color));                        break;
+                            main_content.setBackgroundColor(getResources().getColor(R.color.background_color));
                         break;
                     case 2:
                         // settings
