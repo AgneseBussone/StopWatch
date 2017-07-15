@@ -13,6 +13,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.ExpandableListView;
 import android.widget.ImageView;
+import android.widget.Toast;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -62,7 +63,7 @@ public class PreferenceClickListener implements ExpandableListView.OnChildClickL
                 showStartStopPopup("Select stop mode", context.getString(R.string.KEY_STOP));
                 break;
             case ID_LAP:
-                Log.d(TAG, "lap popup");
+                Toast.makeText(context, "TODO", Toast.LENGTH_SHORT).show();
                 break;
             case ID_TOUCHBTN: {
                 CustomExpandableListAdapter listAdapter = (CustomExpandableListAdapter) parent.getExpandableListAdapter();
@@ -82,7 +83,7 @@ public class PreferenceClickListener implements ExpandableListView.OnChildClickL
                 break;
             }
             case ID_RATE:
-                Log.d(TAG, "rate popup");
+                Toast.makeText(context, "TODO", Toast.LENGTH_SHORT).show();
                 break;
             case ID_DEV:
                 showDevPopup();

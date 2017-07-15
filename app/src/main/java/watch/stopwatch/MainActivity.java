@@ -87,7 +87,7 @@ public class MainActivity extends AppCompatActivity {
         public void onSharedPreferenceChanged(SharedPreferences sp, String key) {
             Context context = getApplicationContext();
             if(key.equals(context.getString(R.string.KEY_TOUCHBTN))){
-                setCenterBtnFeedback(sp, context);
+                setCenterBtnFeedback(sp, context, key);
             }
         }
     };
@@ -402,8 +402,8 @@ public class MainActivity extends AppCompatActivity {
         messageHandler = new MessageHandler(getMainLooper(), getApplicationContext());
     }
 
-    private void setCenterBtnFeedback(SharedPreferences sp, Context context){
-        String pref = sp.getString(context.getString(R.string.KEY_TOUCHBTN), context.getString(R.string.vibrate_only));
+    private void setCenterBtnFeedback(SharedPreferences sp, Context context, String key){
+        String pref = sp.getString(key, context.getString(R.string.vibrate_only));
         if(pref.equals(context.getString(R.string.vibrate_only)))
             centerBtnFeedback = CenterBtnFeedback.VIBRATE;
         else if(pref.equals(context.getString(R.string.sound_only)))
@@ -420,14 +420,16 @@ public class MainActivity extends AppCompatActivity {
         SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(context);
 
         // touch button feedback
-        setCenterBtnFeedback(sp, context);
+        setCenterBtnFeedback(sp, context, context.getString(R.string.KEY_TOUCHBTN));
 
         // night mode
-        String pref = sp.getString(context.getString(R.string.KEY_NIGHT), "No");
-        if(pref.equals("No"))
+        String no = context.getString(R.string.no);
+        String pref = sp.getString(context.getString(R.string.KEY_NIGHT), no);
+        if(pref.equals(no))
             nightModeOn = false;
         else
             nightModeOn = true;
+
         // start / stop / lap
         // screen always on
 
@@ -438,7 +440,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onStop() {
         super.onStop();
-        messageHandler.sendEmptyMessage(MessageHandler.MSG_STOPWATCH_SAVE_LAP);
+        messageHandler.cleanUp();
         // save preset timer list
         savePresetTimers();
         // unregister preference change listener
@@ -734,6 +736,8 @@ public class MainActivity extends AppCompatActivity {
                     centralBtn.clearAnimation();
                     // reset color
                     centralBtn.setBackgroundTintList(null);
+                    // stop sound and vibration, if any
+                    messageHandler.sendEmptyMessage(MessageHandler.MSG_TIMER_CLEAR);
                     timer_timeout.h = timer_timeout.m = timer_timeout.s = 0;
                     timer_state = TimerState.STOPPED;
                 }
