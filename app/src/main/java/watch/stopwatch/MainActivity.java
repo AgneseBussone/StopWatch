@@ -510,7 +510,7 @@ public class MainActivity extends AppCompatActivity {
         setCenterBtnFeedback(context, context.getString(R.string.KEY_TOUCHBTN));
 
         // night mode
-        String no = context.getString(R.string.no);
+        String no = context.getString(R.string.KEY_NIGHT_DEFAULT);
         String pref = sp.getString(context.getString(R.string.KEY_NIGHT), no);
         if(pref.equals(no))
             nightModeOn = false;

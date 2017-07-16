@@ -109,7 +109,7 @@ public class MessageHandler extends Handler {
         setTimerExpiredFeedback(sp, context.getString(R.string.KEY_SOUND));
 
         // ringtone
-        String no_sound = context.getString(R.string.none);
+        String no_sound = context.getString(R.string.KEY_RINGTONE_URI_DEFAULT);
         String ringtone = sp.getString(context.getString(R.string.KEY_RINGTONE_URI), no_sound);
         // if the user didn't select a ringtone, use the default system alarm sound
         if(ringtone.equals(no_sound)){

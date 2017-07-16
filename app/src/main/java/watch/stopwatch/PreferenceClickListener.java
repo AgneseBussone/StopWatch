@@ -24,8 +24,6 @@ import java.util.Map;
  */
 
 
-//TODO: create string for default choices
-
 public class PreferenceClickListener implements ExpandableListView.OnChildClickListener {
 
     private static final String TAG = PreferenceClickListener.class.getSimpleName();
@@ -126,6 +124,7 @@ public class PreferenceClickListener implements ExpandableListView.OnChildClickL
                 dialog.dismiss();
             }
         });
+        dialogBuilder.setNegativeButton("CANCEL", null);
         AlertDialog b = dialogBuilder.create();
         b.show();
     }
@@ -159,7 +158,7 @@ public class PreferenceClickListener implements ExpandableListView.OnChildClickL
                     ((MainActivity)context).recreate();
             }
         });
-
+        dialogBuilder.setNegativeButton("CANCEL", null);
         AlertDialog b = dialogBuilder.create();
         b.show();
     }
@@ -172,7 +171,7 @@ public class PreferenceClickListener implements ExpandableListView.OnChildClickL
         final CharSequence[] titles = sound_list.keySet().toArray(new CharSequence[sound_list.size()]);
 
         // read current preferences
-        String pref = sp.getString(context.getString(R.string.KEY_RINGTONE_TITLE), "");
+        String pref = sp.getString(context.getString(R.string.KEY_RINGTONE_TITLE), titles[0].toString());
         alarm_sound_index = 0;
         if(!pref.isEmpty() && sound_list.containsKey(pref)){
             for(int i = 0; i < titles.length; i++){
@@ -271,7 +270,7 @@ public class PreferenceClickListener implements ExpandableListView.OnChildClickL
         CharSequence[] items = context.getResources().getTextArray(R.array.sound_pref_items);
 
         // read current preferences
-        String pref = sp.getString(context.getString(R.string.KEY_TOUCHBTN), context.getString(R.string.vibrate_only));
+        String pref = sp.getString(context.getString(R.string.KEY_TOUCHBTN), context.getString(R.string.KEY_TOUCHBTN_DEFAULT));
         final boolean[] checkedItems = new boolean[3];
         checkedItems[0] = (pref.equals(context.getString(R.string.sound_only)) || pref.equals(context.getString(R.string.soundAndVibrate)));
         checkedItems[1] = (pref.equals(context.getString(R.string.vibrate_only)) || pref.equals(context.getString(R.string.soundAndVibrate)));
@@ -341,6 +340,7 @@ public class PreferenceClickListener implements ExpandableListView.OnChildClickL
                 }
             }
         });
+        dialogBuilder.setNegativeButton("CANCEL", null);
         AlertDialog b = dialogBuilder.create();
         b.show();
     }
@@ -352,7 +352,7 @@ public class PreferenceClickListener implements ExpandableListView.OnChildClickL
         CharSequence[] items = context.getResources().getTextArray(R.array.sound_pref_items);
 
         // read current preferences
-        String pref = sp.getString(context.getString(R.string.KEY_SOUND), context.getString(R.string.none));
+        String pref = sp.getString(context.getString(R.string.KEY_SOUND), context.getString(R.string.KEY_SOUND_DEFAULT));
         final boolean[] checkedItems = new boolean[3];
         checkedItems[0] = (pref.equals(context.getString(R.string.sound_only)) || pref.equals(context.getString(R.string.soundAndVibrate)));
         checkedItems[1] = (pref.equals(context.getString(R.string.vibrate_only)) || pref.equals(context.getString(R.string.soundAndVibrate)));
@@ -422,6 +422,7 @@ public class PreferenceClickListener implements ExpandableListView.OnChildClickL
                 }
             }
         });
+        dialogBuilder.setNegativeButton("CANCEL", null);
         AlertDialog b = dialogBuilder.create();
         b.show();
     }

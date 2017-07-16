@@ -2,13 +2,13 @@
 <resources>
     <!-- Dialog boxes strings for preference screen -->
     <string-array name="sound_pref_items">
-        <item>Sound</item>
-        <item>Vibrate</item>
-        <item>None</item>
+        <item>@string/sound_only</item>
+        <item>@string/vibrate_only</item>
+        <item>@string/none</item>
     </string-array>
     <string-array name="yes_or_no">
-        <item>Yes</item>
-        <item>No</item>
+        <item>@string/yes</item>
+        <item>@string/no</item>
     </string-array>
     <string-array name="mode_items">
         <item>@string/dedicated_button</item>

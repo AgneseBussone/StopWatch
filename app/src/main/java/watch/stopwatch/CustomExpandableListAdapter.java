@@ -180,7 +180,7 @@ public class CustomExpandableListAdapter extends BaseExpandableListAdapter {
         String pref;
         switch(groupInfo.setting){
             case ID_SOUND:
-                pref = sp.getString(context.getString(R.string.KEY_SOUND), context.getString(R.string.none));
+                pref = sp.getString(context.getString(R.string.KEY_SOUND), context.getString(R.string.KEY_SOUND_DEFAULT));
                 imageView.setTag(pref);
                 if(pref.equals(context.getString(R.string.vibrate_only)) || pref.equals(context.getString(R.string.none))){
                     imageView.setImageResource(groupInfo.imageResourceOFF);
@@ -190,7 +190,7 @@ public class CustomExpandableListAdapter extends BaseExpandableListAdapter {
                 }
                 break;
             case ID_TOUCHBTN:
-                pref = sp.getString(context.getString(R.string.KEY_TOUCHBTN), context.getString(R.string.vibrate_only));
+                pref = sp.getString(context.getString(R.string.KEY_TOUCHBTN), context.getString(R.string.KEY_TOUCHBTN_DEFAULT));
                 imageView.setTag(pref);
                 if(pref.equals(context.getString(R.string.sound_only)) || pref.equals(context.getString(R.string.none))){
                     imageView.setImageResource(groupInfo.imageResourceOFF);
@@ -200,7 +200,7 @@ public class CustomExpandableListAdapter extends BaseExpandableListAdapter {
                 }
                 break;
             case ID_NIGHT:
-                pref = sp.getString(context.getString(R.string.KEY_NIGHT), "No");
+                pref = sp.getString(context.getString(R.string.KEY_NIGHT), context.getString(R.string.KEY_NIGHT_DEFAULT));
                 imageView.setTag(pref);
                 if(pref.equals("No")){
                     imageView.setImageResource(groupInfo.imageResourceOFF);
