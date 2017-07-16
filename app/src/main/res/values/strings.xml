@@ -60,4 +60,6 @@
     <string name="KEY_RINGTONE_URI_DEFAULT">None</string>
     <string name="KEY_TOUCHBTN_DEFAULT">Vibrate</string>
     <string name="KEY_NIGHT_DEFAULT">No</string>
+    <string name="KEY_SCREEN_DEFAULT">No</string>
+
 </resources>

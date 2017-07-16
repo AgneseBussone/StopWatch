@@ -29,6 +29,7 @@ import android.view.View.OnClickListener;
 import android.view.View.OnLongClickListener;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
+import android.view.WindowManager;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.Button;
@@ -113,6 +114,9 @@ public class MainActivity extends AppCompatActivity {
                     key.equals(context.getString(R.string.KEY_STOP)) ||
                     key.equals(context.getString(R.string.KEY_LAP)))
                 setStartStopLapMode(context, key);
+            if(key.equals(context.getString(R.string.KEY_SCREEN))){
+                setScreenAwake(context, key);
+            }
         }
     };
 
@@ -503,7 +507,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void readPreferences() {
-        //TODO: read preferences
         Context context = getApplicationContext();
         sp = PreferenceManager.getDefaultSharedPreferences(context);
 
@@ -522,7 +525,7 @@ public class MainActivity extends AppCompatActivity {
         setStartStopLapMode(context, context.getString(R.string.KEY_START));
 
         // screen always on
-
+        setScreenAwake(context, context.getString(R.string.KEY_SCREEN));
     }
 
     private void setStartStopLapMode(Context context, String key) {
@@ -551,6 +554,19 @@ public class MainActivity extends AppCompatActivity {
         }
         // register listeners in case this method is been called by the preferenceChange Listener
         registerSensorsListener();
+    }
+
+    private void setScreenAwake(Context context, String key){
+        String no = context.getString(R.string.KEY_SCREEN_DEFAULT);
+        String pref = sp.getString(key, no);
+        if(pref.equals(no)){
+            // disable screen awake
+            getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+        }
+        else{
+            // keep screen awake
+            getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+        }
     }
 
     private void registerSensorsListener(){
