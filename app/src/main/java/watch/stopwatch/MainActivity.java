@@ -22,6 +22,7 @@ import android.support.v4.view.ViewPager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.TypedValue;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -789,7 +790,35 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    // Provide the correct feedback (sound, vibrate, both or none)
+    /**
+     * Callback for listening volume up/down pressed event
+     * @param keyCode
+     * @param event
+     * @return
+     */
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        View btn = null;
+        if ((keyCode == KeyEvent.KEYCODE_VOLUME_DOWN)) {
+            // select the correct button
+            if(start_mode == Mode.VOL_DN || stop_mode == Mode.VOL_DN)
+                btn = bigBtn;
+            else if(lap_mode == Mode.VOL_DN)
+                btn = btn1;
+        }
+        else if (keyCode == KeyEvent.KEYCODE_VOLUME_UP){
+            // select the correct button
+            if(start_mode == Mode.VOL_UP || stop_mode == Mode.VOL_UP)
+                btn = bigBtn;
+            else if(lap_mode == Mode.VOL_UP)
+                btn = btn1;
+        }
+        if(btn != null)
+            btn.performClick();
+        return true;
+    }
+
+        // Provide the correct feedback (sound, vibrate, both or none)
     private void btnCenterFeedback(){
         switch (centerBtnFeedback){
             case VIBRATE:
