@@ -28,8 +28,7 @@ public class SettingsData {
 
         List<Item> haptics_input = new ArrayList<>(4);
         haptics_input.add(new Item("Start and Stop Feedback", DATA_ID.ID_TOUCHBTN));
-        haptics_input.add(new Item("Start Mode", DATA_ID.ID_START));
-        haptics_input.add(new Item("Stop Mode", DATA_ID.ID_STOP));
+        haptics_input.add(new Item("Start and Stop Mode", DATA_ID.ID_START_STOP));
         haptics_input.add(new Item("Lap Mode", DATA_ID.ID_LAP));
 
         List<Item> screen_display = new ArrayList<>(2);
@@ -43,8 +42,7 @@ public class SettingsData {
 
         expandableListDetail.put(new GroupInfo("ALARM", DATA_ID.ID_SOUND,
                 R.drawable.ic_sound_on, R.drawable.ic_sound_off), sound_alarm);
-        //TODO: find a better name
-        expandableListDetail.put(new GroupInfo("HAPTICS / INPUT", DATA_ID.ID_TOUCHBTN,
+        expandableListDetail.put(new GroupInfo("HAPTICS", DATA_ID.ID_TOUCHBTN,
                 R.drawable.ic_vibrate, R.drawable.ic_no_haptic), haptics_input);
         expandableListDetail.put(new GroupInfo("SCREEN", DATA_ID.ID_NIGHT,
                 R.drawable.ic_night, R.drawable.ic_day), screen_display);

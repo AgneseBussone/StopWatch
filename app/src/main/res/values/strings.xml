@@ -9,7 +9,12 @@
     <string name="btn2_page2_text">TIMER PRESET</string>
 
     <string name="central_btn_tap">TAP</string>
-    <string name="central_btn_shake">SHAKE</string>
+    <string name="central_btn_swing">SWING</string>
+    <string name="central_btn_clap">CLAP</string>
+    <string name="central_btn_prox">WAVE</string>
+    <string name="central_btn_vol_up">VOL +</string>
+    <string name="central_btn_vol_dn">VOL -</string>
+
     <string name="central_btn_start">to start</string>
     <string name="central_btn_stop">to stop</string>
     <string name="time_default_stopwatch">00:00:00:000</string>
@@ -30,8 +35,7 @@
     <string name="KEY_SOUND">key_pref_sound</string>
     <string name="KEY_RINGTONE_URI">key_pref_uri</string>
     <string name="KEY_RINGTONE_TITLE">key_pref_title</string>
-    <string name="KEY_START">key_pref_start_mode</string>
-    <string name="KEY_STOP">key_pref_stop_mode</string>
+    <string name="KEY_START_STOP">key_pref_start_stop_mode</string>
     <string name="KEY_LAP">key_pref_lap</string>
     <string name="KEY_TOUCHBTN">key_pref_touchBtn</string>
     <string name="KEY_SCREEN">key_pref_screen_on</string>
@@ -45,7 +49,7 @@
     <string name="none">None</string>
     <string name="yes">Yes</string>
     <string name="no">No</string>
-    <string name="dedicated_button">Dedicated button</string>
+    <string name="dedicated_button">Button only</string>
     <string name="volume_up">Volume up</string>
     <string name="volume_down">Volume down</string>
     <string name="clap_sound">Clap sound</string>
@@ -55,8 +59,8 @@
     <!-- Default values for preferences -->
     <!-- I tried to use aliases @string/already_defined_string
     but for some reason won't be correctly resolved in the code..... -->
-    <string name="KEY_START_STOP_LAP_DEFAULT">Dedicated button</string>
-    <string name="KEY_SOUND_DEFAULT">None</string>
+    <string name="KEY_START_STOP_LAP_DEFAULT">Button only</string>
+    <string name="KEY_SOUND_DEFAULT">Sound</string>
     <string name="KEY_RINGTONE_URI_DEFAULT">None</string>
     <string name="KEY_TOUCHBTN_DEFAULT">Vibrate</string>
     <string name="KEY_NIGHT_DEFAULT">No</string>

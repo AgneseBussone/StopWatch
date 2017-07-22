@@ -9,8 +9,7 @@ public class Item {
     public enum DATA_ID{
         ID_SOUND,
         ID_RINGTONE,
-        ID_START,
-        ID_STOP,
+        ID_START_STOP,
         ID_LAP,
         ID_TOUCHBTN,
         ID_SCREEN,

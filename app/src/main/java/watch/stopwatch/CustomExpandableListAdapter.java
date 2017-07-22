@@ -98,18 +98,13 @@ public class CustomExpandableListAdapter extends BaseExpandableListAdapter {
                     SharedPreferences.Editor editor;
                     switch (info.setting) {
                         case ID_SOUND:
-                            if (tag.equals(context.getString(R.string.vibrate_only))) {
-                                image.setImageResource(info.imageResourceON);
-                                tag = context.getString(R.string.soundAndVibrate);
-                            } else if(tag.equals(context.getString(R.string.sound_only))) {
-                                image.setImageResource(info.imageResourceOFF);
-                                tag = context.getString(R.string.none);
-                            } else if(tag.equals(context.getString(R.string.soundAndVibrate))){
-                                image.setImageResource(info.imageResourceOFF);
-                                tag = context.getString(R.string.vibrate_only);
-                            } else{ // none
+                            if (tag.equals(context.getString(R.string.vibrate_only)) ||
+                                    tag.equals(context.getString(R.string.none))) {
                                 image.setImageResource(info.imageResourceON);
                                 tag = context.getString(R.string.sound_only);
+                            } else{ // sound || sound&vibrate
+                                image.setImageResource(info.imageResourceOFF);
+                                tag = context.getString(R.string.none);
                             }
                             // save the preference
                             editor = sp.edit();
@@ -117,18 +112,13 @@ public class CustomExpandableListAdapter extends BaseExpandableListAdapter {
                             editor.apply();
                             break;
                         case ID_TOUCHBTN:
-                            if (tag.equals(context.getString(R.string.vibrate_only))) {
-                                image.setImageResource(info.imageResourceOFF);
-                                tag = context.getString(R.string.none);
-                            } else if(tag.equals(context.getString(R.string.sound_only))) {
-                                image.setImageResource(info.imageResourceON);
-                                tag = context.getString(R.string.soundAndVibrate);
-                            } else if(tag.equals(context.getString(R.string.soundAndVibrate))){
-                                image.setImageResource(info.imageResourceOFF);
-                                tag = context.getString(R.string.sound_only);
-                            } else{ // none
+                            if (tag.equals(context.getString(R.string.sound_only)) ||
+                                    tag.equals(context.getString(R.string.none))) {
                                 image.setImageResource(info.imageResourceON);
                                 tag = context.getString(R.string.vibrate_only);
+                            } else{ // vibrate || sound&vibrate
+                                image.setImageResource(info.imageResourceOFF);
+                                tag = context.getString(R.string.none);
                             }
                             // save the preference
                             editor = sp.edit();

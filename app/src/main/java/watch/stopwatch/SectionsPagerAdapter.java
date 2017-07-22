@@ -108,6 +108,16 @@ public class SectionsPagerAdapter extends FragmentPagerAdapter {
         return (view != null) ? (TextView)view.findViewById(R.id.btn_text_action) : null;
     }
 
+    public ImageView getStopwatchButton(){
+        View view = getView(STOPWATCH_INDEX);
+        return (view != null) ? (ImageView) view.findViewById(R.id.bigBtn) : null;
+    }
+
+    public TextView getStopwatchModeText(){
+        View view = getView(STOPWATCH_INDEX);
+        return (view != null) ? (TextView)view.findViewById(R.id.btn_text_mode) : null;
+    }
+
     public TextView getTimerTV() {
         View view = getView(TIMER_INDEX);
         return (view != null) ? (TextView) view.findViewById(R.id.time_text) : null;
@@ -123,6 +133,15 @@ public class SectionsPagerAdapter extends FragmentPagerAdapter {
         return (view != null) ? (TextView)view.findViewById(R.id.btn_text_action) : null;
     }
 
+    public TextView getTimerModeText(){
+        View view = getView(TIMER_INDEX);
+        return (view != null) ? (TextView)view.findViewById(R.id.btn_text_mode) : null;
+    }
+
+    public ImageView getTimerButton(){
+        View view = getView(TIMER_INDEX);
+        return (view != null) ? (ImageView) view.findViewById(R.id.bigBtn) : null;
+    }
 
     public ImageView getAddMinBtn(){
         View view = getView(TIMER_INDEX);

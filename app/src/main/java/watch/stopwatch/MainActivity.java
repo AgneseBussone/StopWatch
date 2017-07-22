@@ -78,7 +78,10 @@ public class MainActivity extends AppCompatActivity {
     private Button btn1;
     private Button btn2;
     private Button btn3;
-    private ImageView bigBtn;
+    private ImageView stopwatchBigBtn;
+    private TextView stopwatchModeTV;
+    private ImageView timerBigBtn;
+    private TextView timerModeTV;
     private Vibrator vibe;
     private MessageHandler messageHandler;
     private StopwatchState stopwatch_state = StopwatchState.STOPPED;
@@ -95,8 +98,7 @@ public class MainActivity extends AppCompatActivity {
     // Preference variables
     private CenterBtnFeedback centerBtnFeedback = CenterBtnFeedback.VIBRATE;
     private boolean nightModeOn = false;
-    private Mode start_mode = Mode.BTN;
-    private Mode stop_mode = Mode.BTN;
+    private Mode start_stop_mode = Mode.BTN;
     private Mode lap_mode = Mode.BTN;
     private SensorManager sensorManager;
 
@@ -109,12 +111,11 @@ public class MainActivity extends AppCompatActivity {
     private OnSharedPreferenceChangeListener preferenceChangeListener = new OnSharedPreferenceChangeListener() {
         @Override
         public void onSharedPreferenceChanged(SharedPreferences sp, String key) {
-            Context context = getApplicationContext();
+            Context context = MainActivity.this;
             if(key.equals(context.getString(R.string.KEY_TOUCHBTN))){
                 setCenterBtnFeedback(context, key);
             }
-            else if(key.equals(context.getString(R.string.KEY_START)) ||
-                    key.equals(context.getString(R.string.KEY_STOP)) ||
+            else if(key.equals(context.getString(R.string.KEY_START_STOP)) ||
                     key.equals(context.getString(R.string.KEY_LAP)))
                 setStartStopLapMode(context, key);
             if(key.equals(context.getString(R.string.KEY_SCREEN))){
@@ -307,8 +308,19 @@ public class MainActivity extends AppCompatActivity {
             if(event.sensor.getType() == Sensor.TYPE_ACCELEROMETER) {
                 // select the correct button
                 View btn = null;
-                if(start_mode == Mode.SWING || stop_mode == Mode.SWING)
-                    btn = bigBtn;
+                if(start_stop_mode == Mode.SWING){
+                    int page = page_selector.getCheckedRadioButtonId();
+                    switch(page){
+                        case R.id.page1:
+                            btn = stopwatchBigBtn;
+                            break;
+                        case R.id.page2:
+                            btn = timerBigBtn;
+                            break;
+                        case  R.id.page3: // do nothing if in setting page
+                            break;
+                    }
+                }
                 else if(lap_mode == Mode.SWING)
                     btn = btn1;
 
@@ -335,10 +347,22 @@ public class MainActivity extends AppCompatActivity {
                 if(event.values[0] <= PROXIMITY_THRESHOLD){
                     // select the correct button
                     View btn = null;
-                    if(start_mode == Mode.PROX || stop_mode == Mode.PROX)
-                        btn = bigBtn;
+                    if(start_stop_mode == Mode.PROX){
+                        int page = page_selector.getCheckedRadioButtonId();
+                        switch(page){
+                            case R.id.page1:
+                                btn = stopwatchBigBtn;
+                                break;
+                            case R.id.page2:
+                                btn = timerBigBtn;
+                                break;
+                            case  R.id.page3: // do nothing if in setting page
+                                break;
+                        }
+                    }
                     else if(lap_mode == Mode.PROX)
                         btn = btn1;
+
                     if (btn != null) {
                         btn.performClick();
 
@@ -391,10 +415,11 @@ public class MainActivity extends AppCompatActivity {
                 addTime.setOnLongClickListener(longClickListener);
                 addTime = mSectionsPagerAdapter.getAddMinBtn();
                 addTime.setOnLongClickListener(longClickListener);
-                // I believe there are 2 big buttons, but it doesn't matter which one is given here
-                // because this reference will be used just for perform the click
-                // and the callback will take care of everything
-                bigBtn = (ImageView)findViewById(R.id.bigBtn);
+                stopwatchBigBtn = mSectionsPagerAdapter.getStopwatchButton();
+                stopwatchModeTV = mSectionsPagerAdapter.getStopwatchModeText();
+                timerBigBtn = mSectionsPagerAdapter.getTimerButton();
+                timerModeTV = mSectionsPagerAdapter.getTimerModeText();
+                setModeTv();
             }
         });
 
@@ -408,7 +433,7 @@ public class MainActivity extends AppCompatActivity {
         // Read the preset timers and set the adapter
         preset_timers = new ArrayList<>();
         readPresetTimers();
-        presetTimerAdapter = new TimerListAdapter(preset_timers, getApplicationContext(), timerPresetActionClickListener);
+        presetTimerAdapter = new TimerListAdapter(preset_timers, MainActivity.this, timerPresetActionClickListener);
 
         // Page indicator RadioGroup
         page_selector = (RadioGroup)findViewById(R.id.page_selector);
@@ -492,7 +517,7 @@ public class MainActivity extends AppCompatActivity {
         vibe = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
 
         // message handler setup
-        messageHandler = new MessageHandler(getMainLooper(), getApplicationContext());
+        messageHandler = new MessageHandler(getMainLooper(), MainActivity.this);
     }
 
     private void setCenterBtnFeedback(Context context, String key){
@@ -508,7 +533,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void readPreferences() {
-        Context context = getApplicationContext();
+        Context context = MainActivity.this;
         sp = PreferenceManager.getDefaultSharedPreferences(context);
 
         // touch button feedback
@@ -523,38 +548,73 @@ public class MainActivity extends AppCompatActivity {
             nightModeOn = true;
 
         // start / stop / lap
-        setStartStopLapMode(context, context.getString(R.string.KEY_START));
+        setStartStopLapMode(context, context.getString(R.string.KEY_START_STOP));
 
         // screen always on
         setScreenAwake(context, context.getString(R.string.KEY_SCREEN));
     }
 
     private void setStartStopLapMode(Context context, String key) {
-        // TODO: finish
         String pref = sp.getString(key, context.getString(R.string.KEY_START_STOP_LAP_DEFAULT));
 
-        if(key.equals(context.getString(R.string.KEY_START))){
+        // start and stop, button text
+        if(key.equals(context.getString(R.string.KEY_START_STOP))){
             if(pref.equals(context.getString(R.string.dedicated_button))){
-                start_mode = Mode.BTN;
+                start_stop_mode = Mode.BTN;
             }
             else if(pref.equals(context.getString(R.string.volume_up))){
-                start_mode = Mode.VOL_UP;
+                start_stop_mode = Mode.VOL_UP;
             }
             else if(pref.equals(context.getString(R.string.volume_down))){
-                start_mode = Mode.VOL_DN;
+                start_stop_mode = Mode.VOL_DN;
             }
             else if(pref.equals(context.getString(R.string.clap_sound))){
-                start_mode = Mode.CLAP;
+                start_stop_mode = Mode.CLAP;
             }
             else if(pref.equals(context.getString(R.string.swing_motion))){
-                start_mode = Mode.SWING;
+                start_stop_mode = Mode.SWING;
             }
             else if(pref.equals(context.getString(R.string.proximity_sensor))){
-                start_mode = Mode.PROX;
+                start_stop_mode = Mode.PROX;
             }
+            setModeTv();
         }
+
+        // TODO: lap mode
+
         // register listeners in case this method is been called by the preferenceChange Listener
         registerSensorsListener();
+    }
+
+    private void setModeTv(){
+        if(stopwatchModeTV != null && timerModeTV != null){
+            switch (start_stop_mode){
+                case BTN:
+                    stopwatchModeTV.setText(getString(R.string.central_btn_tap));
+                    timerModeTV.setText(getString(R.string.central_btn_tap));
+                    break;
+                case VOL_UP:
+                    stopwatchModeTV.setText(getString(R.string.central_btn_vol_up));
+                    timerModeTV.setText(getString(R.string.central_btn_vol_up));
+                    break;
+                case VOL_DN:
+                    stopwatchModeTV.setText(getString(R.string.central_btn_vol_dn));
+                    timerModeTV.setText(getString(R.string.central_btn_vol_dn));
+                    break;
+                case CLAP:
+                    stopwatchModeTV.setText(R.string.central_btn_clap);
+                    timerModeTV.setText(R.string.central_btn_clap);
+                    break;
+                case PROX:
+                    stopwatchModeTV.setText(getString(R.string.central_btn_prox));
+                    timerModeTV.setText(getString(R.string.central_btn_prox));
+                    break;
+                case SWING:
+                    stopwatchModeTV.setText(R.string.central_btn_swing);
+                    timerModeTV.setText(R.string.central_btn_swing);
+                    break;
+            }
+        }
     }
 
     private void setScreenAwake(Context context, String key){
@@ -574,16 +634,12 @@ public class MainActivity extends AppCompatActivity {
         // register sensors listeners only if there is some feature that needs it selected
 
         // motion sensor
-        if(start_mode == Mode.SWING ||
-                stop_mode == Mode.SWING ||
-                lap_mode == Mode.SWING)
+        if(start_stop_mode == Mode.SWING || lap_mode == Mode.SWING)
             sensorManager.registerListener(sensorEventListener,
                     sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER),
                     SensorManager.SENSOR_DELAY_NORMAL);
         // proximity sensor
-        if(start_mode == Mode.PROX ||
-                stop_mode == Mode.PROX ||
-                lap_mode == Mode.PROX)
+        if(start_stop_mode == Mode.PROX || lap_mode == Mode.PROX)
             sensorManager.registerListener(sensorEventListener,
                     sensorManager.getDefaultSensor(Sensor.TYPE_PROXIMITY),
                     SensorManager.SENSOR_DELAY_NORMAL);
@@ -606,7 +662,7 @@ public class MainActivity extends AppCompatActivity {
         // unregister sensor listener
         sensorManager.unregisterListener(sensorEventListener);
         // unregister preference change listener
-        PreferenceManager.getDefaultSharedPreferences(getApplicationContext())
+        PreferenceManager.getDefaultSharedPreferences(MainActivity.this)
                 .unregisterOnSharedPreferenceChangeListener(preferenceChangeListener);
     }
 
@@ -818,15 +874,37 @@ public class MainActivity extends AppCompatActivity {
         View btn = null;
         if ((keyCode == KeyEvent.KEYCODE_VOLUME_DOWN)) {
             // select the correct button
-            if(start_mode == Mode.VOL_DN || stop_mode == Mode.VOL_DN)
-                btn = bigBtn;
+            if(start_stop_mode == Mode.VOL_DN){
+                int page = page_selector.getCheckedRadioButtonId();
+                switch(page){
+                    case R.id.page1:
+                        btn = stopwatchBigBtn;
+                        break;
+                    case R.id.page2:
+                        btn = timerBigBtn;
+                        break;
+                    case  R.id.page3: // do nothing if in setting page
+                        break;
+                }
+            }
             else if(lap_mode == Mode.VOL_DN)
                 btn = btn1;
         }
         else if (keyCode == KeyEvent.KEYCODE_VOLUME_UP){
             // select the correct button
-            if(start_mode == Mode.VOL_UP || stop_mode == Mode.VOL_UP)
-                btn = bigBtn;
+            if(start_stop_mode == Mode.VOL_UP){
+                int page = page_selector.getCheckedRadioButtonId();
+                switch(page){
+                    case R.id.page1:
+                        btn = stopwatchBigBtn;
+                        break;
+                    case R.id.page2:
+                        btn = timerBigBtn;
+                        break;
+                    case  R.id.page3: // do nothing if in setting page
+                        break;
+                }
+            }
             else if(lap_mode == Mode.VOL_UP)
                 btn = btn1;
         }
@@ -842,11 +920,11 @@ public class MainActivity extends AppCompatActivity {
                 vibe.vibrate(50);
                 break;
             case SOUND:
-                MediaPlayer.create(getApplicationContext(), R.raw.tiny_btn_push).start();
+                MediaPlayer.create(MainActivity.this, R.raw.tiny_btn_push).start();
                 break;
             case BOTH:
                 vibe.vibrate(50);
-                MediaPlayer.create(getApplicationContext(), R.raw.tiny_btn_push).start();
+                MediaPlayer.create(MainActivity.this, R.raw.tiny_btn_push).start();
                 break;
             case NONE: break;
         }

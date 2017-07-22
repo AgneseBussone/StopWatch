@@ -16,8 +16,6 @@ public class GroupInfo {
     public int imageResourceON;
     public int imageResourceOFF;
 
-    //TODO: for sound and input, the shortcut doesn't represent all the possibilities
-
     GroupInfo(String title, Item.DATA_ID setting, int imageResourceON, int imageResourceOFF){
         this.title = title;
         this.imageResourceOFF = imageResourceOFF;

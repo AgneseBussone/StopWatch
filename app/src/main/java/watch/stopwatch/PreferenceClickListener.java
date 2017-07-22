@@ -57,12 +57,8 @@ public class PreferenceClickListener implements ExpandableListView.OnChildClickL
             case ID_RINGTONE:
                 showRingtonePopup();
                 break;
-            case ID_START:
-                showStartStopPopup("Select start mode", context.getString(R.string.KEY_START));
-                break;
-            case ID_STOP:
-//                showStartStopPopup("Select stop mode", context.getString(R.string.KEY_STOP));
-                Toast.makeText(context, "Same as Start for now", Toast.LENGTH_SHORT).show();
+            case ID_START_STOP:
+                showStartStopPopup("Select start and stop mode", context.getString(R.string.KEY_START_STOP));
                 break;
             case ID_LAP:
                 Toast.makeText(context, "TODO", Toast.LENGTH_SHORT).show();
