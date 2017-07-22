@@ -2,6 +2,8 @@ package watch.stopwatch;
 
 import android.animation.Animator;
 import android.animation.Animator.AnimatorListener;
+import android.content.ClipData;
+import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
@@ -39,6 +41,7 @@ import android.widget.NumberPicker;
 import android.widget.RadioGroup;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.Timer;
@@ -371,8 +374,6 @@ public class MainActivity extends AppCompatActivity {
         mViewPager.setAdapter(mSectionsPagerAdapter);
         // Set the limit of pages kept in memory
         mViewPager.setOffscreenPageLimit(mSectionsPagerAdapter.getCount());
-        //TODO: if we want to keep the state after the app is closed...
-        // http://stackoverflow.com/questions/13273285/how-do-i-tell-my-custom-fragmentpageradapter-to-stop-destroying-my-fragments/
 
         // Buttons
         btn1 = (Button)findViewById(R.id.button1);
@@ -705,7 +706,7 @@ public class MainActivity extends AppCompatActivity {
                 if(lapRecordView == null){
                     lapRecordView = createSecondaryView(btn, R.layout.lap_list, mSectionsPagerAdapter.getStopwatchTV());
 
-                    // give to the handler the list
+                    // give the list to the handler
                     Message msg = new Message();
                     msg.obj = lapRecordView.findViewById(R.id.lapsList);
                     msg.what = MessageHandler.MSG_STOPWATCH_SHOW_LAP;
@@ -944,7 +945,7 @@ public class MainActivity extends AppCompatActivity {
         btn.setText("");
         btn.setBackgroundResource(R.drawable.btn_pressed);
 
-        View list_view = View.inflate(getApplicationContext(), mainLayoutResource, secondary_view);
+        View list_view = View.inflate(MainActivity.this, mainLayoutResource, secondary_view);
 
         // set the y position to the height of the father, so the view'll be out of screen (bottom)
         list_view.setY(secondary_view.getHeight());
@@ -1044,6 +1045,19 @@ public class MainActivity extends AppCompatActivity {
         setTimer();
         // mark the timer as set
         timer_state = TimerState.SET;
+    }
+
+    public void copyLaps(View view) {
+        String laps = messageHandler.getLaps();
+        // Gets a handle to the clipboard service.
+        ClipboardManager clipboard = (ClipboardManager)getSystemService(Context.CLIPBOARD_SERVICE);
+        // Creates a new text clip to put on the clipboard
+        ClipData clip = ClipData.newPlainText("laps", laps);
+        // Set the clipboard's primary clip.
+        clipboard.setPrimaryClip(clip);
+
+        Toast.makeText(MainActivity.this, "Laps copied into clipboard", Toast.LENGTH_SHORT).show();
+
     }
 
     /* Save the timers in the shared preferences */

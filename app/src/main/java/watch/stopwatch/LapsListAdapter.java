@@ -29,6 +29,15 @@ public class LapsListAdapter extends BaseAdapter {
 
     public void setLapsFormat(LapsFormat format){ this.format = format; }
 
+    public String getLapString(){
+        String laps = "";
+        for (int i = 0; i < data.size(); i++) {
+            laps += String.valueOf(i) + " ";
+            laps += data.get(i)[format.ordinal()] + "\n";
+        }
+        return laps;
+    }
+
     @Override
     public int getCount() {
         return data.size();

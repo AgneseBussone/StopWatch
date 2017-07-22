@@ -23,6 +23,8 @@ import java.util.ArrayList;
  * Handler callback for update the UI
  */
 
+//TODO: when a timer expires and the app is not in foreground, manage the gui somehow
+
 public class MessageHandler extends Handler {
     private static final String TAG = MessageHandler.class.getSimpleName();
     private enum TimerExpiredFeedback {SOUND, VIBRATE, BOTH, NONE}
@@ -95,8 +97,6 @@ public class MessageHandler extends Handler {
     }
 
     public void cleanUp(){
-        // TODO: save laps?
-
         // unregister listener
         PreferenceManager.getDefaultSharedPreferences(context)
                 .unregisterOnSharedPreferenceChangeListener(preferenceChangeListener);
@@ -353,5 +353,12 @@ public class MessageHandler extends Handler {
                 circleFillView.setValue(0);
             }
         }
+    }
+
+    public String getLaps(){
+        if(lapsListAdapter != null){
+            return lapsListAdapter.getLapString();
+        }
+        return "";
     }
 }
