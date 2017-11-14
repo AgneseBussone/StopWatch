@@ -6,6 +6,7 @@ import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.content.res.Resources;
@@ -93,7 +94,7 @@ public class MainActivity extends AppCompatActivity {
     private ImageView separator;
     private ArrayList<Time> preset_timers;
     private TimerListAdapter presetTimerAdapter;
-    private SharedPreferences sp;
+    private SharedPreferences sharedPreferences;
 
     // Preference variables
     private CenterBtnFeedback centerBtnFeedback = CenterBtnFeedback.VIBRATE;
@@ -518,10 +519,25 @@ public class MainActivity extends AppCompatActivity {
 
         // message handler setup
         messageHandler = new MessageHandler(getMainLooper(), MainActivity.this);
+
+        if(isFirstTime()){
+            //TODO: show tutorial
+//            Intent i = new Intent(this, TutorialActivity.class);
+//            startActivity(i);
+
+            // set the rate counting
+            SharedPreferences.Editor editor = sharedPreferences.edit();
+            editor.putInt("askForRate", getResources().getInteger(R.integer.askForRate_max_value));
+            editor.apply();
+        }
+        else{
+            // check if it's time to ask for rate
+            checkRateCounting();
+        }
     }
 
     private void setCenterBtnFeedback(Context context, String key){
-        String pref = sp.getString(key, context.getString(R.string.vibrate_only));
+        String pref = sharedPreferences.getString(key, context.getString(R.string.vibrate_only));
         if(pref.equals(context.getString(R.string.vibrate_only)))
             centerBtnFeedback = CenterBtnFeedback.VIBRATE;
         else if(pref.equals(context.getString(R.string.sound_only)))
@@ -534,14 +550,14 @@ public class MainActivity extends AppCompatActivity {
 
     private void readPreferences() {
         Context context = MainActivity.this;
-        sp = PreferenceManager.getDefaultSharedPreferences(context);
+        sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
 
         // touch button feedback
         setCenterBtnFeedback(context, context.getString(R.string.KEY_TOUCHBTN));
 
         // night mode
         String no = context.getString(R.string.KEY_NIGHT_DEFAULT);
-        String pref = sp.getString(context.getString(R.string.KEY_NIGHT), no);
+        String pref = sharedPreferences.getString(context.getString(R.string.KEY_NIGHT), no);
         if(pref.equals(no))
             nightModeOn = false;
         else
@@ -555,7 +571,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void setStartStopLapMode(Context context, String key) {
-        String pref = sp.getString(key, context.getString(R.string.KEY_START_STOP_LAP_DEFAULT));
+        String pref = sharedPreferences.getString(key, context.getString(R.string.KEY_START_STOP_LAP_DEFAULT));
 
         // start and stop, button text
         if(key.equals(context.getString(R.string.KEY_START_STOP))){
@@ -619,7 +635,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void setScreenAwake(Context context, String key){
         String no = context.getString(R.string.KEY_SCREEN_DEFAULT);
-        String pref = sp.getString(key, no);
+        String pref = sharedPreferences.getString(key, no);
         if(pref.equals(no)){
             // disable screen awake
             getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
@@ -649,7 +665,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         // register listener
-        sp.registerOnSharedPreferenceChangeListener(preferenceChangeListener);
+        sharedPreferences.registerOnSharedPreferenceChangeListener(preferenceChangeListener);
         registerSensorsListener();
     }
 
@@ -1171,5 +1187,67 @@ public class MainActivity extends AppCompatActivity {
                                            Integer.valueOf(values[2]), Integer.valueOf(values[3])));
             }
         }
+    }
+
+    private void checkRateCounting(){
+        int count = sharedPreferences.getInt(getString(R.string.KEY_ASK_FOR_RATE), getResources().getInteger(R.integer.askForRate_max_value));
+        if(count > 0){ // -1 means no more asking
+            count--;
+            if(count == 0){
+                // ask
+                android.app.AlertDialog alertDialog = new android.app.AlertDialog.Builder(MainActivity.this).create();
+                alertDialog.setTitle("Do you like this app?");
+                alertDialog.setMessage("If so, live a rate");
+                DialogInterface.OnClickListener listener = new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        SharedPreferences.Editor editor = sharedPreferences.edit();
+                        switch (which){
+                            case android.app.AlertDialog.BUTTON_POSITIVE:
+                                // open the rate activity
+                                Intent i = new Intent(MainActivity.this, RateActivity.class);
+                                startActivity(i);
+                                // fallthrough
+                            case android.app.AlertDialog.BUTTON_NEGATIVE:
+                                // do not ask it again
+                                editor.putInt(getString(R.string.KEY_ASK_FOR_RATE), getResources().getInteger(R.integer.askForRate_null));
+                                break;
+                            case android.app.AlertDialog.BUTTON_NEUTRAL:
+                                // restart the counting
+                                editor.putInt(getString(R.string.KEY_ASK_FOR_RATE), getResources().getInteger(R.integer.askForRate_max_value));
+                                break;
+                        }
+                        editor.apply();
+                    }
+                };
+                alertDialog.setButton(android.app.AlertDialog.BUTTON_POSITIVE, "Rate it", listener);
+                alertDialog.setButton(android.app.AlertDialog.BUTTON_NEGATIVE, "No, thanks", listener);
+                alertDialog.setButton(android.app.AlertDialog.BUTTON_NEUTRAL, "Not now", listener);
+
+                alertDialog.show();
+
+            }
+            else {
+                // store the new value
+                SharedPreferences.Editor editor = sharedPreferences.edit();
+                editor.putInt(getString(R.string.KEY_ASK_FOR_RATE), count);
+                editor.apply();
+            }
+        }
+    }
+
+    private boolean isFirstTime()
+    {
+        boolean firstUse = sharedPreferences.getBoolean(getString(R.string.KEY_FIRST_USE), true);
+        if(BuildConfig.DEBUG) {
+//            firstUse = true; //TEST ONLY
+        }
+        if (firstUse) {
+            // first time
+            SharedPreferences.Editor editor = sharedPreferences.edit();
+            editor.putBoolean(getString(R.string.KEY_FIRST_USE), false);
+            editor.apply();
+        }
+        return firstUse;
     }
 }

@@ -41,6 +41,8 @@
     <string name="KEY_SCREEN">key_pref_screen_on</string>
     <string name="KEY_NIGHT">key_pref_night_mode</string>
     <string name="KEY_SMILE">key_pref_smile</string>
+    <string name="KEY_ASK_FOR_RATE">askForRate</string>
+    <string name="KEY_FIRST_USE">firstUse</string>
 
     <!-- Possible values for preferences -->
     <string name="sound_only">Sound</string>

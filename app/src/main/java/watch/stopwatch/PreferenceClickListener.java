@@ -2,6 +2,7 @@ package watch.stopwatch;
 
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.media.Ringtone;
@@ -14,6 +15,7 @@ import android.view.View;
 import android.widget.ExpandableListView;
 import android.widget.ImageView;
 import android.widget.Toast;
+
 
 import java.util.HashMap;
 import java.util.Map;
@@ -81,7 +83,8 @@ public class PreferenceClickListener implements ExpandableListView.OnChildClickL
                 break;
             }
             case ID_RATE:
-                Toast.makeText(context, "TODO", Toast.LENGTH_SHORT).show();
+                Intent i = new Intent(context, RateActivity.class);
+                context.startActivity(i);
                 break;
             case ID_DEV:
                 showDevPopup();
