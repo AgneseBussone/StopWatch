@@ -101,6 +101,7 @@ public class MainActivity extends AppCompatActivity {
     private Mode start_stop_mode = Mode.BTN;
     private Mode lap_mode = Mode.BTN;
     private SensorManager sensorManager;
+    private ClapHandler clapHandler = null;
 
     /***********************************************************************************************
      *
@@ -303,23 +304,29 @@ public class MainActivity extends AppCompatActivity {
         private final int ACC_FILTER_DATA_MIN_TIME = 50; // ms
         long lastSaved = System.currentTimeMillis();
 
+        private View selectBtn(){
+            View btn = null;
+            int page = page_selector.getCheckedRadioButtonId();
+            switch(page){
+                case R.id.page1:
+                    btn = stopwatchBigBtn;
+                    break;
+                case R.id.page2:
+                    btn = timerBigBtn;
+                    break;
+                case  R.id.page3: // do nothing if in setting page
+                    break;
+            }
+            return btn;
+        }
+
         @Override
         public void onSensorChanged(SensorEvent event) {
             if(event.sensor.getType() == Sensor.TYPE_ACCELEROMETER) {
                 // select the correct button
                 View btn = null;
                 if(start_stop_mode == Mode.SWING){
-                    int page = page_selector.getCheckedRadioButtonId();
-                    switch(page){
-                        case R.id.page1:
-                            btn = stopwatchBigBtn;
-                            break;
-                        case R.id.page2:
-                            btn = timerBigBtn;
-                            break;
-                        case  R.id.page3: // do nothing if in setting page
-                            break;
-                    }
+                    btn = selectBtn();
                 }
                 else if(lap_mode == Mode.SWING)
                     btn = btn1;
@@ -348,24 +355,13 @@ public class MainActivity extends AppCompatActivity {
                     // select the correct button
                     View btn = null;
                     if(start_stop_mode == Mode.PROX){
-                        int page = page_selector.getCheckedRadioButtonId();
-                        switch(page){
-                            case R.id.page1:
-                                btn = stopwatchBigBtn;
-                                break;
-                            case R.id.page2:
-                                btn = timerBigBtn;
-                                break;
-                            case  R.id.page3: // do nothing if in setting page
-                                break;
-                        }
+                        btn = selectBtn();
                     }
                     else if(lap_mode == Mode.PROX)
                         btn = btn1;
 
                     if (btn != null) {
                         btn.performClick();
-
                     }
                 }
             }
@@ -374,6 +370,37 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public void onAccuracyChanged(Sensor sensor, int accuracy) {}
     };
+
+    // Listener for the clap mode
+    private ClapListener clapListener = new ClapListener() {
+        @Override
+        public void clapDetected() {
+            // select the correct button
+            View btn = null;
+            if(start_stop_mode == Mode.CLAP){
+                int page = page_selector.getCheckedRadioButtonId();
+                switch(page){
+                    case R.id.page1:
+                        btn = stopwatchBigBtn;
+                        break;
+                    case R.id.page2:
+                        btn = timerBigBtn;
+                        break;
+                    case  R.id.page3: // do nothing if in setting page
+                        break;
+                }
+            }
+            else if(lap_mode == Mode.CLAP)
+                btn = btn1;
+
+            if (btn != null) {
+                btn.performClick();
+            }
+        }
+    };
+
+    /**********************************************************************************************/
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -643,6 +670,15 @@ public class MainActivity extends AppCompatActivity {
             sensorManager.registerListener(sensorEventListener,
                     sensorManager.getDefaultSensor(Sensor.TYPE_PROXIMITY),
                     SensorManager.SENSOR_DELAY_NORMAL);
+        //clap "sensor"
+        if(start_stop_mode == Mode.CLAP || lap_mode == Mode.CLAP){
+            if(clapHandler == null)
+                clapHandler = new ClapHandler();
+            if(clapHandler.isReady()){
+                clapHandler.setListener(clapListener);
+                clapHandler.startDetectingClaps();
+            }
+        }
     }
 
     @Override
@@ -661,6 +697,9 @@ public class MainActivity extends AppCompatActivity {
         savePresetTimers();
         // unregister sensor listener
         sensorManager.unregisterListener(sensorEventListener);
+        // stop detecting claps
+        if(clapHandler != null)
+            clapHandler.stopDetectingClaps();
         // unregister preference change listener
         PreferenceManager.getDefaultSharedPreferences(MainActivity.this)
                 .unregisterOnSharedPreferenceChangeListener(preferenceChangeListener);

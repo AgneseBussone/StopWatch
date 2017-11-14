@@ -20,7 +20,7 @@ import android.widget.TextView;
 import java.util.ArrayList;
 
 /**
- * Handler callback for update the UI
+ * Handler callback to update the UI
  */
 
 //TODO: when a timer expires and the app is not in foreground, manage the gui somehow
