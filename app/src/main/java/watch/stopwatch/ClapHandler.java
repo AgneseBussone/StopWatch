@@ -1,9 +1,8 @@
 package watch.stopwatch;
 
-import android.media.AudioFormat;
+import android.app.Activity;
 import android.media.AudioRecord;
 import android.media.MediaRecorder;
-import android.support.annotation.NonNull;
 import android.util.Log;
 
 import be.tarsos.dsp.AudioDispatcher;
@@ -21,44 +20,48 @@ public class ClapHandler {
 
     // Audio recording rates, from the highest to the lowest
     private final int[] mSampleRates = new int[] {44100, 22050, 11025, 16000, 8000};
-    private final short[] mAudioFormat = new short[] { AudioFormat.ENCODING_PCM_8BIT, AudioFormat.ENCODING_PCM_16BIT };
-    private final short[] mChannelConfig = new short[] { AudioFormat.CHANNEL_IN_MONO, AudioFormat.CHANNEL_IN_STEREO };
-    private final double threshold = 15;
-    private final double sensitivity = 65;
+    private final int tarsos_channelConfig = android.media.AudioFormat.CHANNEL_IN_MONO;
+    private final int tarsos_audioFormat = android.media.AudioFormat.ENCODING_PCM_16BIT;
+    private final double threshold = 7;
+    private final double sensitivity = 25;
 
     private int sampleRate = -1;
     private int bufferSize= -1;
-    private AudioRecord recorder = null;
     private AudioDispatcher dispatcher = null;
     private PercussionOnsetDetector percussionDetector = null;
-
+    private Activity mainActivity;
     private ClapListener listener = null;
 
-    ClapHandler() {
-        // initialize audio settings
-        recorder = findAudioRecord();
-        if (recorder != null) {
-            dispatcher = AudioDispatcherFactory.fromDefaultMicrophone(sampleRate, bufferSize * 2, 0);
-            percussionDetector = new PercussionOnsetDetector(sampleRate, bufferSize * 2,
-                    new OnsetHandler() {
+    ClapHandler(final Activity mainActivity) {
+        this.mainActivity = mainActivity;
+        getValidSampleRates();
+        if (sampleRate != -1 && bufferSize != -1) {
+            dispatcher = AudioDispatcherFactory.fromDefaultMicrophone(sampleRate, bufferSize, 0);
+            percussionDetector = new PercussionOnsetDetector(sampleRate, bufferSize,
+                new OnsetHandler() {
 
-                        @Override
-                        public void handleOnset(double time, double salience) {
-                            Log.d(TAG, "Clap detected!");
-//                            if(listener != null)
-//                                listener.clapDetected();
-                        }
-                    }, sensitivity, threshold);
+                    @Override
+                    public void handleOnset(double time, double salience) {
+                        if(listener != null)
+                            mainActivity.runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    listener.clapDetected();
+                                }
+                            });
+                    }
+                },
+                sensitivity,
+                threshold);
         }
     }
-
-    public boolean isReady(){ return (recorder != null); }
 
     public void setListener(ClapListener clapListener){ listener = clapListener; }
 
     public void startDetectingClaps(){
         if(dispatcher != null && percussionDetector != null) {
             dispatcher.addAudioProcessor(percussionDetector);
+            // note: be careful not to call this multiple times or there'll be conflicts among threads
             new Thread(dispatcher).start();
         }
     }
@@ -70,32 +73,30 @@ public class ClapHandler {
         }
     }
 
-    private AudioRecord findAudioRecord() {
+    private void getValidSampleRates() {
         for (int rate : mSampleRates) {
-            for (short audioFormat : mAudioFormat) {
-                for (short channelConfig : mChannelConfig) {
-                    try {
-                        Log.d(TAG, "Attempting rate " + rate + "Hz, bits: " + audioFormat + ", channel: "
-                                + channelConfig);
-                        int buffer_size = AudioRecord.getMinBufferSize(rate, channelConfig, audioFormat);
+            try {
+                int buffer_size = AudioRecord.getMinBufferSize(rate, tarsos_channelConfig, tarsos_audioFormat);
+                if (buffer_size != AudioRecord.ERROR_BAD_VALUE) {
+                    // check if we can instantiate and have a success
+                    AudioRecord rec = new AudioRecord(MediaRecorder.AudioSource.MIC, rate, tarsos_channelConfig, tarsos_audioFormat, buffer_size);
 
-                        if (buffer_size != AudioRecord.ERROR_BAD_VALUE) {
-                            // check if we can instantiate and have a success
-                            AudioRecord rec = new AudioRecord(MediaRecorder.AudioSource.DEFAULT, rate, channelConfig, audioFormat, buffer_size);
+                    if (rec.getState() == AudioRecord.STATE_INITIALIZED){
+                        Log.d(TAG, "sampleRate= " + rate + " buffer=" + buffer_size);
+                        // memorize the data
+                        sampleRate = rate;
+                        bufferSize = buffer_size;
 
-                            if (rec.getState() == AudioRecord.STATE_INITIALIZED){
-                                // memorize the data
-                                sampleRate = rate;
-                                bufferSize = buffer_size;
-                                return rec;
-                            }
-                        }
-                    } catch (Exception e) {
-                        Log.e(TAG, rate + "Exception, keep trying.",e);
+                        // release the resource
+                        rec.release();
+                        rec = null;
+
+                        break;
                     }
                 }
+            } catch (Exception e) {
+                Log.e(TAG, rate + "Exception, keep trying.",e);
             }
         }
-        return null;
     }
 }

@@ -117,11 +117,14 @@ public class MainActivity extends AppCompatActivity {
                 setCenterBtnFeedback(context, key);
             }
             else if(key.equals(context.getString(R.string.KEY_START_STOP)) ||
-                    key.equals(context.getString(R.string.KEY_LAP)))
+                    key.equals(context.getString(R.string.KEY_LAP))) {
                 setStartStopLapMode(context, key);
+                registerSensorsListener();
+            }
             if(key.equals(context.getString(R.string.KEY_SCREEN))){
                 setScreenAwake(context, key);
             }
+
         }
     };
 
@@ -609,8 +612,6 @@ public class MainActivity extends AppCompatActivity {
 
         // TODO: lap mode
 
-        // register listeners in case this method is been called by the preferenceChange Listener
-        registerSensorsListener();
     }
 
     private void setModeTv(){
@@ -672,9 +673,8 @@ public class MainActivity extends AppCompatActivity {
                     SensorManager.SENSOR_DELAY_NORMAL);
         //clap "sensor"
         if(start_stop_mode == Mode.CLAP || lap_mode == Mode.CLAP){
-            if(clapHandler == null)
-                clapHandler = new ClapHandler();
-            if(clapHandler.isReady()){
+            if(clapHandler == null) {
+                clapHandler = new ClapHandler(this);
                 clapHandler.setListener(clapListener);
                 clapHandler.startDetectingClaps();
             }
