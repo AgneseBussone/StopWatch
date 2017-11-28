@@ -57,6 +57,7 @@
     <string name="clap_sound">Clap sound</string>
     <string name="swing_motion">Swing Motion</string>
     <string name="proximity_sensor">Proximity sensor</string>
+    <string name="clap_warning">Note: works best in quiet environments</string>
 
     <!-- Default values for preferences -->
     <!-- I tried to use aliases @string/already_defined_string

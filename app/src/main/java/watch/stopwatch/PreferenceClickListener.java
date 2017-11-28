@@ -121,6 +121,9 @@ public class PreferenceClickListener implements ExpandableListView.OnChildClickL
                 editor.putString(pref_key, items[which].toString());
                 editor.apply();
                 dialog.dismiss();
+                // for clap sound, display a toast with a note
+                if(items[which].toString().equals(context.getResources().getString(R.string.clap_sound)))
+                    Toast.makeText(context, context.getResources().getString(R.string.clap_warning), Toast.LENGTH_LONG).show();
             }
         });
         dialogBuilder.setNegativeButton("CANCEL", null);
