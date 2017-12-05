@@ -726,18 +726,17 @@ public class MainActivity extends AppCompatActivity {
      * @param view
      */
     public void btn1Click(View view) {
-        vibe.vibrate(30);
         int page = page_selector.getCheckedRadioButtonId();
         switch(page){
             case R.id.page1:
                 // stopwatch - lap
                 if(stopwatch_state == StopwatchState.RUNNING){
                     messageHandler.sendEmptyMessage(MessageHandler.MSG_STOPWATCH_LAP);
+                    vibe.vibrate(30);
                 }
                 break;
-            case R.id.timerListAddBtn:
-                // fallthrough
             case R.id.page2:
+                vibe.vibrate(30);
                 // timer - set/add
                 AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this);
                 LayoutInflater inflater = this.getLayoutInflater();
@@ -795,7 +794,6 @@ public class MainActivity extends AppCompatActivity {
                 b.show();
                 break;
             case R.id.page3:
-                // TBD
                 break;
         }
 
@@ -861,7 +859,6 @@ public class MainActivity extends AppCompatActivity {
                 }
                 break;
             case R.id.page3:
-                // TBD
                 break;
         }
 
@@ -891,7 +888,6 @@ public class MainActivity extends AppCompatActivity {
                 timer_state = TimerState.STOPPED;
                 break;
             case R.id.page3:
-                // TBD
                 break;
         }
 
@@ -910,7 +906,11 @@ public class MainActivity extends AppCompatActivity {
                 break;
             case R.id.page2:
                 // timer
-                manage_timer(view);
+                if(timer_state == TimerState.STOPPED)
+                    // if no timer is set, let the user set a new timer
+                    btn1.performClick();
+                else
+                    manage_timer(view);
                 break;
             case R.id.page3:
                 // TBD
