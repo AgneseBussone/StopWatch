@@ -14,6 +14,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.ExpandableListView;
 import android.widget.ImageView;
+import android.widget.ListView;
 import android.widget.Toast;
 
 
@@ -32,9 +33,8 @@ public class PreferenceClickListener implements ExpandableListView.OnChildClickL
     private Context context;
     private SharedPreferences sp;
 
-    // Variable used to retrieve values from some of the alert dialogs
+    // Variable used to play samples of the ring tones
     // (if declared local, it's must be final, but I need to change the value
-    private int alarm_sound_index;
     private Ringtone alarm_sound;
 
     public PreferenceClickListener(Context context){
@@ -110,27 +110,30 @@ public class PreferenceClickListener implements ExpandableListView.OnChildClickL
 
         // read current preferences
         String pref = sp.getString(pref_key, context.getResources().getString(R.string.KEY_START_STOP_LAP_DEFAULT));
-        int start_index = 0;
+        int checkedItem = 0;
         if(!pref.isEmpty()){
             for(int i = 0; i < items.length; i++){
                 if(pref.equals(items[i].toString())){
-                    start_index = i;
+                    checkedItem = i;
                     break;
                 }
             }
         }
         ModeListAdapter adapter = new ModeListAdapter(context, items, disabledEntry, context.getResources().getString(R.string.KEY_START_STOP_LAP_DEFAULT));
         dialogBuilder.setAdapter(adapter, null);
-        dialogBuilder.setSingleChoiceItems(items, start_index, new DialogInterface.OnClickListener() {
+        dialogBuilder.setSingleChoiceItems(items, checkedItem, null);
+        dialogBuilder.setPositiveButton("SELECT", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
+                ListView lw = ((AlertDialog)dialog).getListView();
+                int selectedItem = lw.getCheckedItemPosition();
                 // save preference
                 SharedPreferences.Editor editor = sp.edit();
-                editor.putString(pref_key, items[which].toString());
+                editor.putString(pref_key, items[selectedItem].toString());
                 editor.apply();
                 dialog.dismiss();
                 // for clap sound, display a toast with a note
-                if(items[which].toString().equals(context.getResources().getString(R.string.clap_sound)))
+                if(items[selectedItem].toString().equals(context.getResources().getString(R.string.clap_sound)))
                     Toast.makeText(context, context.getResources().getString(R.string.clap_warning), Toast.LENGTH_LONG).show();
             }
         });
@@ -140,24 +143,27 @@ public class PreferenceClickListener implements ExpandableListView.OnChildClickL
 
     private void showYesNoPopup(CharSequence title, final String pref_key, final ImageView shortcut, final GroupInfo groupInfo) {
         // Create the dialog
-        AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(context);
+        final AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(context);
         dialogBuilder.setTitle(title);
         final CharSequence[] items = context.getResources().getTextArray(R.array.yes_or_no);
 
         // read current preferences
         String pref = sp.getString(pref_key, items[1].toString()); //default: no
-        final int checkedItem = (pref.equals(items[0].toString()))? 0 : 1;
-        dialogBuilder.setSingleChoiceItems(items, checkedItem, new DialogInterface.OnClickListener() {
+        int checkedItem = (pref.equals(items[0].toString()))? 0 : 1;
+        dialogBuilder.setSingleChoiceItems(items, checkedItem, null);
+        dialogBuilder.setPositiveButton("SELECT", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 // save preference
                 SharedPreferences.Editor editor = sp.edit();
-                String value = items[which].toString();
+                ListView lw = ((AlertDialog)dialog).getListView();
+                int selectedItem = lw.getCheckedItemPosition();
+                String value = items[selectedItem].toString();
                 editor.putString(pref_key, value);
                 editor.apply();
                 if(shortcut != null && groupInfo != null){
                     shortcut.setTag(value);
-                    if(which == 0) // Yes
+                    if(selectedItem == 0) // Yes
                         shortcut.setImageResource(groupInfo.imageResourceON);
                     else
                         shortcut.setImageResource(groupInfo.imageResourceOFF);
@@ -180,17 +186,17 @@ public class PreferenceClickListener implements ExpandableListView.OnChildClickL
 
         // read current preferences
         String pref = sp.getString(context.getString(R.string.KEY_RINGTONE_TITLE), titles[0].toString());
-        alarm_sound_index = 0;
+        int checkedItem = 0;
         if(!pref.isEmpty() && sound_list.containsKey(pref)){
             for(int i = 0; i < titles.length; i++){
                 if(pref.equals(titles[i].toString())){
-                    alarm_sound_index = i;
+                    checkedItem = i;
                     break;
                 }
             }
         }
 
-        dialogBuilder.setSingleChoiceItems(titles, alarm_sound_index, new DialogInterface.OnClickListener() {
+        dialogBuilder.setSingleChoiceItems(titles, checkedItem, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 // play the sample
@@ -198,7 +204,6 @@ public class PreferenceClickListener implements ExpandableListView.OnChildClickL
                     alarm_sound.stop();
                 alarm_sound = RingtoneManager.getRingtone(context, Uri.parse(sound_list.get(String.valueOf(titles[which]))));
                 alarm_sound.play();
-                alarm_sound_index = which;
             }
         });
 
@@ -209,8 +214,10 @@ public class PreferenceClickListener implements ExpandableListView.OnChildClickL
                 if(alarm_sound!= null && alarm_sound.isPlaying())
                     alarm_sound.stop();
                 // save preference
+                ListView lw = ((AlertDialog)dialog).getListView();
+                int selectedItem = lw.getCheckedItemPosition();
                 SharedPreferences.Editor editor = sp.edit();
-                String title = String.valueOf(titles[alarm_sound_index]);
+                String title = String.valueOf(titles[selectedItem]);
                 editor.putString(context.getString(R.string.KEY_RINGTONE_TITLE), title);
                 editor.putString(context.getString(R.string.KEY_RINGTONE_URI), sound_list.get(title));
                 editor.apply();
