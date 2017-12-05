@@ -202,15 +202,48 @@ public class MainActivity extends AppCompatActivity {
                 switch (id) {
 
                     case R.id.setBtn: {
-                        timer_timeout.h = Integer.valueOf(values[0]);
-                        timer_timeout.m = Integer.valueOf(values[1]);
-                        timer_timeout.s = Integer.valueOf(values[2]);
-                        timer_timeout.ms = 0;
+                        switch (timer_state) {
+                            case PAUSED:
+                                // reset
+                                btn3.performClick();
+                                // fallthrough
+                            case SET:
+                                // fallthrough
+                            case STOPPED:
+                                timer_timeout.h = Integer.valueOf(values[0]);
+                                timer_timeout.m = Integer.valueOf(values[1]);
+                                timer_timeout.s = Integer.valueOf(values[2]);
+                                timer_timeout.ms = 0;
 
-                        setTimer();
+                                setTimer();
 
-                        // mark the timer as set
-                        timer_state = TimerState.SET;
+                                // mark the timer as set
+                                timer_state = TimerState.SET;
+
+                                break;
+
+                            case RUNNING:
+                                //stop the current timer
+                                timerBigBtn.performClick();
+
+                                // reset
+                                btn3.performClick();
+
+                                //set the new timer
+                                timer_timeout.h = Integer.valueOf(values[0]);
+                                timer_timeout.m = Integer.valueOf(values[1]);
+                                timer_timeout.s = Integer.valueOf(values[2]);
+                                timer_timeout.ms = 0;
+                                setTimer();
+
+                                // mark the timer as set
+                                timer_state = TimerState.SET;
+
+                                // start
+                                timerBigBtn.performClick();
+
+                                break;
+                        }
 
                         // click on the second button to close the list
                         btn2.performClick();
