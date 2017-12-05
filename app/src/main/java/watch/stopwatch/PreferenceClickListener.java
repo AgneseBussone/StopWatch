@@ -59,12 +59,18 @@ public class PreferenceClickListener implements ExpandableListView.OnChildClickL
             case ID_RINGTONE:
                 showRingtonePopup();
                 break;
-            case ID_START_STOP:
-                showStartStopPopup("Select start and stop mode", context.getString(R.string.KEY_START_STOP));
+            case ID_START_STOP: {
+                String start_stop_key = context.getString(R.string.KEY_START_STOP);
+                String lap_active_mode = sp.getString(context.getString(R.string.KEY_LAP), context.getResources().getString(R.string.KEY_START_STOP_LAP_DEFAULT));
+                showModePopup("Select start and stop mode", start_stop_key, lap_active_mode);
                 break;
-            case ID_LAP:
-                Toast.makeText(context, "TODO", Toast.LENGTH_SHORT).show();
+            }
+            case ID_LAP:{
+                String lap_key = context.getString(R.string.KEY_LAP);
+                String start_stop_active_mode = sp.getString(context.getString(R.string.KEY_START_STOP), context.getResources().getString(R.string.KEY_START_STOP_LAP_DEFAULT));
+                showModePopup("Select lap mode", lap_key, start_stop_active_mode);
                 break;
+            }
             case ID_TOUCHBTN: {
                 CustomExpandableListAdapter listAdapter = (CustomExpandableListAdapter) parent.getExpandableListAdapter();
                 ImageView shortcut = listAdapter.getImageShortcut(groupPosition);
@@ -96,7 +102,7 @@ public class PreferenceClickListener implements ExpandableListView.OnChildClickL
         return true;
     }
 
-    private void showStartStopPopup(CharSequence title, final String pref_key){
+    private void showModePopup(CharSequence title, final String pref_key, final String disabledEntry){
         // Create the dialog
         AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(context);
         dialogBuilder.setTitle(title);
@@ -113,6 +119,8 @@ public class PreferenceClickListener implements ExpandableListView.OnChildClickL
                 }
             }
         }
+        ModeListAdapter adapter = new ModeListAdapter(context, items, disabledEntry, context.getResources().getString(R.string.KEY_START_STOP_LAP_DEFAULT));
+        dialogBuilder.setAdapter(adapter, null);
         dialogBuilder.setSingleChoiceItems(items, start_index, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
@@ -127,8 +135,7 @@ public class PreferenceClickListener implements ExpandableListView.OnChildClickL
             }
         });
         dialogBuilder.setNegativeButton("CANCEL", null);
-        AlertDialog b = dialogBuilder.create();
-        b.show();
+        dialogBuilder.show();
     }
 
     private void showYesNoPopup(CharSequence title, final String pref_key, final ImageView shortcut, final GroupInfo groupInfo) {
@@ -161,8 +168,7 @@ public class PreferenceClickListener implements ExpandableListView.OnChildClickL
             }
         });
         dialogBuilder.setNegativeButton("CANCEL", null);
-        AlertDialog b = dialogBuilder.create();
-        b.show();
+        dialogBuilder.show();
     }
 
     private void showRingtonePopup() {
@@ -221,8 +227,7 @@ public class PreferenceClickListener implements ExpandableListView.OnChildClickL
             }
         });
 
-        AlertDialog b = dialogBuilder.create();
-        b.show();
+        dialogBuilder.show();
     }
 
     // Key: title
@@ -250,8 +255,7 @@ public class PreferenceClickListener implements ExpandableListView.OnChildClickL
         dialogBuilder.setTitle("Creators");
         dialogBuilder.setMessage("Designer: Jeeho Cha\nDevelopers: \n\tAgnese Bussone\n\tFabrizio Perria");
         dialogBuilder.setNeutralButton("Close", null);
-        AlertDialog b = dialogBuilder.create();
-        b.show();
+        dialogBuilder.show();
     }
 
     private void showVersionPopup() {
@@ -261,8 +265,7 @@ public class PreferenceClickListener implements ExpandableListView.OnChildClickL
         dialogBuilder.setTitle("App version");
         dialogBuilder.setMessage(BuildConfig.VERSION_NAME);
         dialogBuilder.setNeutralButton("Close", null);
-        AlertDialog b = dialogBuilder.create();
-        b.show();
+        dialogBuilder.show();
     }
 
     private void showTouchButtonFeedbackPopup(final ImageView shortcut, final GroupInfo groupInfo) {
@@ -343,8 +346,7 @@ public class PreferenceClickListener implements ExpandableListView.OnChildClickL
             }
         });
         dialogBuilder.setNegativeButton("CANCEL", null);
-        AlertDialog b = dialogBuilder.create();
-        b.show();
+        dialogBuilder.show();
     }
 
     private void showSoundPopup(final ImageView shortcut, final GroupInfo groupInfo) {
@@ -425,8 +427,7 @@ public class PreferenceClickListener implements ExpandableListView.OnChildClickL
             }
         });
         dialogBuilder.setNegativeButton("CANCEL", null);
-        AlertDialog b = dialogBuilder.create();
-        b.show();
+        dialogBuilder.show();
     }
 
 

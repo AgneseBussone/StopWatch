@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!--
+Customization of single choice list alert dialog. We needed an adapter in order to disable some options, but
+the alert dialog looked different from the one opened without the adapter.
+The base layout used as starting point is
+https://android.googlesource.com/platform/frameworks/base/+/master/core/res/res/layout/select_dialog_singlechoice.xml
+-->
+
+<CheckedTextView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@android:id/text1"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:drawablePadding="12dp"
+    android:drawableStart="?android:attr/listChoiceIndicatorSingle"
+    android:ellipsize="marquee"
+    android:gravity="center_vertical"
+    android:minHeight="?android:attr/listPreferredItemHeight"
+    android:paddingEnd="7dip"
+    android:paddingStart="12dip"
+    android:textAppearance="?android:attr/textAppearanceMedium"
+    android:textColor="?android:attr/textColorAlertDialogListItem" />
