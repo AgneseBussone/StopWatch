@@ -117,12 +117,16 @@ public class MainActivity extends AppCompatActivity {
             if(key.equals(context.getString(R.string.KEY_TOUCHBTN))){
                 setCenterBtnFeedback(context, key);
             }
-            else if(key.equals(context.getString(R.string.KEY_START_STOP)) ||
-                    key.equals(context.getString(R.string.KEY_LAP))) {
-                setStartStopLapMode(context, key);
+            else if(key.equals(context.getString(R.string.KEY_START_STOP))) {
+                start_stop_mode = setMode(context, key);
+                setModeTv();
                 registerSensorsListener();
             }
-            if(key.equals(context.getString(R.string.KEY_SCREEN))){
+            else if(key.equals(context.getString(R.string.KEY_LAP))) {
+                lap_mode = setMode(context, key);
+                registerSensorsListener();
+            }
+            else if(key.equals(context.getString(R.string.KEY_SCREEN))){
                 setScreenAwake(context, key);
             }
 
@@ -593,41 +597,37 @@ public class MainActivity extends AppCompatActivity {
         else
             nightModeOn = true;
 
-        // start / stop / lap
-        setStartStopLapMode(context, context.getString(R.string.KEY_START_STOP));
+        // start / stop activation mode
+        start_stop_mode = setMode(context, context.getString(R.string.KEY_START_STOP));
+        setModeTv();
+
+        // lap activation mode
+        lap_mode = setMode(context, context.getString(R.string.KEY_LAP));
 
         // screen always on
         setScreenAwake(context, context.getString(R.string.KEY_SCREEN));
     }
 
-    private void setStartStopLapMode(Context context, String key) {
+    private Mode setMode(Context context, String key) {
         String pref = sharedPreferences.getString(key, context.getString(R.string.KEY_START_STOP_LAP_DEFAULT));
+        Mode mode= Mode.BTN; //default mode
 
-        // start and stop, button text
-        if(key.equals(context.getString(R.string.KEY_START_STOP))){
-            if(pref.equals(context.getString(R.string.dedicated_button))){
-                start_stop_mode = Mode.BTN;
-            }
-            else if(pref.equals(context.getString(R.string.volume_up))){
-                start_stop_mode = Mode.VOL_UP;
-            }
-            else if(pref.equals(context.getString(R.string.volume_down))){
-                start_stop_mode = Mode.VOL_DN;
-            }
-            else if(pref.equals(context.getString(R.string.clap_sound))){
-                start_stop_mode = Mode.CLAP;
-            }
-            else if(pref.equals(context.getString(R.string.swing_motion))){
-                start_stop_mode = Mode.SWING;
-            }
-            else if(pref.equals(context.getString(R.string.proximity_sensor))){
-                start_stop_mode = Mode.PROX;
-            }
-            setModeTv();
+        if(pref.equals(context.getString(R.string.volume_up))){
+            mode = Mode.VOL_UP;
         }
-
-        // TODO: lap mode
-
+        else if(pref.equals(context.getString(R.string.volume_down))){
+            mode = Mode.VOL_DN;
+        }
+        else if(pref.equals(context.getString(R.string.clap_sound))){
+            mode = Mode.CLAP;
+        }
+        else if(pref.equals(context.getString(R.string.swing_motion))){
+            mode = Mode.SWING;
+        }
+        else if(pref.equals(context.getString(R.string.proximity_sensor))){
+            mode = Mode.PROX;
+        }
+        return mode;
     }
 
     private void setModeTv(){
