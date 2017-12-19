@@ -29,15 +29,13 @@ public class ClapHandler {
     private int bufferSize= -1;
     private AudioDispatcher dispatcher = null;
     private PercussionOnsetDetector percussionDetector = null;
-    private Activity mainActivity;
     private ClapListener listener = null;
+    private boolean isRunning;
 
     ClapHandler(final Activity mainActivity) {
-        this.mainActivity = mainActivity;
+        isRunning = false;
         getValidSampleRates();
-        if (sampleRate != -1 && bufferSize != -1) {
-            dispatcher = AudioDispatcherFactory.fromDefaultMicrophone(sampleRate, bufferSize, 0);
-            percussionDetector = new PercussionOnsetDetector(sampleRate, bufferSize,
+        percussionDetector = new PercussionOnsetDetector(sampleRate, bufferSize,
                 new OnsetHandler() {
 
                     @Override
@@ -53,16 +51,24 @@ public class ClapHandler {
                 },
                 sensitivity,
                 threshold);
-        }
     }
+
+    public boolean isRunning() { return isRunning; }
 
     public void setListener(ClapListener clapListener){ listener = clapListener; }
 
     public void startDetectingClaps(){
+        // init the audio system
+        if (sampleRate != -1 && bufferSize != -1) {
+            dispatcher = AudioDispatcherFactory.fromDefaultMicrophone(sampleRate, bufferSize, 0);
+
+        }
         if(dispatcher != null && percussionDetector != null) {
             dispatcher.addAudioProcessor(percussionDetector);
             // note: be careful not to call this multiple times or there'll be conflicts among threads
             new Thread(dispatcher).start();
+            isRunning = true;
+            Log.d(TAG, "AudioDispacher thread started");
         }
     }
 
@@ -70,6 +76,8 @@ public class ClapHandler {
         if(dispatcher != null && percussionDetector != null) {
             dispatcher.stop();
             dispatcher.removeAudioProcessor(percussionDetector);
+            isRunning = false;
+            Log.d(TAG, "AudioDispacher stopped");
         }
     }
 

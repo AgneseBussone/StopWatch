@@ -118,11 +118,19 @@ public class MainActivity extends AppCompatActivity {
                 setCenterBtnFeedback(context, key);
             }
             else if(key.equals(context.getString(R.string.KEY_START_STOP))) {
+                // if clap mode was selected, shut down the audio thread
+                if(start_stop_mode == Mode.CLAP)
+                    if(clapHandler != null && clapHandler.isRunning())
+                        clapHandler.stopDetectingClaps();
                 start_stop_mode = setMode(context, key);
                 setModeTv();
                 registerSensorsListener();
             }
             else if(key.equals(context.getString(R.string.KEY_LAP))) {
+                // if clap mode was selected, shut down the audio thread
+                if(lap_mode == Mode.CLAP)
+                    if(clapHandler != null && clapHandler.isRunning())
+                        clapHandler.stopDetectingClaps();
                 lap_mode = setMode(context, key);
                 registerSensorsListener();
             }
@@ -722,8 +730,9 @@ public class MainActivity extends AppCompatActivity {
                     SensorManager.SENSOR_DELAY_NORMAL);
         //clap "sensor"
         if(start_stop_mode == Mode.CLAP || lap_mode == Mode.CLAP){
-            if(clapHandler == null) {
+            if(clapHandler == null)
                 clapHandler = new ClapHandler(this);
+            if(!clapHandler.isRunning()) {
                 clapHandler.setListener(clapListener);
                 clapHandler.startDetectingClaps();
             }
